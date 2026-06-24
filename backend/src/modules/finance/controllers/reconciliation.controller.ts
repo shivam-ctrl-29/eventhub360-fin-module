@@ -3,7 +3,7 @@ import { ReconciliationService } from '../services/reconciliation.service'
 import { PaginationDto } from '../dto/pagination.dto'
 import { ok, paginated } from '../../../shared/response.helper'
 
-const DEMO_USER = 'system'
+const DEMO_USER = '1'
 
 @Controller('fin/reconciliation')
 export class ReconciliationController {

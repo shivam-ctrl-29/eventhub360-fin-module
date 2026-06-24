@@ -5,6 +5,8 @@ import { Payout } from '../entities/payout-schedule.entity'
 import { PaginationDto } from '../dto/pagination.dto'
 import { AuditService } from './audit.service'
 
+const safeId = (userId: string) => (userId && /^\d+$/.test(userId) ? userId : '1')
+
 @Injectable()
 export class PayableService {
   constructor(
@@ -13,18 +15,13 @@ export class PayableService {
   ) {}
 
   async getBills(_params: PaginationDto & { status?: string }) {
-    // Vendor bills live in a different module; return empty until cross-module integration
     return { data: [], total: 0 }
   }
 
   async getPayoutSchedule(params: PaginationDto) {
     const { page = 1, limit = 20 } = params
     try {
-      const [rows, total] = await this.payoutRepo.findAndCount({
-        order: { scheduledDate: 'ASC' },
-        skip: (page - 1) * limit,
-        take: limit,
-      })
+      const [rows, total] = await this.payoutRepo.findAndCount({ order: { scheduledDate: 'ASC' }, skip: (page - 1) * limit, take: limit })
       return { data: rows.map(this.formatPayout), total }
     } catch {
       return { data: [], total: 0 }
@@ -32,9 +29,10 @@ export class PayableService {
   }
 
   async approvePayouts(ids: string[], userId: string) {
+    const uid = safeId(userId)
     try {
-      await this.payoutRepo.update({ payoutId: In(ids) }, { status: 'approved', updatedBy: userId })
-      await this.audit.log(userId, 'APPROVE_PAYOUTS', 'payout', ids[0], `${ids.length} payouts approved`, 'success')
+      await this.payoutRepo.update({ payoutId: In(ids) }, { status: 'approved', updatedBy: uid })
+      await this.audit.log(uid, 'APPROVE_PAYOUTS', 'payout', ids[0], `${ids.length} payouts approved`, 'success')
       return { approved: ids.length }
     } catch {
       return { approved: 0 }
@@ -42,9 +40,10 @@ export class PayableService {
   }
 
   async disburse(ids: string[], userId: string) {
+    const uid = safeId(userId)
     try {
-      await this.payoutRepo.update({ payoutId: In(ids) }, { status: 'paid', paidAt: new Date(), updatedBy: userId })
-      await this.audit.log(userId, 'DISBURSE_PAYOUTS', 'payout', ids[0], `${ids.length} payouts disbursed`, 'success')
+      await this.payoutRepo.update({ payoutId: In(ids) }, { status: 'paid', paidAt: new Date(), updatedBy: uid })
+      await this.audit.log(uid, 'DISBURSE_PAYOUTS', 'payout', ids[0], `${ids.length} payouts disbursed`, 'success')
       return { disbursed: ids.length }
     } catch {
       return { disbursed: 0 }
@@ -53,13 +52,9 @@ export class PayableService {
 
   private formatPayout(p: Payout) {
     return {
-      id: p.payoutId,
-      vendorInvoiceId: p.vendorInvoiceId,
-      amount: Number(p.amount),
-      scheduledDate: p.scheduledDate,
-      status: p.status,
-      paidAt: p.paidAt,
-      createdAt: p.createdAt,
+      id: p.payoutId, vendorInvoiceId: p.vendorInvoiceId,
+      amount: Number(p.amount), scheduledDate: p.scheduledDate,
+      status: p.status, paidAt: p.paidAt, createdAt: p.createdAt,
     }
   }
 }

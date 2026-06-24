@@ -22,7 +22,7 @@ export class AuditService {
   ) {
     try {
       const entry = this.repo.create({
-        userId, action, entity, entityId, description, severity, ipAddress, metadata,
+        userId, action, entity, entityId, description, severity, ipAddress,
       })
       await this.repo.save(entry)
     } catch {

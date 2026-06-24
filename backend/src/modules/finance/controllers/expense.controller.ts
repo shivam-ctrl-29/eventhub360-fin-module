@@ -1,13 +1,18 @@
 import { Controller, Get, Post, Param, Body, Query } from '@nestjs/common'
 import { ExpenseService } from '../services/expense.service'
-import { ExpenseListDto, RejectExpenseDto } from '../dto/expense.dto'
+import { ExpenseListDto, RejectExpenseDto, CreateExpenseDto } from '../dto/expense.dto'
 import { ok, paginated } from '../../../shared/response.helper'
 
-const DEMO_USER = 'system'
+const DEMO_USER = '1'
 
 @Controller('fin/expenses')
 export class ExpenseController {
   constructor(private readonly svc: ExpenseService) {}
+
+  @Post()
+  async create(@Body() dto: CreateExpenseDto) {
+    return ok(await this.svc.create(dto, DEMO_USER), 'Expense created')
+  }
 
   @Get()
   async list(@Query() params: ExpenseListDto) {

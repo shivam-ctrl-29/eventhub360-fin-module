@@ -3,7 +3,7 @@ import { PaymentService } from '../services/payment.service'
 import { RecordPaymentDto, PaymentListDto } from '../dto/payment.dto'
 import { ok, paginated } from '../../../shared/response.helper'
 
-const DEMO_USER = 'system'
+const DEMO_USER = '1'
 
 @Controller('fin/payments')
 export class PaymentController {

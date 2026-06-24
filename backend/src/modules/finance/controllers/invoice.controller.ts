@@ -5,7 +5,7 @@ import { InvoiceService } from '../services/invoice.service'
 import { CreateInvoiceDto, InvoiceListDto, CreateCreditNoteDto } from '../dto/invoice.dto'
 import { ok, paginated } from '../../../shared/response.helper'
 
-const DEMO_USER = 'system'
+const DEMO_USER = '1'
 
 @Controller('fin/invoices')
 export class InvoiceController {
