@@ -31,8 +31,8 @@ export default function ExpenseApproval() {
 
   const filtered = search
     ? expenses.filter((e) =>
-        e.employeeName.toLowerCase().includes(search.toLowerCase()) ||
-        e.description.toLowerCase().includes(search.toLowerCase())
+        ((e as any).employeeName ?? e.description ?? '').toLowerCase().includes(search.toLowerCase()) ||
+        (e.description ?? '').toLowerCase().includes(search.toLowerCase())
       )
     : expenses
 
@@ -151,7 +151,8 @@ export default function ExpenseApproval() {
 
         {!isLoading && filtered.map((e, i) => {
           const isCompliant = e.amount <= POLICY_THRESHOLD
-          const initials = e.employeeName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+          const empName = (e as any).employeeName ?? e.category ?? 'EX'
+          const initials = empName.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
           return (
             <div key={e.id} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 120px 160px 140px', padding: '16px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -159,7 +160,7 @@ export default function ExpenseApproval() {
                   {initials}
                 </div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{e.employeeName}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{empName}</div>
                   <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'capitalize' }}>{e.category.replace('_', ' ')}</div>
                 </div>
               </div>
@@ -170,8 +171,8 @@ export default function ExpenseApproval() {
               </span>
               {e.status === 'pending' && can('expense.approve') && (
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <button onClick={() => handleApprove(e.id, e.employeeName)} style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Approve</button>
-                  <button onClick={() => handleReject(e.id, e.employeeName)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#DC2626', fontSize: 11, cursor: 'pointer' }}>Reject</button>
+                  <button onClick={() => handleApprove(e.id, empName)} style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Approve</button>
+                  <button onClick={() => handleReject(e.id, empName)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#DC2626', fontSize: 11, cursor: 'pointer' }}>Reject</button>
                 </div>
               )}
               {e.status !== 'pending' && (
