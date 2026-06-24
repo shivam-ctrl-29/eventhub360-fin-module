@@ -192,13 +192,13 @@ export default function PaymentList() {
           const statusStyle = STATUS_COLORS[p.status] ?? { bg: '#F1F5F9', color: '#475569' }
           return (
             <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '140px 1.5fr 140px 130px 130px 110px 110px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#8B1A1A' }}>{p.paymentNumber}</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{p.customerName}</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{p.invoiceNumber}</div>
-              <div><span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: modeStyle.bg, color: modeStyle.color, textTransform: 'uppercase' }}>{p.paymentMode.replace('_', ' ')}</span></div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#8B1A1A' }}>{(p as any).paymentNumber ?? `PAY-${p.id}`}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{(p as any).customerName ?? `Invoice #${p.invoiceId}`}</div>
+              <div style={{ fontSize: 11, color: '#64748b' }}>{(p as any).invoiceNumber ?? (p as any).invoiceId ?? '—'}</div>
+              <div><span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: modeStyle.bg, color: modeStyle.color, textTransform: 'uppercase' }}>{((p as any).paymentMode ?? p.mode ?? '—').replace('_', ' ')}</span></div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(p.amount)}</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{dayjs(p.paymentDate).format('MMM DD, YYYY')}</div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: statusStyle.bg, color: statusStyle.color, textTransform: 'capitalize' }}>{p.status}</span>
+              <div style={{ fontSize: 11, color: '#64748b' }}>{dayjs((p as any).paymentDate ?? (p as any).paidAt ?? p.createdAt).format('MMM DD, YYYY')}</div>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: statusStyle.bg, color: statusStyle.color, textTransform: 'capitalize' }}>{(p as any).status ?? 'completed'}</span>
             </div>
           )
         })}

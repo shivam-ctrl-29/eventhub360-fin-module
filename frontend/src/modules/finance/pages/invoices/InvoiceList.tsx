@@ -147,11 +147,11 @@ export default function InvoiceList() {
           return (
             <div key={inv.id} style={{ display: 'grid', gridTemplateColumns: '140px 1.5fr 1.5fr 100px 100px 130px 100px 80px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#8B1A1A' }}>{inv.invoiceNumber}</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{inv.customer.name}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{(inv as any).customer?.name ?? '—'}</div>
               <div style={{ fontSize: 11, color: '#64748b' }}>—</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{dayjs(inv.issueDate).format('MMM DD, YYYY')}</div>
-              <div style={{ fontSize: 11, color: inv.status === 'overdue' ? '#DC2626' : '#64748b', fontWeight: inv.status === 'overdue' ? 600 : 400 }}>{dayjs(inv.dueDate).format('MMM DD, YYYY')}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(inv.grandTotal)}</div>
+              <div style={{ fontSize: 11, color: '#64748b' }}>{(inv as any).issueDate ? dayjs((inv as any).issueDate).format('MMM DD, YYYY') : dayjs(inv.createdAt).format('MMM DD, YYYY')}</div>
+              <div style={{ fontSize: 11, color: inv.status === 'overdue' ? '#DC2626' : '#64748b', fontWeight: inv.status === 'overdue' ? 600 : 400 }}>{(inv as any).dueDate ? dayjs((inv as any).dueDate).format('MMM DD, YYYY') : '—'}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR((inv as any).grandTotal ?? inv.total)}</div>
               <div>
                 <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: style.bg, color: style.color, textTransform: 'capitalize' }}>
                   {inv.status}

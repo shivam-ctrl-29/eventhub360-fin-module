@@ -103,7 +103,7 @@ export default function ReconciliationDesk() {
                   <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                     <select onChange={(e) => handleMatch(entry.id, e.target.value)} style={{ flex: 1, padding: '6px 10px', border: '1px solid #E8E0D8', borderRadius: 6, fontSize: 11, color: '#334155', outline: 'none' }}>
                       <option value="">— Match to Invoice —</option>
-                      {invoices.map((inv) => <option key={inv.id} value={inv.id}>{inv.invoiceNumber} · {inv.customer?.name ?? ''} · {formatINR(inv.grandTotal)}</option>)}
+                      {invoices.map((inv) => <option key={inv.id} value={inv.id}>{inv.invoiceNumber} · {(inv as any).customer?.name ?? ''} · {formatINR((inv as any).grandTotal ?? inv.total)}</option>)}
                     </select>
                     <button onClick={() => handleSettle(entry.id)} disabled={!localMatched[entry.id]} style={{ width: 32, height: 32, borderRadius: 6, border: 'none', background: localMatched[entry.id] ? '#8B1A1A' : '#F1F5F9', color: localMatched[entry.id] ? '#fff' : '#94a3b8', cursor: localMatched[entry.id] ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <LinkOutlined style={{ fontSize: 13 }} />
@@ -133,7 +133,7 @@ export default function ReconciliationDesk() {
                   <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>{inv.customer?.name ?? ''}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2a4a' }}>{formatINR(inv.grandTotal)}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2a4a' }}>{formatINR((inv as any).grandTotal ?? inv.total)}</div>
                   <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: isMatched ? '#DBEAFE' : '#FEF3C7', color: isMatched ? '#1E40AF' : '#92400E' }}>
                     {isMatched ? 'Matched' : 'Pending'}
                   </span>

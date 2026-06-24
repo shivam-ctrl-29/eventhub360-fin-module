@@ -87,10 +87,10 @@ export default function PayoutSchedule() {
             <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '36px 120px 1.5fr 130px 110px 100px 80px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB', opacity: p.status === 'disbursed' ? 0.7 : 1 }}>
               <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(p.id)} style={{ cursor: 'pointer', accentColor: '#8B1A1A' }} />
               <div style={{ fontSize: 12, fontWeight: 700, color: '#8B1A1A' }}>{p.id.slice(0, 12)}</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{p.vendorName}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{(p as any).vendorName ?? (p as any).vendorInvoiceId ?? 'Vendor'}</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(p.amount)}</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{dayjs(p.scheduledDate).format('MMM DD, YYYY')}</div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: prStyle.bg, color: prStyle.color, textTransform: 'capitalize' }}>{p.priority}</span>
+              <div style={{ fontSize: 11, color: '#64748b' }}>{(p as any).scheduledDate ? dayjs((p as any).scheduledDate).format('MMM DD, YYYY') : '—'}</div>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: prStyle.bg, color: prStyle.color, textTransform: 'capitalize' }}>{(p as any).priority ?? 'normal'}</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: p.status === 'disbursed' ? '#059669' : '#94a3b8', display: 'flex', alignItems: 'center', gap: 4, textTransform: 'capitalize' }}>
                 {p.status === 'disbursed' ? <><CheckOutlined style={{ fontSize: 11 }} /> Done</> : p.status}
               </span>
