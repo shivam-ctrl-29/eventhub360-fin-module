@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Invoice, InvoiceLine } from '../entities/invoice.entity'
+import { CreditNote } from '../entities/credit-note.entity'
 import { CreateInvoiceDto, InvoiceListDto } from '../dto/invoice.dto'
 import { AuditService } from './audit.service'
 
@@ -14,6 +15,7 @@ export class InvoiceService {
   constructor(
     @InjectRepository(Invoice) private readonly invoiceRepo: Repository<Invoice>,
     @InjectRepository(InvoiceLine) private readonly lineRepo: Repository<InvoiceLine>,
+    @InjectRepository(CreditNote) private readonly creditNoteRepo: Repository<CreditNote>,
     private readonly audit: AuditService,
   ) {}
 
@@ -86,7 +88,21 @@ export class InvoiceService {
     }
   }
 
-  async getCreditNotes(_params: InvoiceListDto) { return { data: [], total: 0 } }
+  async getCreditNotes(params: InvoiceListDto) {
+    const { page = 1, limit = 20 } = params
+    try {
+      const [rows, total] = await this.creditNoteRepo.findAndCount({
+        order: { createdAt: 'DESC' }, skip: (page - 1) * limit, take: limit,
+      })
+      return {
+        data: rows.map((cn) => ({
+          id: cn.creditNoteId, invoiceId: cn.invoiceId,
+          amount: Number(cn.amount), reason: cn.reason, createdAt: cn.createdAt,
+        })),
+        total,
+      }
+    } catch { return { data: [], total: 0 } }
+  }
   async getDebitNotes(_params: InvoiceListDto) { return { data: [], total: 0 } }
 
   private format(inv: Invoice) {

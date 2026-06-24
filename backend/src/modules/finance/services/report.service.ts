@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Invoice } from '../entities/invoice.entity'
 import { Payment } from '../entities/payment.entity'
+import { Expense } from '../entities/expense.entity'
 import { AuditService } from './audit.service'
 import { PaginationDto } from '../dto/pagination.dto'
 
@@ -11,6 +12,7 @@ export class ReportService {
   constructor(
     @InjectRepository(Invoice) private readonly invoiceRepo: Repository<Invoice>,
     @InjectRepository(Payment) private readonly paymentRepo: Repository<Payment>,
+    @InjectRepository(Expense) private readonly expenseRepo: Repository<Expense>,
     private readonly audit: AuditService,
   ) {}
 
@@ -33,9 +35,12 @@ export class ReportService {
 
   async getEventPnL(eventId?: string) {
     try {
-      const invoices = await this.invoiceRepo.find()
+      const [invoices, expenses] = await Promise.all([
+        this.invoiceRepo.find(),
+        this.expenseRepo.find({ where: { status: 'approved' } }),
+      ])
       const totalRevenue = invoices.reduce((s, i) => s + Number(i.total), 0)
-      const totalExpenses = Math.round(totalRevenue * 0.65 * 100) / 100
+      const totalExpenses = expenses.reduce((s, e) => s + Number(e.amount), 0)
       const netProfit = Math.round((totalRevenue - totalExpenses) * 100) / 100
       const netMargin = totalRevenue > 0 ? Math.round((netProfit / totalRevenue) * 1000) / 10 : 0
       return {
@@ -49,7 +54,9 @@ export class ReportService {
         grossMargin: netMargin,
         netProfit,
         netMargin,
-        lineItems: [],
+        lineItems: expenses.map((e) => ({
+          category: e.category, description: e.description, amount: Number(e.amount),
+        })),
       }
     } catch {
       return {
@@ -113,8 +120,28 @@ export class ReportService {
     }
   }
 
-  async getARAgingEntries(_params: PaginationDto) {
-    return { data: [], total: 0 }
+  async getARAgingEntries(params: PaginationDto) {
+    const { page = 1, limit = 20 } = params
+    try {
+      const now = new Date()
+      const [invoices, total] = await this.invoiceRepo.findAndCount({
+        where: { status: 'Issued' },
+        order: { createdAt: 'DESC' },
+        skip: (page - 1) * limit,
+        take: limit,
+      })
+      return {
+        data: invoices.map((inv) => {
+          const days = Math.floor((now.getTime() - new Date(inv.updatedAt).getTime()) / 86400000)
+          const bucket = days <= 0 ? 'Current' : days <= 30 ? '1-30 days' : days <= 60 ? '31-60 days' : days <= 90 ? '61-90 days' : '90+ days'
+          return {
+            id: inv.invoiceId, invoiceNo: inv.invoiceNo,
+            amount: Number(inv.balance), daysOutstanding: days, bucket,
+          }
+        }),
+        total,
+      }
+    } catch { return { data: [], total: 0 } }
   }
 
   async getDunningQueue(_params: PaginationDto) {
