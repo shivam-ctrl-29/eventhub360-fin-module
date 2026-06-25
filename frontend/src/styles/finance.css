@@ -1,0 +1,343 @@
+/* ── EventHub 360 — Finance Module Global Styles ── */
+
+:root {
+  --color-primary: #8B1A1A;
+  --color-primary-hover: #6e1515;
+  --color-primary-light: rgba(139, 26, 26, 0.08);
+  --color-gold: #C4A24D;
+  --color-gold-light: rgba(196, 162, 77, 0.15);
+  --color-bg: #F5F0EB;
+  --color-white: #FFFFFF;
+  --color-text: #334155;
+  --color-heading: #1a2a4a;
+  --color-green: #059669;
+  --color-red: #DC2626;
+  --color-border: #E8E0D8;
+  --sidebar-width: 220px;
+  --copilot-width: 280px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Layout ── */
+.eh-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.eh-sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  background: var(--color-white);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+}
+
+.eh-main {
+  margin-left: var(--sidebar-width);
+  margin-right: var(--copilot-width);
+  flex: 1;
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--color-bg);
+}
+
+.eh-copilot {
+  width: var(--copilot-width);
+  min-height: 100vh;
+  background: var(--color-white);
+  border-left: 1px solid var(--color-border);
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  padding: 20px 16px;
+  overflow-y: auto;
+}
+
+/* ── Sidebar Brand ── */
+.eh-brand {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.eh-brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.eh-brand-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* ── KPI Cards ── */
+.eh-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.eh-kpi-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.eh-kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.eh-kpi-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-heading);
+  line-height: 1.2;
+}
+
+.eh-kpi-delta {
+  font-size: 12px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.eh-kpi-delta.positive { color: var(--color-green); }
+.eh-kpi-delta.negative { color: var(--color-red); }
+.eh-kpi-delta.warning  { color: var(--color-gold); }
+
+/* ── Cards / Panels ── */
+.eh-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.eh-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-heading);
+  margin-bottom: 4px;
+}
+
+.eh-card-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+/* ── Status Badges ── */
+.eh-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.eh-badge-pending   { background: #FEF3C7; color: #92400E; }
+.eh-badge-paid      { background: #D1FAE5; color: #065F46; }
+.eh-badge-overdue   { background: #FEE2E2; color: #991B1B; }
+.eh-badge-delinquent{ background: #FEE2E2; color: #991B1B; }
+.eh-badge-current   { background: #DBEAFE; color: #1E40AF; }
+.eh-badge-draft     { background: #F1F5F9; color: #475569; }
+.eh-badge-approved  { background: #D1FAE5; color: #065F46; }
+.eh-badge-compliant { background: #D1FAE5; color: #065F46; }
+.eh-badge-policy    { background: #FEE2E2; color: #991B1B; }
+
+/* ── Amount Display ── */
+.eh-amount { font-variant-numeric: tabular-nums; }
+.eh-amount-positive { color: var(--color-green); font-weight: 600; }
+.eh-amount-negative { color: var(--color-red);   font-weight: 600; }
+
+/* ── AI Copilot Panel ── */
+.eh-copilot-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.eh-copilot-avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--color-gold-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gold);
+  font-size: 16px;
+}
+
+.eh-copilot-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-gold);
+}
+
+.eh-copilot-sub {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.eh-copilot-alert {
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #78350F;
+}
+
+.eh-copilot-alert-title {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.eh-copilot-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  margin: 16px 0 10px;
+}
+
+.eh-copilot-input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 36px 10px 12px;
+  font-size: 12px;
+  background: #F8F5F1;
+  outline: none;
+  color: var(--color-text);
+  margin-top: 16px;
+  position: relative;
+}
+
+.eh-copilot-input:focus {
+  border-color: var(--color-primary);
+}
+
+/* ── Progress Bars ── */
+.eh-progress-bar {
+  height: 8px;
+  background: #F1F5F9;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+
+.eh-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.eh-progress-fill.primary { background: var(--color-primary); }
+.eh-progress-fill.gold    { background: var(--color-gold); }
+.eh-progress-fill.green   { background: var(--color-green); }
+.eh-progress-fill.light   { background: #E2C4C4; }
+
+/* ── Page Header ── */
+.eh-page-header {
+  margin-bottom: 24px;
+}
+
+.eh-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-heading);
+  line-height: 1.2;
+}
+
+.eh-page-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+/* ── Search Bar ── */
+.eh-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: #94a3b8;
+  cursor: text;
+}
+
+/* ── Tables ── */
+.eh-table-wrapper {
+  background: var(--color-white);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+/* ── Utility ── */
+.eh-flex { display: flex; }
+.eh-flex-col { display: flex; flex-direction: column; }
+.eh-items-center { align-items: center; }
+.eh-justify-between { justify-content: space-between; }
+.eh-gap-2 { gap: 8px; }
+.eh-gap-4 { gap: 16px; }
+.eh-mb-4 { margin-bottom: 16px; }
+.eh-mb-6 { margin-bottom: 24px; }
+.eh-text-sm { font-size: 12px; }
+.eh-text-xs { font-size: 11px; }
+.eh-font-bold { font-weight: 700; }
+.eh-text-muted { color: #94a3b8; }
+.eh-text-primary { color: var(--color-primary); }
+.eh-text-gold { color: var(--color-gold); }
+.eh-text-green { color: var(--color-green); }
+.eh-text-red { color: var(--color-red); }

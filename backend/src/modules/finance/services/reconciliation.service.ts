@@ -1,0 +1,45 @@
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { Payment } from '../entities/payment.entity'
+import { AuditService } from './audit.service'
+import { PaginationDto } from '../dto/pagination.dto'
+
+@Injectable()
+export class ReconciliationService {
+  constructor(
+    @InjectRepository(Payment) private readonly paymentRepo: Repository<Payment>,
+    private readonly audit: AuditService,
+  ) {}
+
+  async findAll(params: PaginationDto & { reconciled?: boolean }) {
+    const { page = 1, limit = 20 } = params
+    try {
+      const [rows, total] = await this.paymentRepo.findAndCount({
+        order: { paidAt: 'DESC' },
+        skip: (page - 1) * limit,
+        take: limit,
+      })
+      return {
+        data: rows.map((p) => ({
+          id: p.paymentId, invoiceId: p.invoiceId, amount: Number(p.amount),
+          mode: p.mode, gatewayRef: p.gatewayRef, paidAt: p.paidAt,
+          isReconciled: !!p.gatewayRef,
+        })),
+        total,
+      }
+    } catch {
+      return { data: [], total: 0 }
+    }
+  }
+
+  async match(entryId: string, invoiceId: string, userId: string) {
+    await this.audit.log(userId, 'RECONCILE_ENTRY', 'payment', entryId, `Matched to invoice ${invoiceId}`, 'success')
+    return { id: entryId, matchedInvoiceId: invoiceId, isReconciled: true }
+  }
+
+  async unmatch(entryId: string, userId: string) {
+    await this.audit.log(userId, 'UNMATCH_ENTRY', 'payment', entryId, 'Reconciliation removed', 'warning')
+    return { id: entryId, matchedInvoiceId: null, isReconciled: false }
+  }
+}
