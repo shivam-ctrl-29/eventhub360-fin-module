@@ -61,8 +61,9 @@ export default function CreditDebitNote() {
   const creditNotes = creditPage?.data ?? []
   const debitNotes  = debitPage?.data ?? []
 
-  const creditTotal = creditNotes.reduce((s, n) => s + n.grandTotal, 0)
-  const debitTotal  = debitNotes.reduce((s, n) => s + n.grandTotal, 0)
+  const amountOf = (n: any) => Number(n.grandTotal ?? n.amount ?? 0)
+  const creditTotal = creditNotes.reduce((s, n) => s + amountOf(n), 0)
+  const debitTotal  = debitNotes.reduce((s, n) => s + amountOf(n), 0)
 
   const handleCreate = () => {
     if (!formData.refInvoice || !formData.amount) {
@@ -106,8 +107,8 @@ export default function CreditDebitNote() {
   type NoteRow = { id: string; noteNumber: string; type: 'Credit' | 'Debit'; refNumber: string; clientOrVendor: string; reason: string; grandTotal: number; date: string; status: string }
 
   const allNotes: NoteRow[] = [
-    ...creditNotes.map((n) => ({ id: n.id, noteNumber: n.creditNoteNumber, type: 'Credit' as const, refNumber: n.originalInvoiceNumber, clientOrVendor: n.customerName, reason: n.reason, grandTotal: n.grandTotal, date: n.date, status: n.status })),
-    ...debitNotes.map((n)  => ({ id: n.id, noteNumber: n.debitNoteNumber,  type: 'Debit'  as const, refNumber: n.originalInvoiceNumber, clientOrVendor: n.vendorName,   reason: n.reason, grandTotal: n.grandTotal, date: n.date, status: n.status })),
+    ...creditNotes.map((n: any) => ({ id: String(n.id), noteNumber: n.creditNoteNumber ?? `CN-${n.id}`, type: 'Credit' as const, refNumber: n.originalInvoiceNumber ?? `#${n.invoiceId ?? ''}`, clientOrVendor: n.customerName ?? '—', reason: n.reason ?? '', grandTotal: amountOf(n), date: n.date ?? n.createdAt, status: n.status ?? 'issued' })),
+    ...debitNotes.map((n: any)  => ({ id: String(n.id), noteNumber: n.debitNoteNumber ?? `DN-${n.id}`,  type: 'Debit'  as const, refNumber: n.originalInvoiceNumber ?? `#${n.invoiceId ?? ''}`, clientOrVendor: n.vendorName ?? '—',   reason: n.reason ?? '', grandTotal: amountOf(n), date: n.date ?? n.createdAt, status: n.status ?? 'issued' })),
   ].sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
 
   return (
