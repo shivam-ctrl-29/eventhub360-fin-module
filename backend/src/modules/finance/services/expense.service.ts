@@ -71,15 +71,26 @@ export class ExpenseService {
   }
 
   async getBudgetVsActual(_params: { month: string; year: number }) {
-    return [
-      { category: 'food_beverage', budgeted: 150000, actual: 0, variance: 150000 },
-      { category: 'logistics',     budgeted: 80000,  actual: 0, variance: 80000  },
-      { category: 'travel',        budgeted: 50000,  actual: 0, variance: 50000  },
-      { category: 'marketing',     budgeted: 100000, actual: 0, variance: 100000 },
-      { category: 'venue',         budgeted: 200000, actual: 0, variance: 200000 },
-      { category: 'decor',         budgeted: 120000, actual: 0, variance: 120000 },
-      { category: 'miscellaneous', budgeted: 30000,  actual: 0, variance: 30000  },
-    ]
+    // Actual spend is the real approved-expense total per category.
+    // No budget table exists yet, so budgeted is 0 (not fabricated).
+    const categories = ['food_beverage', 'logistics', 'travel', 'marketing', 'venue', 'decor', 'miscellaneous']
+    try {
+      const rows = await this.repo
+        .createQueryBuilder('e')
+        .select('e.category', 'category')
+        .addSelect('SUM(e.amount)', 'actual')
+        .where('e.status = :status', { status: 'approved' })
+        .groupBy('e.category')
+        .getRawMany()
+      const actualByCat: Record<string, number> = {}
+      for (const r of rows) actualByCat[r.category] = Number(r.actual)
+      return categories.map((category) => {
+        const actual = actualByCat[category] ?? 0
+        return { category, budgeted: 0, actual, variance: 0 - actual }
+      })
+    } catch {
+      return categories.map((category) => ({ category, budgeted: 0, actual: 0, variance: 0 }))
+    }
   }
 
   private format(e: Expense) {
