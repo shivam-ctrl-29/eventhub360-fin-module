@@ -43,6 +43,20 @@ export default function ReconciliationDesk() {
     })
   }
 
+  const autoReconcile = async () => {
+    const unmatched = entries.filter((e) => !e.isReconciled)
+    if (unmatched.length === 0) { message.info('Nothing left to reconcile'); return }
+    let matched = 0
+    for (const e of unmatched) {
+      const inv = invoices.find((i) => Math.round(((i as any).grandTotal ?? (i as any).total ?? 0)) === Math.round((e as any).amount ?? 0))
+      if (inv) {
+        try { await matchMutation.mutateAsync({ entryId: e.id, invoiceId: inv.id }); matched++ } catch { /* skip */ }
+      }
+    }
+    if (matched > 0) message.success(`Auto-reconciled ${matched} of ${unmatched.length} entries`)
+    else message.warning('No matching invoices found for the open entries')
+  }
+
   const isLoading = entriesLoading || invoicesLoading
 
   const unmatchedCount  = entries.filter((e) => !e.isReconciled).length
@@ -142,7 +156,7 @@ export default function ReconciliationDesk() {
             )
           })}
           <div style={{ padding: '14px 20px', borderTop: '1px solid #E8E0D8' }}>
-            <button style={{ width: '100%', padding: '9px 0', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={autoReconcile} style={{ width: '100%', padding: '9px 0', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
               Auto-Reconcile All
             </button>
           </div>

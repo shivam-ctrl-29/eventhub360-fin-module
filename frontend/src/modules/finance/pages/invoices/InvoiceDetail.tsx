@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { DownloadOutlined, EditOutlined, PrinterOutlined } from '@ant-design/icons'
-import { Skeleton, Alert } from 'antd'
+import { Skeleton, Alert, message } from 'antd'
 import { useInvoice } from '../../hooks/useInvoices'
 import { formatINR } from '../../utils/currencyFormatter'
 import dayjs from 'dayjs'
@@ -32,8 +32,8 @@ export default function InvoiceDetail() {
           <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2a4a' }}>Invoice {invoice.invoiceNumber}</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}><PrinterOutlined /> Print</button>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}><DownloadOutlined /> PDF</button>
+          <button onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}><PrinterOutlined /> Print</button>
+          <button onClick={() => { message.info('Use the print dialog and choose "Save as PDF"'); window.print() }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}><DownloadOutlined /> PDF</button>
           <button onClick={() => navigate(`/finance/invoices/${id}/edit`)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}><EditOutlined /> Edit</button>
         </div>
       </div>
@@ -51,8 +51,8 @@ export default function InvoiceDetail() {
             <div style={{ fontSize: 28, fontWeight: 800, color: '#1a2a4a', marginBottom: 4 }}>INVOICE</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#8B1A1A' }}>{invoice.invoiceNumber}</div>
             <div style={{ fontSize: 11, color: '#64748b', marginTop: 8, lineHeight: 1.6 }}>
-              Date: {dayjs(invoice.issueDate).format('MMM DD, YYYY')}<br />
-              Due: {dayjs(invoice.dueDate).format('MMM DD, YYYY')}
+              Date: {dayjs((invoice as any).issueDate ?? invoice.createdAt).format('MMM DD, YYYY')}<br />
+              Due: {(invoice as any).dueDate ? dayjs((invoice as any).dueDate).format('MMM DD, YYYY') : '—'}
             </div>
             <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20, background: statusStyle.bg, color: statusStyle.color, marginTop: 8, display: 'inline-block', textTransform: 'capitalize' }}>
               {invoice.status}
@@ -62,9 +62,9 @@ export default function InvoiceDetail() {
 
         <div style={{ background: '#F8F5F1', borderRadius: 8, padding: '14px 16px', marginBottom: 24 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Bill To</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{invoice.customer.name}</div>
-          {invoice.customer.email && <div style={{ fontSize: 11, color: '#64748b', marginTop: 3 }}>{invoice.customer.email}</div>}
-          {invoice.customer.gstin && <div style={{ fontSize: 11, color: '#64748b' }}>GSTIN: {invoice.customer.gstin}</div>}
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{(invoice as any).customer?.name ?? 'Client'}</div>
+          {(invoice as any).customer?.email && <div style={{ fontSize: 11, color: '#64748b', marginTop: 3 }}>{(invoice as any).customer.email}</div>}
+          {(invoice as any).customer?.gstin && <div style={{ fontSize: 11, color: '#64748b' }}>GSTIN: {(invoice as any).customer.gstin}</div>}
         </div>
 
         <div style={{ marginBottom: 24 }}>
@@ -76,7 +76,7 @@ export default function InvoiceDetail() {
               <div style={{ fontSize: 12, color: '#334155' }}>{item.description}</div>
               <div style={{ fontSize: 12, color: '#64748b' }}>{item.quantity}</div>
               <div style={{ fontSize: 12, color: '#64748b' }}>{formatINR(item.unitPrice)}</div>
-              <div style={{ fontSize: 12, color: '#64748b' }}>{item.gstRate}%</div>
+              <div style={{ fontSize: 12, color: '#64748b' }}>{(item as any).gstRate ?? 18}%</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{formatINR(item.total)}</div>
             </div>
           ))}
@@ -84,7 +84,7 @@ export default function InvoiceDetail() {
 
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div style={{ width: 260 }}>
-            {[{ l: 'Subtotal', v: formatINR(invoice.subtotal) }, { l: 'GST Total', v: formatINR(invoice.totalGST) }].map((r) => (
+            {[{ l: 'Subtotal', v: formatINR(invoice.subtotal) }, { l: 'GST Total', v: formatINR((invoice as any).totalGST ?? (invoice as any).taxTotal ?? 0) }].map((r) => (
               <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontSize: 12, color: '#64748b' }}>{r.l}</span>
                 <span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>{r.v}</span>
@@ -92,7 +92,7 @@ export default function InvoiceDetail() {
             ))}
             <div style={{ borderTop: '2px solid #1a2a4a', paddingTop: 10, display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 14, fontWeight: 700, color: '#1a2a4a' }}>Total Due</span>
-              <span style={{ fontSize: 20, fontWeight: 800, color: '#8B1A1A' }}>{formatINR(invoice.grandTotal)}</span>
+              <span style={{ fontSize: 20, fontWeight: 800, color: '#8B1A1A' }}>{formatINR((invoice as any).grandTotal ?? invoice.total)}</span>
             </div>
           </div>
         </div>

@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { CalendarOutlined, CheckOutlined } from '@ant-design/icons'
+import { CalendarOutlined, CheckOutlined, DownloadOutlined } from '@ant-design/icons'
 import { Skeleton, message, Modal } from 'antd'
 import { usePayoutSchedule, useApprovePayouts, useDisburse } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
+import { downloadCSV } from '../../utils/exportHelper'
 import dayjs from 'dayjs'
 
 const PRIORITY_COLORS: Record<string, { bg: string; color: string }> = {
@@ -23,6 +24,25 @@ export default function PayoutSchedule() {
   const approved = payouts.filter((p) => p.status === 'approved')
 
   const toggleSelect = (id: string) => setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])
+
+  const scheduleBatch = () => {
+    const unpaid = payouts.filter((p) => p.status !== 'paid').map((p) => p.id)
+    if (unpaid.length === 0) { message.info('No pending payouts to schedule'); return }
+    setSelected(unpaid)
+    message.success(`${unpaid.length} payout(s) selected — review and confirm below`)
+  }
+
+  const exportSchedule = () => {
+    if (payouts.length === 0) { message.info('No payouts to export'); return }
+    downloadCSV('payout-schedule', payouts.map((p) => ({
+      id: p.id,
+      vendor: (p as any).vendorName ?? (p as any).vendorInvoiceId ?? '',
+      amount: p.amount,
+      status: p.status,
+      scheduledDate: (p as any).scheduledDate ?? '',
+    })))
+    message.success(`Exported ${payouts.length} payouts`)
+  }
 
   const handleApproveDisburse = () => {
     if (selected.length === 0) return
@@ -51,7 +71,7 @@ export default function PayoutSchedule() {
           <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2a4a' }}>Payout Schedule</div>
           <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>Manage and approve vendor payment disbursements</div>
         </div>
-        <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+        <button onClick={scheduleBatch} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
           <CalendarOutlined /> Schedule Batch Payout
         </button>
       </div>
@@ -99,7 +119,7 @@ export default function PayoutSchedule() {
         })}
 
         <div style={{ padding: '14px 20px', borderTop: '1px solid #E8E0D8', display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-          <button style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}>Export Schedule</button>
+          <button onClick={exportSchedule} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}>Export Schedule</button>
           <button onClick={handleApproveDisburse} disabled={selected.length === 0} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: selected.length === 0 ? '#cbd5e1' : '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: selected.length === 0 ? 'not-allowed' : 'pointer' }}>Approve & Disburse ({selected.length})</button>
         </div>
       </div>

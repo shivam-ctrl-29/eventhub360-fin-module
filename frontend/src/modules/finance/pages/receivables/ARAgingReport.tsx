@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { Skeleton, Alert, message } from 'antd'
+import { Skeleton, Alert, message, Modal } from 'antd'
 import { useARAgingSummary, useARAgingEntries } from '../../hooks/useARDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 import { receivableApi } from '../../api/receivableApi'
@@ -20,6 +20,23 @@ export default function ARAgingReport() {
     } catch {
       message.error('Failed to send reminder')
     }
+  }
+
+  const showHistory = (c: any) => {
+    Modal.info({
+      title: c.customerName,
+      content: (
+        <div style={{ fontSize: 13, lineHeight: 1.9 }}>
+          <div>Total outstanding: <b>{formatINR(c.total)}</b></div>
+          <div>Current: {formatINR(c.current)}</div>
+          <div>1–30 days: {formatINR(c.days1to30)}</div>
+          <div>31–60 days: {formatINR(c.days31to60)}</div>
+          <div>61–90 days: {formatINR(c.days61to90)}</div>
+          <div>90+ days: {formatINR(c.days90plus)}</div>
+        </div>
+      ),
+      okButtonProps: { style: { background: '#8B1A1A', borderColor: '#8B1A1A' } },
+    })
   }
   return (
     <div>
@@ -93,7 +110,7 @@ export default function ARAgingReport() {
             <div style={{ fontSize: 12, color: '#334155' }}>{formatINR(c.current)}</div>
             <div style={{ fontSize: 12, color: c.days31to60 > 0 ? '#DC2626' : '#334155', fontWeight: c.days31to60 > 0 ? 700 : 400 }}>{formatINR(c.days31to60)}</div>
             <button onClick={() => handleSendReminder(c.customerId)} style={{ fontSize: 11, padding: '5px 10px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', cursor: 'pointer' }}>Send Reminder</button>
-            <button style={{ fontSize: 11, padding: '5px 10px', borderRadius: 6, border: 'none', background: '#F5F0EB', color: '#64748b', cursor: 'pointer' }}>History</button>
+            <button onClick={() => showHistory(c)} style={{ fontSize: 11, padding: '5px 10px', borderRadius: 6, border: 'none', background: '#F5F0EB', color: '#64748b', cursor: 'pointer' }}>History</button>
           </div>
         ))}
         {!entriesLoading && entries.length === 0 && (

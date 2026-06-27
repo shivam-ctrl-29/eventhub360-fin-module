@@ -6,6 +6,7 @@ import {
 import { Skeleton, message, Modal } from 'antd'
 import { useVendorBills, useApprovePayouts } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
+import { downloadCSV } from '../../utils/exportHelper'
 import dayjs from 'dayjs'
 
 export default function VendorBillList() {
@@ -43,6 +44,12 @@ export default function VendorBillList() {
 
   const totalPayable = bills.reduce((s, b) => s + b.totalAmount, 0)
   const dueToday = bills.filter((b) => dayjs(b.dueDate).isSame(dayjs(), 'day')).reduce((s, b) => s + b.totalAmount, 0)
+
+  const exportQueue = () => {
+    if (bills.length === 0) { message.info('No bills to export'); return }
+    downloadCSV('vendor-bills', bills.map((b) => ({ id: b.id, vendor: (b as any).vendorName ?? '', amount: b.totalAmount, dueDate: (b as any).dueDate ?? '' })))
+    message.success(`Exported ${bills.length} bills`)
+  }
 
   return (
     <div>
@@ -152,7 +159,7 @@ export default function VendorBillList() {
           })}
 
           <div style={{ padding: '14px 20px', borderTop: '1px solid #F5F0EB', display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-            <button style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Export Queue</button>
+            <button onClick={exportQueue} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Export Queue</button>
             <button onClick={handleApprove} disabled={selected.length === 0} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: selected.length === 0 ? '#cbd5e1' : '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: selected.length === 0 ? 'not-allowed' : 'pointer' }}>Approve Selected ({selected.length})</button>
           </div>
         </div>

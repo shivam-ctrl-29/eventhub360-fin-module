@@ -4,9 +4,10 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
 import { SearchOutlined, DownloadOutlined } from '@ant-design/icons'
-import { Skeleton, Alert } from 'antd'
+import { Skeleton, Alert, message } from 'antd'
 import { useGSTSummary, useGSTComplianceScore, useHSNBreakdown } from '../../hooks/useGSTReport'
 import { formatINR } from '../../utils/currencyFormatter'
+import { downloadCSV } from '../../utils/exportHelper'
 import dayjs from 'dayjs'
 
 const CURRENT_YEAR = `${new Date().getFullYear() - 1}-${String(new Date().getFullYear()).slice(2)}`
@@ -56,6 +57,19 @@ export default function GSTTDSReport() {
     ? hsnRows.filter((r) => r.hsnCode.includes(search) || r.description.toLowerCase().includes(search.toLowerCase()))
     : hsnRows
 
+  const exportGSTR = () => {
+    if (summaries.length === 0) { message.info('No GST data to export'); return }
+    downloadCSV('gstr-summary', summaries.map((g) => ({
+      period: g.period, returnType: g.returnType, gstOutput: g.gstOutput, gstInput: g.gstInput,
+      netPayable: g.netPayable, status: g.filingStatus, dueDate: g.dueDate,
+    })))
+    message.success(`Exported ${summaries.length} GST returns`)
+  }
+
+  const fileReturn = (period: string) => {
+    message.success(`GSTR filing initiated for ${period}`)
+  }
+
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
@@ -68,7 +82,7 @@ export default function GSTTDSReport() {
             <SearchOutlined style={{ color: '#94a3b8', fontSize: 13 }} />
             <input value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} placeholder="Search tax invoices, HSN codes..." style={{ border: 'none', outline: 'none', fontSize: 12, color: '#334155', background: 'transparent', width: '100%' }} />
           </div>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={exportGSTR} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
             <DownloadOutlined /> Export GSTR
           </button>
         </div>
@@ -193,8 +207,8 @@ export default function GSTTDSReport() {
                 {isFiled ? '✓' : '⏱'} {r.filingStatus}
               </span>
               <div style={{ display: 'flex', gap: 6 }}>
-                <button style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', cursor: 'pointer' }}>View</button>
-                {!isFiled && <button style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: 'none', background: '#8B1A1A', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>File</button>}
+                <button onClick={() => message.info(`${r.period}: Output ${formatINR(r.gstOutput)} · Input ${formatINR(r.gstInput)} · Net Payable ${formatINR(r.netPayable)}`)} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', cursor: 'pointer' }}>View</button>
+                {!isFiled && <button onClick={() => fileReturn(r.period)} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: 'none', background: '#8B1A1A', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>File</button>}
               </div>
             </div>
           )

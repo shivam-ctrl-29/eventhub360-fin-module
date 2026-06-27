@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { DownloadOutlined, PrinterOutlined } from '@ant-design/icons'
+import { message } from 'antd'
 
 export default function ReceiptView() {
   const { id } = useParams()
@@ -13,8 +14,8 @@ export default function ReceiptView() {
           <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2a4a' }}>Payment Receipt</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}><PrinterOutlined /> Print</button>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}><DownloadOutlined /> Download</button>
+          <button onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}><PrinterOutlined /> Print</button>
+          <button onClick={() => { message.info('Use the print dialog and choose "Save as PDF"'); window.print() }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}><DownloadOutlined /> Download</button>
         </div>
       </div>
 

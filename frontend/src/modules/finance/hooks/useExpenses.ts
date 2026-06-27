@@ -9,6 +9,15 @@ export function useExpenseList(params: TableParams & { status?: string; category
   })
 }
 
+export function useCreateExpense() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: { category: string; description: string; amount: number; submittedDate: string }) =>
+      expenseApi.create(payload).then((r) => r.data.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['finance', 'expenses'] }) },
+  })
+}
+
 export function useApproveExpense() {
   const qc = useQueryClient()
   return useMutation({

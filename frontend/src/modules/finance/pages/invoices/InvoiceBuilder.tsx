@@ -247,7 +247,7 @@ export default function InvoiceBuilder() {
             <button type="submit" disabled={createInvoice.isPending} style={{ width: '100%', padding: '10px 0', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', marginBottom: 8, opacity: createInvoice.isPending ? 0.7 : 1 }}>
               {createInvoice.isPending ? 'Sending...' : 'Send Invoice'}
             </button>
-            <button type="button" style={{ width: '100%', padding: '10px 0', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            <button type="button" onClick={() => { message.info('Use the print dialog and choose "Save as PDF"'); window.print() }} style={{ width: '100%', padding: '10px 0', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               Download PDF
             </button>
           </div>

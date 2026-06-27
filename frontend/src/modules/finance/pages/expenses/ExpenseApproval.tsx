@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useDebounce } from '@shared/hooks/useDebounce'
 import { SearchOutlined, BellOutlined, FilterOutlined } from '@ant-design/icons'
-import { Skeleton, message, Modal } from 'antd'
-import { useExpenseList, useApproveExpense, useRejectExpense } from '../../hooks/useExpenses'
+import { Skeleton, message, Modal, Form, Input, InputNumber, Select, DatePicker } from 'antd'
+import { useExpenseList, useApproveExpense, useRejectExpense, useCreateExpense } from '../../hooks/useExpenses'
 import { usePermissions } from '@shared/hooks/usePermissions'
 import { formatINR } from '../../utils/currencyFormatter'
+import dayjs from 'dayjs'
 
 const CATEGORY_DISPLAY: Record<string, { label: string; icon: string; color: string; bar: string }> = {
   food_beverage: { label: 'F&B',       icon: '🍽️', color: '#FEE2E2', bar: '#8B1A1A' },
@@ -18,16 +19,46 @@ const CATEGORY_DISPLAY: Record<string, { label: string; icon: string; color: str
 
 const POLICY_THRESHOLD = 5000
 
+const STATUS_CYCLE: Array<string | undefined> = [undefined, 'pending', 'approved', 'rejected']
+
 export default function ExpenseApproval() {
   const [localSearch, setLocalSearch] = useState('')
   const search = useDebounce(localSearch, 300)
-  const [statusFilter] = useState<string | undefined>(undefined)
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [form] = Form.useForm()
 
   const { data: page, isLoading } = useExpenseList({ page: 1, limit: 20, status: statusFilter })
   const { can } = usePermissions()
   const approveMutation = useApproveExpense()
   const rejectMutation  = useRejectExpense()
+  const createMutation  = useCreateExpense()
   const expenses = page?.data ?? []
+
+  const cycleFilter = () => {
+    const idx = STATUS_CYCLE.indexOf(statusFilter)
+    const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length]
+    setStatusFilter(next)
+    message.info(next ? `Filtering: ${next}` : 'Showing all expenses')
+  }
+
+  const submitCreate = async () => {
+    try {
+      const v = await form.validateFields()
+      await createMutation.mutateAsync({
+        category: v.category,
+        description: v.description,
+        amount: v.amount,
+        submittedDate: (v.submittedDate ?? dayjs()).format('YYYY-MM-DD'),
+      })
+      message.success('Expense created')
+      setCreateOpen(false)
+      form.resetFields()
+    } catch (e: any) {
+      if (e?.errorFields) return
+      message.error('Failed to create expense')
+    }
+  }
 
   const filtered = search
     ? expenses.filter((e) =>
@@ -88,7 +119,7 @@ export default function ExpenseApproval() {
             <SearchOutlined style={{ color: '#94a3b8', fontSize: 13 }} />
             <input value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} placeholder="Search transactions..." style={{ border: 'none', outline: 'none', fontSize: 12, color: '#334155', background: 'transparent', width: '100%' }} />
           </div>
-          <button style={{ background: '#8B1A1A', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={() => setCreateOpen(true)} style={{ background: '#8B1A1A', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
             + Quick Create
           </button>
           <div style={{ width: 34, height: 34, background: '#fff', border: '1px solid #E8E0D8', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -133,8 +164,8 @@ export default function ExpenseApproval() {
             <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>Employee Reimbursement Claims</div>
             <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Manage and approve multi-step claim workflows.</div>
           </div>
-          <button style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-            <FilterOutlined style={{ fontSize: 11 }} /> Filter
+          <button onClick={cycleFilter} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: statusFilter ? '#FBEAEA' : '#fff', fontSize: 12, color: statusFilter ? '#8B1A1A' : '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, textTransform: 'capitalize' }}>
+            <FilterOutlined style={{ fontSize: 11 }} /> {statusFilter ?? 'Filter'}
           </button>
         </div>
 
@@ -182,6 +213,39 @@ export default function ExpenseApproval() {
           )
         })}
       </div>
+
+      <Modal
+        title="New Expense Claim"
+        open={createOpen}
+        onCancel={() => setCreateOpen(false)}
+        onOk={submitCreate}
+        okText="Create Expense"
+        confirmLoading={createMutation.isPending}
+        okButtonProps={{ style: { background: '#8B1A1A', borderColor: '#8B1A1A' } }}
+      >
+        <Form form={form} layout="vertical" initialValues={{ category: 'venue', submittedDate: dayjs() }}>
+          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
+            <Select options={[
+              { value: 'food_beverage', label: 'Food & Beverage' },
+              { value: 'logistics', label: 'Logistics' },
+              { value: 'travel', label: 'Travel' },
+              { value: 'marketing', label: 'Marketing' },
+              { value: 'venue', label: 'Venue' },
+              { value: 'decor', label: 'Decor' },
+              { value: 'miscellaneous', label: 'Miscellaneous' },
+            ]} />
+          </Form.Item>
+          <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please enter a description' }]}>
+            <Input placeholder="e.g. Conference hall booking" />
+          </Form.Item>
+          <Form.Item name="amount" label="Amount (₹)" rules={[{ required: true, message: 'Please enter an amount' }]}>
+            <InputNumber min={1} style={{ width: '100%' }} placeholder="25000" />
+          </Form.Item>
+          <Form.Item name="submittedDate" label="Date" rules={[{ required: true }]}>
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   )
 }

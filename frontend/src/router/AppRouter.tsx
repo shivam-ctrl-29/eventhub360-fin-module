@@ -8,7 +8,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
     // Seed a dev token so the app is navigable before the login page is built
     if (import.meta.env.DEV) {
       const h = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-      const p = btoa(JSON.stringify({ sub: '1', id: '1', name: 'Shivam Mathur', email: 'admin@demo.in', role: 'admin' }))
+      const p = btoa(JSON.stringify({ sub: '1', id: '1', name: 'Shivam Mathur', email: 'admin@demo.in', role: 'super_admin' }))
       localStorage.setItem('auth_token', `${h}.${p}.dev-sig`)
       window.location.reload()
       return null

@@ -6,6 +6,9 @@ export const expenseApi = {
   list: (params: TableParams & { status?: string; category?: string }) =>
     axiosInstance.get<ApiResponse<PaginatedResponse<Expense>>>('/api/fin/expenses', { params }),
 
+  create: (payload: { category: string; description: string; amount: number; submittedDate: string }) =>
+    axiosInstance.post<ApiResponse<Expense>>('/api/fin/expenses', payload),
+
   approve: (id: string) =>
     axiosInstance.post<ApiResponse<Expense>>(`/api/fin/expenses/${id}/approve`),
 

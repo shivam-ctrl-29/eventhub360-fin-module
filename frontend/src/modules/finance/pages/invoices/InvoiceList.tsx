@@ -8,6 +8,8 @@ import { useDebounce } from '@shared/hooks/useDebounce'
 import { usePermissions } from '@shared/hooks/usePermissions'
 import type { InvoiceStatus } from '../../types/invoice.types'
 import { formatINR } from '../../utils/currencyFormatter'
+import { downloadCSV } from '../../utils/exportHelper'
+import { message, Dropdown } from 'antd'
 import dayjs from 'dayjs'
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
@@ -69,6 +71,17 @@ export default function InvoiceList() {
     setLocalSearch(val)
   }, [])
 
+  const handleExport = () => {
+    if (invoices.length === 0) { message.info('No invoices to export'); return }
+    downloadCSV('invoices', invoices.map((inv) => ({
+      invoiceNumber: inv.invoiceNumber,
+      status: inv.status,
+      total: (inv as any).grandTotal ?? inv.total,
+      createdAt: dayjs(inv.createdAt).format('YYYY-MM-DD'),
+    })))
+    message.success(`Exported ${invoices.length} invoices`)
+  }
+
   return (
     <div>
       {/* Header */}
@@ -78,7 +91,7 @@ export default function InvoiceList() {
           <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>Manage all GST-compliant invoices and proforma documents</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}>
+          <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}>
             <DownloadOutlined /> Export
           </button>
           {can('invoice.create') && (
@@ -164,9 +177,18 @@ export default function InvoiceList() {
                 <button onClick={() => navigate(`/finance/invoices/${inv.id}/edit`)} style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <EditOutlined style={{ fontSize: 11, color: '#64748b' }} />
                 </button>
-                <button style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <MoreOutlined style={{ fontSize: 11, color: '#64748b' }} />
-                </button>
+                <Dropdown
+                  trigger={['click']}
+                  menu={{ items: [
+                    { key: 'view', label: 'View details', onClick: () => navigate(`/finance/invoices/${inv.id}`) },
+                    { key: 'edit', label: 'Edit invoice', onClick: () => navigate(`/finance/invoices/${inv.id}/edit`) },
+                    { key: 'export', label: 'Export this row', onClick: () => { downloadCSV(`invoice-${inv.invoiceNumber}`, [{ invoiceNumber: inv.invoiceNumber, status: inv.status, total: (inv as any).grandTotal ?? inv.total }]); message.success('Invoice exported') } },
+                  ] }}
+                >
+                  <button style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <MoreOutlined style={{ fontSize: 11, color: '#64748b' }} />
+                  </button>
+                </Dropdown>
               </div>
             </div>
           )

@@ -38,6 +38,39 @@ export default function DunningManagement() {
     })
   }
 
+  const handleSendAll = () => {
+    if (queue.length === 0) { message.info('No clients in the dunning queue'); return }
+    Modal.confirm({
+      title: 'Send All Reminders',
+      content: `Send reminders to all ${queue.length} client(s) in the queue?`,
+      okText: 'Send All',
+      okButtonProps: { style: { background: '#8B1A1A', borderColor: '#8B1A1A' } },
+      onOk: async () => {
+        let sent = 0
+        for (const d of queue) {
+          try { await sendReminder.mutateAsync({ customerId: d.customerId, level: d.dunningLevel }); sent++ } catch { /* skip */ }
+        }
+        message.success(`Sent ${sent} reminder(s)`)
+      },
+    })
+  }
+
+  const viewHistory = (d: any) => {
+    Modal.info({
+      title: `${d.customerName} — Collection History`,
+      content: (
+        <div style={{ fontSize: 13, lineHeight: 1.9 }}>
+          <div>Outstanding: <b>{formatINR(d.outstandingAmount)}</b></div>
+          <div>Current level: {d.dunningLevel}</div>
+          <div>Emails sent: {d.emailsSent ?? 0}</div>
+          <div>Last action: {d.lastActionDate ? dayjs(d.lastActionDate).format('MMM DD, YYYY') : '—'}</div>
+          <div>Next action: {d.nextActionDate ? dayjs(d.nextActionDate).format('MMM DD, YYYY') : '—'}</div>
+        </div>
+      ),
+      okButtonProps: { style: { background: '#8B1A1A', borderColor: '#8B1A1A' } },
+    })
+  }
+
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
@@ -59,7 +92,7 @@ export default function DunningManagement() {
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', overflow: 'hidden' }}>
           <div style={{ padding: '16px 20px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>Dunning Queue</div>
-            <button style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 12px', background: '#8B1A1A', cursor: 'pointer' }}>
+            <button onClick={handleSendAll} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 12px', background: '#8B1A1A', cursor: 'pointer' }}>
               <SendOutlined /> Send All Reminders
             </button>
           </div>
@@ -86,7 +119,7 @@ export default function DunningManagement() {
                 {selectedId === d.id && (
                   <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
                     <button onClick={(e) => { e.stopPropagation(); handleSend(d.customerId, d.dunningLevel) }} style={{ padding: '6px 14px', borderRadius: 6, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Send Now</button>
-                    <button style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', fontSize: 11, cursor: 'pointer' }}>View History</button>
+                    <button onClick={(e) => { e.stopPropagation(); viewHistory(d) }} style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', fontSize: 11, cursor: 'pointer' }}>View History</button>
                   </div>
                 )}
               </div>

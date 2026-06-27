@@ -3,9 +3,10 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
 import { CalendarOutlined, CaretRightOutlined, MoreOutlined } from '@ant-design/icons'
-import { Skeleton, Alert } from 'antd'
+import { Skeleton, Alert, message, Modal, Dropdown } from 'antd'
 import { useARAgingSummary, useARAgingEntries } from '../../hooks/useARDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
+import { downloadCSV } from '../../utils/exportHelper'
 
 const BUCKET_COLORS = ['#C4A24D', '#E2946B', '#CC5555', '#8B1A1A']
 
@@ -28,7 +29,7 @@ export default function ARAPAgingDashboard() {
   const totalOut  = buckets.reduce((s, b) => s + b.amount, 0)
 
   const displayed = view === 'Overdue Only'
-    ? entries.filter((e) => e.days31to60 > 0 || e.days61to90 > 0 || e.over90 > 0)
+    ? entries.filter((e) => e.days31to60 > 0 || e.days61to90 > 0 || (e.days90plus ?? (e as any).over90 ?? 0) > 0)
     : entries
 
   const forecastData = buckets.map((b, i) => ({
@@ -36,6 +37,32 @@ export default function ARAPAgingDashboard() {
     amount: b.amount,
     color: BUCKET_COLORS[i] ?? '#94a3b8',
   }))
+
+  const showAccount = (c: any) => {
+    Modal.info({
+      title: c.customerName,
+      content: (
+        <div style={{ fontSize: 13, lineHeight: 1.9 }}>
+          <div>Total outstanding: <b>{formatINR(c.total)}</b></div>
+          <div>Current: {formatINR(c.current)}</div>
+          <div>1–30 days: {formatINR(c.days1to30)}</div>
+          <div>31–60 days: {formatINR(c.days31to60)}</div>
+          <div>61–90 days: {formatINR(c.days61to90)}</div>
+          <div>90+ days: {formatINR(c.days90plus)}</div>
+        </div>
+      ),
+      okButtonProps: { style: { background: '#8B1A1A', borderColor: '#8B1A1A' } },
+    })
+  }
+
+  const exportAccounts = () => {
+    if (displayed.length === 0) { message.info('No accounts to export'); return }
+    downloadCSV('ar-aging-accounts', displayed.map((c: any) => ({
+      customer: c.customerName, total: c.total, current: c.current,
+      days1to30: c.days1to30, days31to60: c.days31to60, days61to90: c.days61to90, days90plus: c.days90plus,
+    })))
+    message.success(`Exported ${displayed.length} accounts`)
+  }
 
   return (
     <div>
@@ -151,12 +178,20 @@ export default function ARAPAgingDashboard() {
               <div style={{ fontSize: 12, fontWeight: entry.days31to60 > 0 ? 700 : 400, color: entry.days31to60 > 0 ? '#DC2626' : '#334155' }}>{formatINR(entry.days31to60)}</div>
               <div style={{ fontSize: 12, fontWeight: (entry.days61to90 + entry.days90plus) > 0 ? 700 : 400, color: (entry.days61to90 + entry.days90plus) > 0 ? '#991B1B' : '#334155' }}>{formatINR(entry.days61to90 + entry.days90plus)}</div>
               <div style={{ display: 'flex', gap: 6 }}>
-                <button style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <button onClick={() => showAccount(entry)} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <CaretRightOutlined style={{ fontSize: 11, color: '#8B1A1A' }} />
                 </button>
-                <button style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <MoreOutlined style={{ fontSize: 11, color: '#64748b' }} />
-                </button>
+                <Dropdown
+                  trigger={['click']}
+                  menu={{ items: [
+                    { key: 'view', label: 'View breakdown', onClick: () => showAccount(entry) },
+                    { key: 'export', label: 'Export accounts', onClick: exportAccounts },
+                  ] }}
+                >
+                  <button style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <MoreOutlined style={{ fontSize: 11, color: '#64748b' }} />
+                  </button>
+                </Dropdown>
               </div>
             </div>
           )
@@ -166,7 +201,7 @@ export default function ARAPAgingDashboard() {
           <span style={{ fontSize: 11, color: '#94a3b8' }}>Showing {displayed.length} of {entriesPage?.total ?? 0} accounts</span>
           <div style={{ display: 'flex', gap: 6 }}>
             {['‹', '›'].map((a) => (
-              <button key={a} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', fontSize: 13, color: '#334155' }}>{a}</button>
+              <button key={a} onClick={() => message.info('All accounts are shown on a single page')} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', fontSize: 13, color: '#334155' }}>{a}</button>
             ))}
           </div>
         </div>

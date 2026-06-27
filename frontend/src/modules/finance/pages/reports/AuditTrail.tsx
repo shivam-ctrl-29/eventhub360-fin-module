@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useDebounce } from '@shared/hooks/useDebounce'
 import { SearchOutlined, DownloadOutlined, FilterOutlined } from '@ant-design/icons'
-import { Skeleton, Alert } from 'antd'
+import { Skeleton, Alert, message } from 'antd'
 import { useAuditTrail } from '../../hooks/usePnL'
 import { usePermissions } from '@shared/hooks/usePermissions'
+import { downloadCSV } from '../../utils/exportHelper'
 import dayjs from 'dayjs'
 
 const SEVERITY_STYLE: Record<string, { bg: string; color: string; dot: string }> = {
@@ -56,7 +57,11 @@ export default function AuditTrail() {
             <SearchOutlined style={{ color: '#94a3b8', fontSize: 13 }} />
             <input value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} placeholder="Search logs..." style={{ border: 'none', outline: 'none', fontSize: 12, background: 'transparent', width: '100%', color: '#334155' }} />
           </div>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}>
+          <button onClick={() => {
+            if (filtered.length === 0) { message.info('No logs to export'); return }
+            downloadCSV('audit-trail', filtered.map((l) => ({ time: dayjs(l.timestamp).format('YYYY-MM-DD HH:mm'), user: l.user, action: l.action, entity: l.entity, entityId: l.entityId, severity: l.severity, description: l.description })))
+            message.success(`Exported ${filtered.length} log entries`)
+          }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}>
             <DownloadOutlined /> Export
           </button>
         </div>

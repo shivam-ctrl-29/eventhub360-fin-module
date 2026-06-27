@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { DownloadOutlined, SettingOutlined } from '@ant-design/icons'
-import { Skeleton, Alert } from 'antd'
+import { Skeleton, Alert, message } from 'antd'
 import { useEventPnL } from '../../hooks/usePnL'
 import { formatINR } from '../../utils/currencyFormatter'
+import { downloadCSV } from '../../utils/exportHelper'
 import dayjs from 'dayjs'
 
 const PIE_COLORS = ['#8B1A1A', '#C4A24D', '#94a3b8', '#E2946B']
@@ -18,11 +19,23 @@ export default function ProfitLossReport() {
   const lineItems = pnl?.lineItems ?? []
   const categoryTotals = lineItems.reduce<Record<string, number>>((acc, item) => {
     const cat = item.category ?? 'Other'
-    acc[cat] = (acc[cat] ?? 0) + item.actual
+    acc[cat] = (acc[cat] ?? 0) + ((item as any).actual ?? (item as any).amount ?? 0)
     return acc
   }, {})
   const pieData = Object.entries(categoryTotals).map(([name, value]) => ({ name, value }))
   const totalCosts = pnl?.totalExpenses ?? 0
+
+  const exportPnL = () => {
+    if (!pnl) { message.info('No P&L data to export'); return }
+    downloadCSV('event-pnl', [{
+      event: pnl.eventName,
+      revenue: pnl.totalRevenue,
+      expenses: pnl.totalExpenses,
+      netProfit: pnl.netProfit,
+      netMargin: `${pnl.netMargin}%`,
+    }])
+    message.success('P&L exported')
+  }
 
   return (
     <div>
@@ -50,10 +63,10 @@ export default function ProfitLossReport() {
                   ● Active Project
                 </span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-                  <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
+                  <button onClick={exportPnL} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
                     <DownloadOutlined style={{ fontSize: 12 }} /> Export P&L
                   </button>
-                  <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', fontSize: 12, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>
+                  <button onClick={() => message.info('Adjustments require finance-manager approval — coming in the next sprint')} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', fontSize: 12, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>
                     <SettingOutlined style={{ fontSize: 12 }} /> Manage Adjustments
                   </button>
                 </div>
@@ -150,7 +163,7 @@ export default function ProfitLossReport() {
               <div key={i} style={{ flex: 1, borderRadius: '3px 3px 0 0', background: i === 3 ? '#8B1A1A' : '#E8E0D8', height: `${h}%` }} />
             ))}
           </div>
-          <button style={{ width: '100%', padding: '8px 0', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
+          <button onClick={() => message.info(`Revenue ${formatINR(pnl?.totalRevenue ?? 0)} · Costs ${formatINR(totalCosts)} · Net ${formatINR(pnl?.netProfit ?? 0)} (${pnl?.netMargin ?? 0}% margin)`)} style={{ width: '100%', padding: '8px 0', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
             View Analytics Detail
           </button>
         </div>
