@@ -2,6 +2,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { payableApi } from '../api/payableApi'
 import type { TableParams } from '../types/finance.common.types'
 
+export function useAPAgingSummary() {
+  return useQuery({
+    queryKey: ['finance', 'ap-aging-summary'],
+    queryFn: () => payableApi.getAPAgingSummary().then((r) => r.data.data),
+  })
+}
+
 export function useVendorBills(params: TableParams & { status?: string }) {
   return useQuery({
     queryKey: ['finance', 'vendor-bills', params],

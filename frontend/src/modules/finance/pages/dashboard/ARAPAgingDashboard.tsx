@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-} from 'recharts'
-import { CalendarOutlined, CaretRightOutlined, MoreOutlined } from '@ant-design/icons'
+import { CaretRightOutlined, MoreOutlined, DownloadOutlined } from '@ant-design/icons'
 import { Skeleton, Alert, message, Modal, Dropdown } from 'antd'
 import { useARAgingSummary, useARAgingEntries } from '../../hooks/useARDashboard'
+import { useAPAgingSummary } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 import { downloadCSV } from '../../utils/exportHelper'
 
@@ -23,6 +21,7 @@ export default function ARAPAgingDashboard() {
 
   const { data: summary, isLoading: summaryLoading, isError: summaryError } = useARAgingSummary()
   const { data: entriesPage, isLoading: entriesLoading } = useARAgingEntries({ page: 1, limit: 20 })
+  const { data: apAging, isLoading: apLoading } = useAPAgingSummary()
 
   const buckets   = summary?.buckets ?? []
   const entries   = entriesPage?.data ?? []
@@ -31,12 +30,6 @@ export default function ARAPAgingDashboard() {
   const displayed = view === 'Overdue Only'
     ? entries.filter((e) => e.days31to60 > 0 || e.days61to90 > 0 || (e.days90plus ?? (e as any).over90 ?? 0) > 0)
     : entries
-
-  const forecastData = buckets.map((b, i) => ({
-    week: b.bucket,
-    amount: b.amount,
-    color: BUCKET_COLORS[i] ?? '#94a3b8',
-  }))
 
   const showAccount = (c: any) => {
     Modal.info({
@@ -68,17 +61,12 @@ export default function ARAPAgingDashboard() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
         <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1.5px', color: '#94a3b8', textTransform: 'uppercase' }}>Enterprise Ledger</div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #E8E0D8', borderRadius: 8, padding: '5px 12px', fontSize: 12, color: '#334155', cursor: 'pointer' }}>
-            <CalendarOutlined style={{ color: '#8B1A1A' }} /> Filter by Date
-          </div>
-          <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 8, padding: '5px 10px', cursor: 'pointer' }}>
-            <MoreOutlined style={{ color: '#64748b' }} />
-          </div>
-        </div>
+        <button onClick={exportAccounts} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #E8E0D8', borderRadius: 8, padding: '6px 14px', fontSize: 12, color: '#334155', cursor: 'pointer' }}>
+          <DownloadOutlined style={{ color: '#8B1A1A' }} /> Export Accounts
+        </button>
       </div>
 
-      <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1a2a4a', marginBottom: 24, lineHeight: 1.2 }}>Accounts Receivable Aging</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1a2a4a', marginBottom: 24, lineHeight: 1.2 }}>AR / AP Aging</h1>
 
       {summaryError && <Alert type="error" message="Failed to load aging data." style={{ marginBottom: 16 }} />}
 
@@ -98,7 +86,7 @@ export default function ARAPAgingDashboard() {
             : (
               <>
                 <div style={{ fontSize: 28, fontWeight: 800, color: '#1a2a4a', lineHeight: 1 }}>{summary?.avgCollectionDays?.toFixed(1) ?? '—'} Days</div>
-                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6 }}>Industry average: 42 days</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6 }}>Across {entriesPage?.total ?? 0} outstanding invoice{(entriesPage?.total ?? 0) === 1 ? '' : 's'}</div>
               </>
             )
           }
@@ -207,24 +195,33 @@ export default function ARAPAgingDashboard() {
         </div>
       </div>
 
-      {/* Collection Forecast */}
+      {/* Accounts Payable Aging — real, from scheduled vendor payouts */}
       <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 4 }}>Collection Forecast</div>
-        <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 16 }}>Aging bucket distribution by outstanding amount</div>
-        {summaryLoading
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>Accounts Payable Aging</div>
+          <span style={{ fontSize: 11, color: '#94a3b8' }}>Total payable {formatINR(apAging?.totalPayable ?? 0, { compact: true })} · {apAging?.openCount ?? 0} open</span>
+        </div>
+        <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 16 }}>Unpaid vendor payouts bucketed by days past their scheduled date</div>
+        {apLoading
           ? <Skeleton active paragraph={{ rows: 3 }} />
-          : (
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={forecastData} barSize={20}>
-                <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis hide />
-                <Tooltip formatter={(v: number) => [formatINR(v, { compact: true })]} contentStyle={{ borderRadius: 8, border: '1px solid #E8E0D8', fontSize: 11 }} />
-                <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
-                  {forecastData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          )
+          : (apAging?.totalPayable ?? 0) === 0
+            ? <div style={{ textAlign: 'center', padding: '24px 0', color: '#94a3b8', fontSize: 12 }}>No outstanding payables</div>
+            : (() => {
+                const apBuckets = apAging?.buckets ?? []
+                const apMax = Math.max(...apBuckets.map((b) => b.amount), 1)
+                const apColors = ['#94a3b8', '#C4A24D', '#E06666', '#8B1A1A']
+                return apBuckets.map((b, i) => (
+                  <div key={b.bucket} style={{ marginBottom: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span style={{ fontSize: 12, color: '#334155' }}>{b.bucket}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.amount, { compact: true })}</span>
+                    </div>
+                    <div style={{ height: 10, background: '#F1F5F9', borderRadius: 5, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${Math.round((b.amount / apMax) * 100)}%`, background: apColors[i % apColors.length], borderRadius: 5 }} />
+                    </div>
+                  </div>
+                ))
+              })()
         }
       </div>
     </div>

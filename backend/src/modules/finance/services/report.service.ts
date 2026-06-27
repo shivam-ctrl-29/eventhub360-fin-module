@@ -120,25 +120,29 @@ export class ReportService {
       const now = new Date()
       const invoices = await this.invoiceRepo.find({ where: { status: 'Issued' } })
       let current = 0, days30 = 0, days60 = 0, days90 = 0, over90 = 0
+      let cCur = 0, c30 = 0, c60 = 0, c90 = 0, cOver = 0
+      let daysSum = 0
       for (const inv of invoices) {
-        const days = Math.floor((now.getTime() - new Date(inv.updatedAt).getTime()) / 86400000)
+        const days = Math.floor((now.getTime() - new Date(inv.createdAt).getTime()) / 86400000)
+        daysSum += Math.max(0, days)
         const amt = Number(inv.balance)
-        if (days <= 0) current += amt
-        else if (days <= 30) days30 += amt
-        else if (days <= 60) days60 += amt
-        else if (days <= 90) days90 += amt
-        else over90 += amt
+        if (days <= 0) { current += amt; cCur++ }
+        else if (days <= 30) { days30 += amt; c30++ }
+        else if (days <= 60) { days60 += amt; c60++ }
+        else if (days <= 90) { days90 += amt; c90++ }
+        else { over90 += amt; cOver++ }
       }
       const total = current + days30 + days60 + days90 + over90
+      const avgCollectionDays = invoices.length > 0 ? Math.round((daysSum / invoices.length) * 10) / 10 : 0
       return {
         totalOutstanding: total,
-        avgCollectionDays: 45,
+        avgCollectionDays,
         buckets: [
-          { bucket: 'Current', amount: current, count: 0 },
-          { bucket: '1-30 days', amount: days30, count: 0 },
-          { bucket: '31-60 days', amount: days60, count: 0 },
-          { bucket: '61-90 days', amount: days90, count: 0 },
-          { bucket: '90+ days', amount: over90, count: 0 },
+          { bucket: 'Current', amount: current, count: cCur },
+          { bucket: '1-30 days', amount: days30, count: c30 },
+          { bucket: '31-60 days', amount: days60, count: c60 },
+          { bucket: '61-90 days', amount: days90, count: c90 },
+          { bucket: '90+ days', amount: over90, count: cOver },
         ],
       }
     } catch {
@@ -167,7 +171,7 @@ export class ReportService {
       })
       return {
         data: invoices.map((inv) => {
-          const days = Math.floor((now.getTime() - new Date(inv.updatedAt).getTime()) / 86400000)
+          const days = Math.floor((now.getTime() - new Date(inv.createdAt).getTime()) / 86400000)
           const bal = Number(inv.balance)
           return {
             customerId: inv.invoiceId,

@@ -18,6 +18,34 @@ export class PayableService {
     return { data: [], total: 0 }
   }
 
+  // Real AP (payables) aging: unpaid payouts bucketed by how overdue they are vs scheduled date.
+  async getAPAgingSummary() {
+    try {
+      const payouts = await this.payoutRepo.find()
+      const open = payouts.filter((p) => p.status !== 'paid')
+      const now = Date.now()
+      const buckets = [
+        { bucket: 'Not due', amount: 0 },
+        { bucket: '1-30 days', amount: 0 },
+        { bucket: '31-60 days', amount: 0 },
+        { bucket: '60+ days', amount: 0 },
+      ]
+      for (const p of open) {
+        const amt = Number(p.amount)
+        if (!p.scheduledDate) { buckets[0].amount += amt; continue }
+        const days = Math.floor((now - new Date(p.scheduledDate).getTime()) / 86400000)
+        if (days <= 0) buckets[0].amount += amt
+        else if (days <= 30) buckets[1].amount += amt
+        else if (days <= 60) buckets[2].amount += amt
+        else buckets[3].amount += amt
+      }
+      const totalPayable = buckets.reduce((s, b) => s + b.amount, 0)
+      return { totalPayable, openCount: open.length, buckets }
+    } catch {
+      return { totalPayable: 0, openCount: 0, buckets: [] }
+    }
+  }
+
   async getPayoutSchedule(params: PaginationDto) {
     const { page = 1, limit = 20 } = params
     try {

@@ -20,6 +20,11 @@ export class PayableController {
     return ok({ id: 'mock-' + Date.now(), status: 'pending' }, 'Bill uploaded')
   }
 
+  @Get('aging/summary')
+  async getAPAgingSummary() {
+    return ok(await this.svc.getAPAgingSummary())
+  }
+
   @Get('payouts')
   async getPayouts(@Query() params: PaginationDto) {
     const { data, total } = await this.svc.getPayoutSchedule(params)

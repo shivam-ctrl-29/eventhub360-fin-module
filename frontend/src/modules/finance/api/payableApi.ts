@@ -2,7 +2,16 @@ import axiosInstance from '@shared/api/axiosInstance'
 import type { ApiResponse, PaginatedResponse, TableParams } from '../types/finance.common.types'
 import type { VendorBill, PayoutScheduleItem } from '../types/expense.types'
 
+export interface APAgingSummary {
+  totalPayable: number
+  openCount: number
+  buckets: Array<{ bucket: string; amount: number }>
+}
+
 export const payableApi = {
+  getAPAgingSummary: () =>
+    axiosInstance.get<ApiResponse<APAgingSummary>>('/api/fin/ap/aging/summary'),
+
   getBills: (params: TableParams & { status?: string }) =>
     axiosInstance.get<ApiResponse<PaginatedResponse<VendorBill>>>('/api/fin/ap/bills', { params }),
 
