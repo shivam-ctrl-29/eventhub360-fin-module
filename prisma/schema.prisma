@@ -1,0 +1,404 @@
+// EventHub 360 — Finance & Accounting Module (FIN)
+// Prisma schema reconstructed to match existing services, seed data and the
+// Backend Architecture v1.0 specification.
+//
+// NOTE: "enum-like" columns (status, mode, priority, category, etc.) are stored
+// as String to remain compatible with the existing services, which mix the
+// shared TypeScript enums (src/common/enums) with raw string literals. Allowed
+// values are enforced at the application layer via class-validator DTOs and the
+// shared enums. This matches the spec note that column constraints are
+// preliminary and subject to change.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Numbering sequences (INV / PAY / CN / DN)
+// ---------------------------------------------------------------------------
+model NumberingSequence {
+  id        String   @id @default(uuid())
+  entity    String   @unique
+  prefix    String
+  nextNo    BigInt   @default(1001)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("numbering_sequences")
+}
+
+// ---------------------------------------------------------------------------
+// Parties — Customers & Vendors (local mirror of CRM/Procurement modules)
+// ---------------------------------------------------------------------------
+model Customer {
+  id             String   @id @default(uuid())
+  customerCode   String   @unique @map("customer_code")
+  name           String
+  email          String
+  phone          String?
+  gstin          String?
+  pan            String?
+  billingAddress String?  @map("billing_address")
+  city           String?
+  state          String?
+  creditLimit    Decimal  @default(0) @map("credit_limit") @db.Decimal(15, 2)
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  invoices    Invoice[]
+  creditNotes CreditNote[]
+
+  @@map("customers")
+}
+
+model Vendor {
+  id            String   @id @default(uuid())
+  vendorCode    String   @unique @map("vendor_code")
+  name          String
+  email         String
+  phone         String?
+  gstin         String?
+  pan           String?
+  bankName      String?  @map("bank_name")
+  accountNumber String?  @map("account_number")
+  ifscCode      String?  @map("ifsc_code")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  vendorBills VendorBill[]
+  debitNotes  DebitNote[]
+
+  @@map("vendors")
+}
+
+// ---------------------------------------------------------------------------
+// Invoices & line items
+// ---------------------------------------------------------------------------
+model Invoice {
+  id            String   @id @default(uuid())
+  invoiceNumber String   @unique @map("invoice_number")
+  customerId    String   @map("customer_id")
+  status        String   @default("draft")
+  issueDate     DateTime @map("issue_date")
+  dueDate       DateTime @map("due_date")
+  subtotal      Decimal  @default(0) @db.Decimal(15, 2)
+  totalGst      Decimal  @default(0) @map("total_gst") @db.Decimal(15, 2)
+  grandTotal    Decimal  @default(0) @map("grand_total") @db.Decimal(15, 2)
+  amountPaid    Decimal  @default(0) @map("amount_paid") @db.Decimal(15, 2)
+  amountDue     Decimal  @default(0) @map("amount_due") @db.Decimal(15, 2)
+  isInterState  Boolean  @default(false) @map("is_inter_state")
+  paymentMode   String?  @map("payment_mode")
+  notes         String?
+  terms         String?
+  createdBy     String?  @map("created_by")
+  sentAt        DateTime? @map("sent_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  customer       Customer                  @relation(fields: [customerId], references: [id])
+  lineItems      InvoiceLineItem[]
+  payments       Payment[]
+  creditNotes    CreditNote[]
+  debitNotes     DebitNote[]
+  dunningRecords DunningRecord[]
+  bankEntries    BankReconciliationEntry[] @relation("InvoiceBankEntries")
+
+  @@index([customerId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("invoices")
+}
+
+model InvoiceLineItem {
+  id          String  @id @default(uuid())
+  invoiceId   String  @map("invoice_id")
+  description String
+  quantity    Decimal @db.Decimal(10, 2)
+  unitPrice   Decimal @map("unit_price") @db.Decimal(15, 2)
+  gstRate     Int     @map("gst_rate")
+  hsnCode     String? @map("hsn_code")
+  taxableAmt  Decimal @map("taxable_amt") @db.Decimal(15, 2)
+  cgst        Decimal @default(0) @db.Decimal(15, 2)
+  sgst        Decimal @default(0) @db.Decimal(15, 2)
+  igst        Decimal @default(0) @db.Decimal(15, 2)
+  gstAmount   Decimal @map("gst_amount") @db.Decimal(15, 2)
+  total       Decimal @db.Decimal(15, 2)
+  sortOrder   Int     @default(0) @map("sort_order")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_line_items")
+}
+
+// ---------------------------------------------------------------------------
+// Payments
+// ---------------------------------------------------------------------------
+model Payment {
+  id            String   @id @default(uuid())
+  paymentNumber String   @unique @map("payment_number")
+  invoiceId     String   @map("invoice_id")
+  amount        Decimal  @db.Decimal(15, 2)
+  paymentMode   String   @map("payment_mode")
+  utrNumber     String?  @unique @map("utr_number")
+  chequeNumber  String?  @map("cheque_number")
+  bankName      String?  @map("bank_name")
+  status        String   @default("pending")
+  paymentDate   DateTime @map("payment_date")
+  remarks       String?
+  recordedBy    String?  @map("recorded_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  invoice     Invoice                   @relation(fields: [invoiceId], references: [id])
+  bankEntries BankReconciliationEntry[] @relation("PaymentBankEntries")
+
+  @@index([invoiceId])
+  @@index([status])
+  @@map("payments")
+}
+
+// ---------------------------------------------------------------------------
+// Bank reconciliation
+// ---------------------------------------------------------------------------
+model BankReconciliationEntry {
+  id               String    @id @default(uuid())
+  bankDescription  String    @map("bank_description")
+  utrNumber        String    @unique @map("utr_number")
+  amount           Decimal   @db.Decimal(15, 2)
+  transactionDate  DateTime  @map("transaction_date")
+  matchedInvoiceId String?   @map("matched_invoice_id")
+  matchedPaymentId String?   @map("matched_payment_id")
+  isReconciled     Boolean   @default(false) @map("is_reconciled")
+  reconciledBy     String?   @map("reconciled_by")
+  reconciledAt     DateTime? @map("reconciled_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  matchedInvoice Invoice? @relation("InvoiceBankEntries", fields: [matchedInvoiceId], references: [id])
+  matchedPayment Payment? @relation("PaymentBankEntries", fields: [matchedPaymentId], references: [id])
+
+  @@index([isReconciled])
+  @@index([transactionDate])
+  @@map("bank_reconciliation_entries")
+}
+
+// ---------------------------------------------------------------------------
+// Credit & Debit notes
+// ---------------------------------------------------------------------------
+model CreditNote {
+  id                String   @id @default(uuid())
+  creditNoteNumber  String   @unique @map("credit_note_number")
+  originalInvoiceId String   @map("original_invoice_id")
+  customerId        String   @map("customer_id")
+  reason            String
+  subtotal          Decimal  @db.Decimal(15, 2)
+  gstAmount         Decimal  @map("gst_amount") @db.Decimal(15, 2)
+  grandTotal        Decimal  @map("grand_total") @db.Decimal(15, 2)
+  date              DateTime
+  createdBy         String?  @map("created_by")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  originalInvoice Invoice  @relation(fields: [originalInvoiceId], references: [id])
+  customer        Customer @relation(fields: [customerId], references: [id])
+
+  @@map("credit_notes")
+}
+
+model DebitNote {
+  id                String   @id @default(uuid())
+  debitNoteNumber   String   @unique @map("debit_note_number")
+  originalInvoiceId String?  @map("original_invoice_id")
+  vendorId          String?  @map("vendor_id")
+  reason            String
+  subtotal          Decimal  @db.Decimal(15, 2)
+  gstAmount         Decimal  @map("gst_amount") @db.Decimal(15, 2)
+  grandTotal        Decimal  @map("grand_total") @db.Decimal(15, 2)
+  date              DateTime
+  createdBy         String?  @map("created_by")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  originalInvoice Invoice? @relation(fields: [originalInvoiceId], references: [id])
+  vendor          Vendor?  @relation(fields: [vendorId], references: [id])
+
+  @@map("debit_notes")
+}
+
+// ---------------------------------------------------------------------------
+// Payables — vendor bills & payouts
+// ---------------------------------------------------------------------------
+model VendorBill {
+  id          String   @id @default(uuid())
+  billNumber  String   @map("bill_number")
+  vendorId    String   @map("vendor_id")
+  amount      Decimal  @db.Decimal(15, 2)
+  gstAmount   Decimal  @map("gst_amount") @db.Decimal(15, 2)
+  totalAmount Decimal  @map("total_amount") @db.Decimal(15, 2)
+  billDate    DateTime @map("bill_date")
+  dueDate     DateTime @map("due_date")
+  status      String   @default("pending")
+  priority    String   @default("medium")
+  category    String
+  documentUrl String?  @map("document_url")
+  approvedBy  String?  @map("approved_by")
+  approvedAt  DateTime? @map("approved_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  vendor  Vendor   @relation(fields: [vendorId], references: [id])
+  payouts Payout[]
+
+  @@unique([vendorId, billNumber])
+  @@index([status])
+  @@index([priority])
+  @@map("vendor_bills")
+}
+
+model Payout {
+  id           String    @id @default(uuid())
+  vendorBillId String    @map("vendor_bill_id")
+  amount       Decimal   @db.Decimal(15, 2)
+  scheduledDate DateTime @map("scheduled_date")
+  priority     String    @default("medium")
+  status       String    @default("pending")
+  approvedBy   String?   @map("approved_by")
+  approvedAt   DateTime? @map("approved_at")
+  disbursedBy  String?   @map("disbursed_by")
+  disbursedAt  DateTime? @map("disbursed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  vendorBill VendorBill @relation(fields: [vendorBillId], references: [id])
+
+  @@index([status])
+  @@index([priority])
+  @@map("payouts")
+}
+
+// ---------------------------------------------------------------------------
+// Expenses
+// ---------------------------------------------------------------------------
+model Expense {
+  id            String    @id @default(uuid())
+  employeeId    String    @map("employee_id")
+  category      String
+  description   String
+  amount        Decimal   @db.Decimal(15, 2)
+  receiptUrl    String?   @map("receipt_url")
+  submittedDate DateTime  @map("submitted_date")
+  status        String    @default("pending")
+  approvedBy    String?   @map("approved_by")
+  approvedDate  DateTime? @map("approved_date")
+  remarks       String?
+  ocrAmount     Decimal?  @map("ocr_amount") @db.Decimal(15, 2)
+  ocrFlagged    Boolean   @default(false) @map("ocr_flagged")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([category])
+  @@map("expenses")
+}
+
+model ExpenseBudget {
+  id        String   @id @default(uuid())
+  category  String
+  month     Int
+  year      Int
+  budgeted  Decimal  @db.Decimal(15, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([category, month, year])
+  @@map("expense_budgets")
+}
+
+// ---------------------------------------------------------------------------
+// GST filings & TDS
+// ---------------------------------------------------------------------------
+model GSTFiling {
+  id           String    @id @default(uuid())
+  branchId     String?   @map("branch_id")
+  period       String
+  returnType   String    @map("return_type")
+  gstOutput    Decimal   @map("gst_output") @db.Decimal(15, 2)
+  gstInput     Decimal   @map("gst_input") @db.Decimal(15, 2)
+  itcAvailable Decimal   @map("itc_available") @db.Decimal(15, 2)
+  itcUtilized  Decimal   @map("itc_utilized") @db.Decimal(15, 2)
+  netPayable   Decimal   @map("net_payable") @db.Decimal(15, 2)
+  filingStatus String    @default("pending") @map("filing_status")
+  filedDate    DateTime? @map("filed_date")
+  dueDate      DateTime  @map("due_date")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@unique([branchId, period, returnType])
+  @@map("gst_filings")
+}
+
+model TdsEntry {
+  id            String    @id @default(uuid())
+  section       String
+  payeeName     String    @map("payee_name")
+  pan           String
+  grossAmount   Decimal   @map("gross_amount") @db.Decimal(15, 2)
+  tdsRate       Decimal   @map("tds_rate") @db.Decimal(5, 2)
+  tdsAmount     Decimal   @map("tds_amount") @db.Decimal(15, 2)
+  period        String
+  depositedDate DateTime? @map("deposited_date")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([period])
+  @@map("tds_entries")
+}
+
+// ---------------------------------------------------------------------------
+// Dunning
+// ---------------------------------------------------------------------------
+model DunningRecord {
+  id             String    @id @default(uuid())
+  invoiceId      String    @map("invoice_id")
+  customerId     String    @map("customer_id")
+  level          String    @default("L1")
+  status         String    @default("active")
+  daysOverdue    Int       @default(0) @map("days_overdue")
+  channel        String?
+  emailsSent     Int       @default(0) @map("emails_sent")
+  actionDate     DateTime  @default(now()) @map("action_date")
+  nextActionDate DateTime? @map("next_action_date")
+  notes          String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+  @@index([status])
+  @@map("dunning_records")
+}
+
+// ---------------------------------------------------------------------------
+// Audit trail (immutable)
+// ---------------------------------------------------------------------------
+model FinAuditTrail {
+  id          String   @id @default(uuid())
+  userId      String?  @map("user_id")
+  action      String
+  entity      String
+  entityId    String   @map("entity_id")
+  description String
+  severity    String   @default("info")
+  ipAddress   String?  @map("ip_address")
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([entity, entityId])
+  @@index([userId])
+  @@index([severity])
+  @@map("fin_audit_trail")
+}
