@@ -3,15 +3,22 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from 'recharts'
-import { BellOutlined, CalendarOutlined, MoreOutlined } from '@ant-design/icons'
+import { BellOutlined, CalendarOutlined } from '@ant-design/icons'
 import { Skeleton } from 'antd'
-import { useFinanceKPIs, useRevenueTrends, useBranchPerformance } from '../../hooks/useFinanceDashboard'
+import { useFinanceKPIs, useRevenueTrends, useBranchPerformance, useExpenseDistribution } from '../../hooks/useFinanceDashboard'
+import { useARAgingSummary } from '../../hooks/useARDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 
-const HEATMAP_COLS = ['0-15D', '15-30D', '30-45D', '45-60D', '60-90D', '90-120D', '120+D']
-const heatIntensity = (v: number) => {
-  const colors = ['#F5F0EB', '#F5C6C6', '#EE9999', '#E06666', '#CC3333', '#8B1A1A']
-  return colors[Math.min(v, 5)]
+const PIE_COLORS = ['#8B1A1A', '#C4A24D', '#E2946B', '#94a3b8', '#1a2a4a', '#CC5555', '#6B8E23']
+
+// Current financial year + quarter label (India FY: Apr–Mar)
+function currentFYLabel() {
+  const now = new Date()
+  const m = now.getMonth() // 0-11
+  const y = now.getFullYear()
+  const fyStart = m >= 3 ? y : y - 1
+  const q = m >= 3 && m <= 5 ? 'Q1' : m >= 6 && m <= 8 ? 'Q2' : m >= 9 && m <= 11 ? 'Q3' : 'Q4'
+  return `${q} FY${fyStart}-${String(fyStart + 1).slice(2)}`
 }
 
 const KPI_META = [
@@ -31,12 +38,12 @@ export default function FinanceDashboard() {
   const { data: kpis, isLoading: kpisLoading } = useFinanceKPIs()
   const { data: revenueTrends, isLoading: trendsLoading } = useRevenueTrends(currentYear)
   const { data: branches, isLoading: branchesLoading } = useBranchPerformance()
+  const { data: expenseDist, isLoading: expenseLoading } = useExpenseDistribution()
+  const { data: agingSummary } = useARAgingSummary()
 
-  const expenseData = [
-    { name: 'Venue & Ops', value: 54, color: '#8B1A1A' },
-    { name: 'Marketing',   value: 28, color: '#C4A24D' },
-    { name: 'Payroll',     value: 18, color: '#E2C4C4' },
-  ]
+  const expenseData = (expenseDist ?? []).map((e, i) => ({
+    name: e.category, value: e.pct, amount: e.amount, color: PIE_COLORS[i % PIE_COLORS.length],
+  }))
 
   return (
     <div>
@@ -52,7 +59,7 @@ export default function FinanceDashboard() {
             background: '#fff', border: '1px solid #E8E0D8',
             borderRadius: 8, padding: '6px 12px', fontSize: 12, color: '#334155',
           }}>
-            <CalendarOutlined style={{ color: '#8B1A1A' }} /> Q4 FY2024
+            <CalendarOutlined style={{ color: '#8B1A1A' }} /> {currentFYLabel()}
           </div>
           <div style={{
             width: 34, height: 34, background: '#fff', border: '1px solid #E8E0D8',
@@ -131,13 +138,14 @@ export default function FinanceDashboard() {
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis hide />
               <Tooltip
-                formatter={(v: number) => [`$${v}K`]}
+                formatter={(v: number) => [formatINR(v, { compact: true }), revenueTab]}
                 contentStyle={{ borderRadius: 8, border: '1px solid #E8E0D8', fontSize: 11 }}
               />
               <Bar
                 dataKey={revenueTab === 'Revenue' ? 'revenue' : 'expenses'}
                 fill={revenueTab === 'Revenue' ? '#8B1A1A' : '#C4A24D'}
                 radius={[4, 4, 0, 0]}
+                isAnimationActive={false}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -146,87 +154,85 @@ export default function FinanceDashboard() {
         {/* Expense Distribution */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 4 }}>Expense Distribution</div>
-          <ResponsiveContainer width="100%" height={140}>
-            <PieChart>
-              <Pie
-                data={expenseData}
-                cx="50%"
-                cy="50%"
-                innerRadius={42}
-                outerRadius={65}
-                paddingAngle={2}
-                dataKey="value"
-              >
-                {expenseData.map((entry) => (
-                  <Cell key={entry.name} fill={entry.color} />
+          {expenseLoading
+            ? <Skeleton active paragraph={{ rows: 3 }} />
+            : expenseData.length === 0
+              ? <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8', fontSize: 12 }}>No expense data yet</div>
+              : (
+            <>
+              <ResponsiveContainer width="100%" height={140}>
+                <PieChart>
+                  <Pie data={expenseData} cx="50%" cy="50%" innerRadius={42} outerRadius={65} paddingAngle={2} dataKey="value" isAnimationActive={false}>
+                    {expenseData.map((entry) => (<Cell key={entry.name} fill={entry.color} />))}
+                  </Pie>
+                  <Tooltip formatter={(_v: number, _n, p: any) => [formatINR(p.payload.amount), p.payload.name]} contentStyle={{ borderRadius: 8, border: '1px solid #E8E0D8', fontSize: 11 }} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div style={{ marginTop: 8 }}>
+                {expenseData.map((e) => (
+                  <div key={e.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#334155' }}>
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: e.color, display: 'inline-block' }} />
+                      {e.name}
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#1a2a4a' }}>{e.value}%</span>
+                  </div>
                 ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-          <div style={{ marginTop: 8 }}>
-            {expenseData.map((e) => (
-              <div key={e.name} style={{
-                display: 'flex', justifyContent: 'space-between',
-                alignItems: 'center', marginBottom: 6,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#334155' }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: e.color, display: 'inline-block' }} />
-                  {e.name}
-                </div>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#1a2a4a' }}>{e.value}%</span>
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
       </div>
 
       {/* ── Bottom Row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
-        {/* Invoice Aging Heatmap — visual indicator, data comes from AR aging report */}
+        {/* Invoice Aging — real AR aging buckets from the DB */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>Invoice Aging Heatmap</div>
-            <MoreOutlined style={{ color: '#94a3b8', cursor: 'pointer' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>Invoice Aging</div>
+            <span style={{ fontSize: 11, color: '#94a3b8' }}>Total {formatINR((agingSummary?.buckets ?? []).reduce((s, b) => s + b.amount, 0), { compact: true })}</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${HEATMAP_COLS.length}, 1fr)`, gap: 3, marginBottom: 6 }}>
-            {HEATMAP_COLS.map((col) => (
-              <div key={col} style={{ fontSize: 9, color: '#94a3b8', textAlign: 'center', fontWeight: 600 }}>{col}</div>
-            ))}
-          </div>
-          {[[1,2,3,4,2,1,0],[0,1,2,5,3,2,1],[1,1,1,2,1,0,0],[0,2,4,3,2,1,0]].map((row, ri) => (
-            <div key={ri} style={{ display: 'grid', gridTemplateColumns: `repeat(${HEATMAP_COLS.length}, 1fr)`, gap: 3, marginBottom: 3 }}>
-              {row.map((val, ci) => (
-                <div key={ci} style={{ height: 22, borderRadius: 4, background: heatIntensity(val), border: '1px solid rgba(0,0,0,0.04)' }} />
-              ))}
-            </div>
-          ))}
-          <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 10, fontStyle: 'italic' }}>
-            See AR Aging Report for full breakdown.
-          </div>
+          {(() => {
+            const buckets = agingSummary?.buckets ?? []
+            const max = Math.max(...buckets.map((b) => b.amount), 1)
+            const colors = ['#F5C6C6', '#EE9999', '#E06666', '#CC3333', '#8B1A1A']
+            if (buckets.length === 0) return <div style={{ textAlign: 'center', padding: '28px 0', color: '#94a3b8', fontSize: 12 }}>No outstanding invoices</div>
+            return buckets.map((b, i) => (
+              <div key={b.bucket} style={{ marginBottom: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, color: '#334155' }}>{b.bucket}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.amount, { compact: true })}</span>
+                </div>
+                <div style={{ height: 10, background: '#F5F0EB', borderRadius: 5, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${Math.round((b.amount / max) * 100)}%`, background: colors[i % colors.length], borderRadius: 5 }} />
+                </div>
+              </div>
+            ))
+          })()}
         </div>
 
         {/* Branch Performance */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 14 }}>Branch Performance</div>
           <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 80px 70px 28px',
+            display: 'grid', gridTemplateColumns: '1fr 90px 70px 60px',
             gap: 8, marginBottom: 10,
           }}>
-            {['BRANCH NAME', 'REVENUE', 'GROWTH', ''].map((h) => (
+            {['BRANCH NAME', 'REVENUE', 'INVOICES', 'SHARE'].map((h) => (
               <div key={h} style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px' }}>{h}</div>
             ))}
           </div>
           {branchesLoading
             ? <Skeleton active paragraph={{ rows: 3 }} />
-            : (branches ?? []).map((b) => (
-              <div key={b.branchId} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 70px 28px', gap: 8, alignItems: 'center', padding: '12px 0', borderTop: '1px solid #F5F0EB' }}>
+            : (branches ?? []).length === 0
+              ? <div style={{ textAlign: 'center', padding: '24px 0', color: '#94a3b8', fontSize: 12 }}>No branch data</div>
+              : (branches ?? []).map((b: any) => (
+              <div key={b.branchId} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 70px 60px', gap: 8, alignItems: 'center', padding: '12px 0', borderTop: '1px solid #F5F0EB' }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{b.branchName}</div>
                 <div style={{ fontSize: 13, color: '#334155' }}>{formatINR(b.revenue ?? 0, { compact: true })}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#059669' }}>
-                  —
-                </div>
-                <div style={{ width: 24, height: 3, borderRadius: 2, background: '#C4A24D' }} />
+                <div style={{ fontSize: 13, color: '#334155' }}>{b.events ?? 0}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#8B1A1A' }}>{b.sharePct ?? 0}%</div>
               </div>
             ))
           }

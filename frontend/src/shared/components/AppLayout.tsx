@@ -1,5 +1,77 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { useFinanceKPIs } from '../../modules/finance/hooks/useFinanceDashboard'
+import { useInvoiceList } from '../../modules/finance/hooks/useInvoices'
+import { formatINR } from '../../modules/finance/utils/currencyFormatter'
+
+function InsightsPanel() {
+  const navigate = useNavigate()
+  const { data: kpis } = useFinanceKPIs()
+  const { data: invoicePage } = useInvoiceList({ page: 1, limit: 100 })
+
+  const invoices = invoicePage?.data ?? []
+  const amounts = invoices.map((i: any) => Number(i.grandTotal ?? i.total ?? 0)).filter((n) => n > 0)
+  const avg = amounts.length ? amounts.reduce((s, n) => s + n, 0) / amounts.length : 0
+  const top = invoices.reduce((m: any, i: any) => {
+    const v = Number(i.grandTotal ?? i.total ?? 0)
+    return v > Number(m?.grandTotal ?? m?.total ?? 0) ? i : m
+  }, null as any)
+  const topVal = top ? Number(top.grandTotal ?? top.total ?? 0) : 0
+  const pctAboveAvg = avg > 0 ? Math.round(((topVal - avg) / avg) * 100) : 0
+
+  const reports = [
+    { label: 'Cash Flow Forecast', path: '/finance/cash-flow' },
+    { label: 'P&L Report', path: '/finance/pnl' },
+    { label: 'GST / TDS Report', path: '/finance/gst-tds' },
+  ]
+
+  return (
+    <aside style={{
+      width: 280, minHeight: '100vh', background: '#FFFFFF',
+      borderLeft: '1px solid #E8E0D8', position: 'fixed',
+      right: 0, top: 0, bottom: 0, zIndex: 100, padding: '20px 16px', overflowY: 'auto',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #E8E0D8' }}>
+        <div style={{ width: 36, height: 36, background: 'rgba(196,162,77,0.15)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📊</div>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#C4A24D' }}>Finance Insights</div>
+          <div style={{ fontSize: 11, color: '#94a3b8' }}>Live from your data</div>
+        </div>
+      </div>
+
+      {top && pctAboveAvg > 0 && (
+        <div style={{ background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 8, padding: 12, marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#78350F', marginBottom: 6 }}>⚡ Largest Invoice</div>
+          <div style={{ fontSize: 12, color: '#78350F', lineHeight: 1.5 }}>
+            Invoice <strong>{top.invoiceNumber}</strong> ({formatINR(topVal)}) is {pctAboveAvg}% above the average invoice value.
+          </div>
+        </div>
+      )}
+
+      <div style={{ background: '#F8F5F1', borderRadius: 8, padding: 12, marginBottom: 16 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#94a3b8', marginBottom: 8 }}>At a Glance</div>
+        {[
+          { l: 'Total Revenue', v: kpis ? formatINR(kpis.totalRevenue, { compact: true }) : '—' },
+          { l: 'Receivables', v: kpis ? formatINR(kpis.receivables, { compact: true }) : '—' },
+          { l: 'Invoices', v: String(invoices.length) },
+        ].map((s) => (
+          <div key={s.l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#334155', marginBottom: 5 }}>
+            <span>{s.l}</span><span style={{ fontWeight: 700 }}>{s.v}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: '#94a3b8', marginBottom: 10 }}>
+        Quick Reports
+      </div>
+      {reports.map((r) => (
+        <div key={r.label} onClick={() => navigate(r.path)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0', fontSize: 12, color: '#334155', borderBottom: '1px solid #F1EDE8', cursor: 'pointer' }}>
+          <span style={{ color: '#C4A24D' }}>↗</span> {r.label}
+        </div>
+      ))}
+    </aside>
+  )
+}
 
 const financeSubLinks = [
   { label: 'CFO Dashboard',        path: '/finance/dashboard' },
@@ -150,43 +222,8 @@ export default function AppLayout() {
         <Outlet />
       </main>
 
-      {/* ── RIGHT AI COPILOT ── */}
-      <aside style={{
-        width: 280, minHeight: '100vh', background: '#FFFFFF',
-        borderLeft: '1px solid #E8E0D8', position: 'fixed',
-        right: 0, top: 0, bottom: 0, zIndex: 100, padding: '20px 16px', overflowY: 'auto',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #E8E0D8' }}>
-          <div style={{ width: 36, height: 36, background: 'rgba(196,162,77,0.15)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🤖</div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#C4A24D' }}>AI Finance Copilot</div>
-            <div style={{ fontSize: 11, color: '#94a3b8' }}>Enterprise Insights</div>
-          </div>
-        </div>
-
-        <div style={{ background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 8, padding: 12, marginBottom: 16 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#78350F', marginBottom: 6 }}>⚡ Anomaly Detected</div>
-          <div style={{ fontSize: 12, color: '#78350F', lineHeight: 1.5 }}>
-            Invoice <strong>INV-2024-041</strong> is 15% higher than previous averages for venue rental.
-          </div>
-        </div>
-
-        <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: '#94a3b8', marginBottom: 10 }}>
-          Quick Reports
-        </div>
-        {['Cash Flow Forecast', 'Expenditure Analysis', 'Quarterly Report'].map((r) => (
-          <div key={r} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0', fontSize: 12, color: '#334155', borderBottom: '1px solid #F1EDE8', cursor: 'pointer' }}>
-            <span style={{ color: '#C4A24D' }}>↗</span> {r}
-          </div>
-        ))}
-
-        <div style={{ marginTop: 16 }}>
-          <input
-            placeholder="Ask AI about performance..."
-            style={{ width: '100%', border: '1px solid #E8E0D8', borderRadius: 8, padding: '10px 12px', fontSize: 12, background: '#F8F5F1', outline: 'none', color: '#334155' }}
-          />
-        </div>
-      </aside>
+      {/* ── RIGHT INSIGHTS PANEL (live data) ── */}
+      <InsightsPanel />
     </div>
   )
 }

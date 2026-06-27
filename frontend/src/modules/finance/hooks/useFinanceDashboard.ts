@@ -15,6 +15,13 @@ export function useRevenueTrends(year: number) {
   })
 }
 
+export function useExpenseDistribution() {
+  return useQuery({
+    queryKey: ['finance', 'expense-distribution'],
+    queryFn: () => dashboardApi.getExpenseDistribution().then((r) => r.data.data),
+  })
+}
+
 export function useBranchPerformance() {
   return useQuery({
     queryKey: ['finance', 'branch-performance'],
