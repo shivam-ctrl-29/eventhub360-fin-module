@@ -16,6 +16,11 @@ export class DashboardController {
     return ok(await this.svc.getRevenueTrends(Number(year)))
   }
 
+  @Get('fin/company')
+  async getCompany() {
+    return ok(await this.svc.getCompany())
+  }
+
   @Get('fin/dashboard/expense-distribution')
   async getExpenseDistribution() {
     return ok(await this.svc.getExpenseDistribution())

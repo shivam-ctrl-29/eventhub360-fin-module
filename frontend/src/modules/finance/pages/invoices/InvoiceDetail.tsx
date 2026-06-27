@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { DownloadOutlined, EditOutlined, PrinterOutlined } from '@ant-design/icons'
 import { Skeleton, Alert, message } from 'antd'
 import { useInvoice } from '../../hooks/useInvoices'
+import { useCompany } from '../../hooks/useFinanceDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 import dayjs from 'dayjs'
 
@@ -18,6 +19,7 @@ export default function InvoiceDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { data: invoice, isLoading, isError } = useInvoice(id ?? '')
+  const { data: company } = useCompany()
 
   if (isLoading) return <div style={{ padding: 32 }}><Skeleton active paragraph={{ rows: 10 }} /></div>
   if (isError || !invoice) return <Alert type="error" message="Failed to load invoice." style={{ margin: 24 }} />
@@ -41,10 +43,11 @@ export default function InvoiceDetail() {
       <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 32, maxWidth: 800 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
           <div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#8B1A1A' }}>EventHub360</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#8B1A1A' }}>{company?.name ?? 'EventHub360'}</div>
             <div style={{ fontSize: 11, color: '#94a3b8' }}>Premium Concierge ERP</div>
             <div style={{ fontSize: 11, color: '#64748b', marginTop: 8, lineHeight: 1.6 }}>
-              123, Business Tower, BKC<br />Mumbai, Maharashtra 400051<br />GSTIN: 27AABCE1234F1Z5
+              {company?.gstin && <>GSTIN: {company.gstin}<br /></>}
+              {company?.pan && <>PAN: {company.pan}</>}
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>

@@ -59,8 +59,8 @@ export default function ProfitLossReport() {
                     📅 {dayjs(pnl.eventDate).format('MMM DD, YYYY')}
                   </span>
                 )}
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#065F46', background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 6, padding: '5px 10px', fontWeight: 600 }}>
-                  ● Active Project
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#334155', background: '#F5F0EB', borderRadius: 6, padding: '5px 10px', fontWeight: 600 }}>
+                  {(pnl?.lineItems?.length ?? 0)} cost line{(pnl?.lineItems?.length ?? 0) === 1 ? '' : 's'}
                 </span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
                   <button onClick={exportPnL} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
@@ -150,22 +150,36 @@ export default function ProfitLossReport() {
         </div>
 
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 8 }}>Benchmarking</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 8 }}>Profit Breakdown</div>
           <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5, marginBottom: 16 }}>
-            Profitability compared to similar events in the same period.
+            Revenue, costs and net profit for this view.
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 }}>
-            <span style={{ fontSize: 11, color: '#94a3b8' }}>Vs. Similar Events</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#059669' }}>+8.5% Above Avg</span>
+          {(() => {
+            const rev = pnl?.totalRevenue ?? 0
+            const cost = totalCosts
+            const net = pnl?.netProfit ?? 0
+            const max = Math.max(rev, cost, Math.abs(net), 1)
+            const bars = [
+              { label: 'Revenue', value: rev, color: '#8B1A1A' },
+              { label: 'Costs', value: cost, color: '#C4A24D' },
+              { label: 'Net Profit', value: net, color: '#059669' },
+            ]
+            return bars.map((b) => (
+              <div key={b.label} style={{ marginBottom: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, color: '#334155' }}>{b.label}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.value, { compact: true })}</span>
+                </div>
+                <div style={{ height: 9, background: '#F1F5F9', borderRadius: 5 }}>
+                  <div style={{ height: '100%', width: `${Math.round((Math.abs(b.value) / max) * 100)}%`, background: b.color, borderRadius: 5 }} />
+                </div>
+              </div>
+            ))
+          })()}
+          <div style={{ marginTop: 8, paddingTop: 12, borderTop: '1px solid #F5F0EB', display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, color: '#64748b' }}>Net Margin</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: '#8B1A1A' }}>{(pnl?.netMargin ?? 0).toFixed(1)}%</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 60, marginBottom: 16 }}>
-            {[35, 42, 38, 55, 40].map((h, i) => (
-              <div key={i} style={{ flex: 1, borderRadius: '3px 3px 0 0', background: i === 3 ? '#8B1A1A' : '#E8E0D8', height: `${h}%` }} />
-            ))}
-          </div>
-          <button onClick={() => message.info(`Revenue ${formatINR(pnl?.totalRevenue ?? 0)} · Costs ${formatINR(totalCosts)} · Net ${formatINR(pnl?.netProfit ?? 0)} (${pnl?.netMargin ?? 0}% margin)`)} style={{ width: '100%', padding: '8px 0', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
-            View Analytics Detail
-          </button>
         </div>
       </div>
 

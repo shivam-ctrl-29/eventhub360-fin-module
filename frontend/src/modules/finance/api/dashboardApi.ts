@@ -27,7 +27,18 @@ export interface ExpenseDistributionSlice {
   pct: number
 }
 
+export interface CompanyInfo {
+  companyId: string
+  name: string
+  gstin: string | null
+  pan: string | null
+  baseCurrency: string
+}
+
 export const dashboardApi = {
+  getCompany: () =>
+    axiosInstance.get<ApiResponse<CompanyInfo | null>>('/api/fin/company'),
+
   getKPIs: () =>
     axiosInstance.get<ApiResponse<DashboardKPIs>>('/api/fin/dashboard'),
 

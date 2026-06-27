@@ -42,8 +42,7 @@ export default function InvoiceBuilder() {
     defaultValues: {
       paymentMode: 'bank_transfer',
       items: [
-        { desc: 'Venue Booking — Grand Ballroom', qty: 1,   rate: 250000, gst: 18 },
-        { desc: 'Catering Services (per head)',   qty: 200, rate: 1500,   gst: 5  },
+        { desc: '', qty: 1, rate: 0, gst: 18 },
       ],
     },
   })
@@ -101,7 +100,7 @@ export default function InvoiceBuilder() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Invoice Number *</label>
-                <input {...register('invoiceNumber')} placeholder="INV-2024-047" style={errors.invoiceNumber ? INPUT_ERR : INPUT} />
+                <input {...register('invoiceNumber')} placeholder="INV-..." style={errors.invoiceNumber ? INPUT_ERR : INPUT} />
                 {errors.invoiceNumber && <div style={ERR}>{errors.invoiceNumber.message}</div>}
               </div>
               <div>
@@ -116,7 +115,7 @@ export default function InvoiceBuilder() {
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>PO Number</label>
-                <input {...register('poNumber')} placeholder="PO-2024-001" style={INPUT} />
+                <input {...register('poNumber')} placeholder="PO-..." style={INPUT} />
               </div>
             </div>
           </div>

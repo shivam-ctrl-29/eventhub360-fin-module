@@ -17,12 +17,47 @@ export class ReportService {
   ) {}
 
   async getGSTSummary(_financialYear: string) {
-    // GST filing records will come from a dedicated gst_filing table (future integration)
-    return this.mockGSTSummary()
+    // GST output tax is computed from real issued/paid invoice tax totals, grouped by month.
+    try {
+      const invoices = await this.invoiceRepo.find()
+      const byPeriod: Record<string, { output: number }> = {}
+      for (const inv of invoices) {
+        const d = new Date(inv.createdAt)
+        const period = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        byPeriod[period] = byPeriod[period] ?? { output: 0 }
+        byPeriod[period].output += Number(inv.taxTotal)
+      }
+      const periods = Object.keys(byPeriod).sort().reverse()
+      if (periods.length === 0) return []
+      return periods.map((period) => {
+        const gstOutput = Math.round(byPeriod[period].output * 100) / 100
+        return {
+          id: period, period, returnType: 'GSTR3B',
+          gstOutput, gstInput: 0, itcAvailable: 0, itcUtilized: 0,
+          netPayable: gstOutput,
+          filingStatus: 'pending', filedDate: null, dueDate: `${period}-20`,
+        }
+      })
+    } catch {
+      return []
+    }
   }
 
   async getGSTComplianceScore() {
-    return { score: 0, totalReturns: 0, filedOnTime: 0, pending: 0 }
+    // Real: nothing has been filed yet, so compliance reflects pending returns.
+    try {
+      const summary = await this.getGSTSummary('')
+      const totalReturns = summary.length
+      const filedOnTime = summary.filter((s) => s.filingStatus === 'filed').length
+      return {
+        score: totalReturns > 0 ? Math.round((filedOnTime / totalReturns) * 100) : 0,
+        totalReturns,
+        filedOnTime,
+        pending: totalReturns - filedOnTime,
+      }
+    } catch {
+      return { score: 0, totalReturns: 0, filedOnTime: 0, pending: 0 }
+    }
   }
 
   async getHSNBreakdown(_params: PaginationDto & { period: string }) {
@@ -152,14 +187,5 @@ export class ReportService {
 
   async getDunningQueue(_params: PaginationDto) {
     return { data: [], total: 0 }
-  }
-
-  private mockGSTSummary() {
-    const months = ['2026-04', '2026-05', '2026-06']
-    return months.map((period) => ({
-      id: period, period, returnType: 'GSTR3B',
-      gstOutput: 0, gstInput: 0, itcAvailable: 0, itcUtilized: 0, netPayable: 0,
-      filingStatus: 'pending', filedDate: null, dueDate: `${period}-20`,
-    }))
   }
 }

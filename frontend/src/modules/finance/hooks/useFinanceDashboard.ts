@@ -15,6 +15,14 @@ export function useRevenueTrends(year: number) {
   })
 }
 
+export function useCompany() {
+  return useQuery({
+    queryKey: ['finance', 'company'],
+    queryFn: () => dashboardApi.getCompany().then((r) => r.data.data),
+    staleTime: 1000 * 60 * 30,
+  })
+}
+
 export function useExpenseDistribution() {
   return useQuery({
     queryKey: ['finance', 'expense-distribution'],

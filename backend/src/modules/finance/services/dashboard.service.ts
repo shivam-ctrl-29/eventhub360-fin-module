@@ -73,6 +73,18 @@ export class DashboardService {
     }
   }
 
+  async getCompany() {
+    try {
+      const rows = await this.invoiceRepo.manager.query(
+        `SELECT company_id AS "companyId", name, gstin, pan, base_currency AS "baseCurrency"
+         FROM company ORDER BY company_id LIMIT 1`,
+      )
+      return rows[0] ?? null
+    } catch {
+      return null
+    }
+  }
+
   async getExpenseDistribution() {
     try {
       const rows = await this.expenseRepo

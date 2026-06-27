@@ -126,7 +126,7 @@ export default function PaymentList() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, padding: '12px 0' }}>
           <div>
             <label style={{ fontSize: 11, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Invoice ID *</label>
-            <input {...register('invoiceId')} placeholder="INV-2024-..." style={errors.invoiceId ? INPUT_ERR : INPUT} />
+            <input {...register('invoiceId')} placeholder="INV-..." style={errors.invoiceId ? INPUT_ERR : INPUT} />
             {errors.invoiceId && <div style={ERR}>{errors.invoiceId.message}</div>}
           </div>
           <div>
