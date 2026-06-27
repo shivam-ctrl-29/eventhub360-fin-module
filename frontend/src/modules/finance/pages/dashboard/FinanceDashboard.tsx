@@ -1,12 +1,15 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from 'recharts'
 import { BellOutlined, CalendarOutlined } from '@ant-design/icons'
-import { Skeleton } from 'antd'
+import { Skeleton, Badge, Dropdown } from 'antd'
 import { useFinanceKPIs, useRevenueTrends, useBranchPerformance, useExpenseDistribution } from '../../hooks/useFinanceDashboard'
 import { useARAgingSummary } from '../../hooks/useARDashboard'
+import { useExpenseList } from '../../hooks/useExpenses'
+import { usePayoutSchedule } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 
 const PIE_COLORS = ['#8B1A1A', '#C4A24D', '#E2946B', '#94a3b8', '#1a2a4a', '#CC5555', '#6B8E23']
@@ -21,17 +24,27 @@ function currentFYLabel() {
   return `${q} FY${fyStart}-${String(fyStart + 1).slice(2)}`
 }
 
+const NEUTRAL = '#94a3b8', POS = '#059669', NEG = '#DC2626'
+
+// Each KPI's caption is derived from the real value, not a fixed sentiment.
 const KPI_META = [
-  { key: 'totalRevenue',  label: 'TOTAL REVENUE', icon: '💰', iconBg: '#FEF3C7', deltaType: 'positive', deltaLabel: 'This FY'       },
-  { key: 'receivables',   label: 'RECEIVABLES',   icon: '📋', iconBg: '#FEE2E2', deltaType: 'negative', deltaLabel: 'Overdue'        },
-  { key: 'payables',      label: 'PAYABLE',        icon: '🧾', iconBg: '#F1F5F9', deltaType: 'warning',  deltaLabel: 'Pending Bills'  },
-  { key: 'eventMargin',   label: 'EVENT MARGIN',   icon: '📈', iconBg: '#FEF3C7', deltaType: 'positive', deltaLabel: 'Gross Margin'   },
-  { key: 'taxLiability',  label: 'TAXES',          icon: '🏛️', iconBg: '#F1F5F9', deltaType: 'warning',  deltaLabel: 'GST Accrued'   },
-  { key: 'cashForecast',  label: 'CASH FORECAST',  icon: '🏦', iconBg: '#D1FAE5', deltaType: 'positive', deltaLabel: 'Healthy'        },
+  { key: 'totalRevenue', label: 'TOTAL REVENUE', icon: '💰', iconBg: '#FEF3C7',
+    caption: () => ({ text: 'Invoiced this FY', color: NEUTRAL }) },
+  { key: 'receivables', label: 'RECEIVABLES', icon: '📋', iconBg: '#FEE2E2',
+    caption: (v: number) => ({ text: v > 0 ? 'Awaiting collection' : 'All collected', color: v > 0 ? NEG : POS }) },
+  { key: 'payables', label: 'PAYABLE', icon: '🧾', iconBg: '#F1F5F9',
+    caption: (v: number) => ({ text: v > 0 ? 'Scheduled payouts' : 'Nothing due', color: v > 0 ? '#C4A24D' : POS }) },
+  { key: 'eventMargin', label: 'EVENT MARGIN', icon: '📈', iconBg: '#FEF3C7',
+    caption: (v: number) => ({ text: v >= 0 ? 'Profitable' : 'Loss-making', color: v >= 0 ? POS : NEG }) },
+  { key: 'taxLiability', label: 'TAXES', icon: '🏛️', iconBg: '#F1F5F9',
+    caption: () => ({ text: 'GST on sales', color: NEUTRAL }) },
+  { key: 'cashForecast', label: 'CASH FORECAST', icon: '🏦', iconBg: '#D1FAE5',
+    caption: (v: number) => ({ text: v >= 0 ? 'Positive position' : 'Negative position', color: v >= 0 ? POS : NEG }) },
 ] as const
 
 // ── Component ─────────────────────────────────────────────────────────
 export default function FinanceDashboard() {
+  const navigate = useNavigate()
   const [revenueTab, setRevenueTab] = useState<'Revenue' | 'Expenses'>('Revenue')
   const currentYear = new Date().getFullYear()
 
@@ -40,10 +53,26 @@ export default function FinanceDashboard() {
   const { data: branches, isLoading: branchesLoading } = useBranchPerformance()
   const { data: expenseDist, isLoading: expenseLoading } = useExpenseDistribution()
   const { data: agingSummary } = useARAgingSummary()
+  const { data: pendingExpenses } = useExpenseList({ page: 1, limit: 100, status: 'pending' })
+  const { data: payouts } = usePayoutSchedule({ page: 1, limit: 100 })
 
   const expenseData = (expenseDist ?? []).map((e, i) => ({
     name: e.category, value: e.pct, amount: e.amount, color: PIE_COLORS[i % PIE_COLORS.length],
   }))
+
+  // Real, data-driven notifications for the bell
+  const pendingExpenseCount = pendingExpenses?.total ?? 0
+  const scheduledPayoutCount = (payouts?.data ?? []).filter((p: any) => p.status === 'scheduled').length
+  const alerts: Array<{ text: string; to: string }> = []
+  if ((kpis?.receivables ?? 0) > 0) alerts.push({ text: `${formatINR(kpis!.receivables, { compact: true })} in receivables outstanding`, to: '/finance/ar-aging' })
+  if (pendingExpenseCount > 0) alerts.push({ text: `${pendingExpenseCount} expense${pendingExpenseCount > 1 ? 's' : ''} awaiting approval`, to: '/finance/expenses' })
+  if (scheduledPayoutCount > 0) alerts.push({ text: `${scheduledPayoutCount} vendor payout${scheduledPayoutCount > 1 ? 's' : ''} scheduled`, to: '/finance/payouts' })
+
+  const bellMenu = {
+    items: alerts.length
+      ? alerts.map((a, i) => ({ key: String(i), label: a.text, onClick: () => navigate(a.to) }))
+      : [{ key: 'none', label: 'No new alerts', disabled: true }],
+  }
 
   return (
     <div>
@@ -61,13 +90,17 @@ export default function FinanceDashboard() {
           }}>
             <CalendarOutlined style={{ color: '#8B1A1A' }} /> {currentFYLabel()}
           </div>
-          <div style={{
-            width: 34, height: 34, background: '#fff', border: '1px solid #E8E0D8',
-            borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-          }}>
-            <BellOutlined style={{ fontSize: 15, color: '#64748b' }} />
-          </div>
+          <Dropdown menu={bellMenu} trigger={['click']} placement="bottomRight">
+            <Badge count={alerts.length} size="small" offset={[-4, 4]}>
+              <div style={{
+                width: 34, height: 34, background: '#fff', border: '1px solid #E8E0D8',
+                borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+              }}>
+                <BellOutlined style={{ fontSize: 15, color: '#64748b' }} />
+              </div>
+            </Badge>
+          </Dropdown>
         </div>
       </div>
 
@@ -83,6 +116,7 @@ export default function FinanceDashboard() {
               const raw = kpis ? kpis[k.key] : 0
               const isPercent = k.key === 'eventMargin'
               const display = isPercent ? `${raw.toFixed(1)}%` : formatINR(raw, { compact: true })
+              const cap = k.caption(raw)
               return (
                 <div key={k.label} style={{ background: '#fff', borderRadius: 12, padding: '14px 12px', border: '1px solid #E8E0D8' }}>
                   <div style={{ width: 32, height: 32, background: k.iconBg, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, marginBottom: 10 }}>
@@ -94,8 +128,8 @@ export default function FinanceDashboard() {
                   <div style={{ fontSize: 18, fontWeight: 700, color: '#1a2a4a', lineHeight: 1.2 }}>
                     {display}
                   </div>
-                  <div style={{ fontSize: 11, marginTop: 5, fontWeight: 500, color: k.deltaType === 'positive' ? '#059669' : k.deltaType === 'negative' ? '#DC2626' : '#C4A24D' }}>
-                    {k.deltaType === 'positive' ? '↑' : k.deltaType === 'negative' ? '↓' : '⏱'} {k.deltaLabel}
+                  <div style={{ fontSize: 11, marginTop: 5, fontWeight: 500, color: cap.color }}>
+                    {cap.text}
                   </div>
                 </div>
               )
@@ -110,8 +144,8 @@ export default function FinanceDashboard() {
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>Revenue Trends</div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Monthly comparison vs Previous Year</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{revenueTab} Trends</div>
+              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Monthly {revenueTab.toLowerCase()} · FY {currentYear}</div>
             </div>
             <div style={{ display: 'flex', gap: 4 }}>
               {(['Revenue', 'Expenses'] as const).map((tab) => (
