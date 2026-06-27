@@ -146,15 +146,24 @@ export class DashboardService {
         return { week: `W${i + 1}`, historical, projected: Math.round(monthlyBurn / 4) }
       })
 
+      const lastPayment = payments.reduce<Date | null>((m, p) => {
+        const t = new Date(p.paidAt)
+        return !m || t > m ? t : m
+      }, null)
+
       return {
         netLiquidity,
         opexRunway: Math.round(opexRunway * 10) / 10,
         healthScore,
+        inflows: inflow,
+        outflows: outflow,
+        lastPaymentAt: lastPayment ? lastPayment.toISOString() : null,
         weeklyForecast,
       }
     } catch {
       return {
         netLiquidity: 0, opexRunway: 0, healthScore: 0,
+        inflows: 0, outflows: 0, lastPaymentAt: null,
         weeklyForecast: Array.from({ length: 6 }, (_, i) => ({ week: `W${i + 1}`, historical: 0, projected: 0 })),
       }
     }

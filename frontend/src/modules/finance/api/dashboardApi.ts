@@ -15,6 +15,9 @@ export interface CashHealthData {
   netLiquidity: number
   opexRunway: number
   healthScore: number
+  inflows: number
+  outflows: number
+  lastPaymentAt: string | null
   weeklyForecast: Array<{ week: string; historical: number; projected: number }>
 }
 
