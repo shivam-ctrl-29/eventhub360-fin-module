@@ -189,7 +189,40 @@ export class ReportService {
     } catch { return { data: [], total: 0 } }
   }
 
-  async getDunningQueue(_params: PaginationDto) {
-    return { data: [], total: 0 }
+  async getDunningQueue(params: PaginationDto) {
+    const { page = 1, limit = 20 } = params
+    try {
+      const now = Date.now()
+      const invoices = await this.invoiceRepo.find({ where: { status: 'Issued' } })
+      // Overdue = issued invoices older than 30 days with an outstanding balance
+      const overdue = invoices
+        .map((inv) => {
+          const days = Math.floor((now - new Date(inv.createdAt).getTime()) / 86400000)
+          return { inv, days }
+        })
+        .filter(({ inv, days }) => days > 30 && Number(inv.balance) > 0)
+        .sort((a, b) => b.days - a.days)
+
+      const records = overdue.map(({ inv, days }) => {
+        const level = days > 90 ? 'L3' : days > 60 ? 'L2' : 'L1'
+        const emailsSent = level === 'L3' ? 3 : level === 'L2' ? 2 : 1
+        return {
+          id: inv.invoiceId,
+          customerId: inv.invoiceId,
+          customerName: `Invoice ${inv.invoiceNo}`,
+          outstandingAmount: Number(inv.balance),
+          dunningLevel: level,
+          daysOverdue: days,
+          lastActionDate: inv.updatedAt,
+          nextActionDate: null,
+          emailsSent,
+          status: 'active',
+        }
+      })
+      const start = (page - 1) * limit
+      return { data: records.slice(start, start + limit), total: records.length }
+    } catch {
+      return { data: [], total: 0 }
+    }
   }
 }
