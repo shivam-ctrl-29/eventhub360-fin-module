@@ -12,7 +12,7 @@ import { useExpenseList } from '../../hooks/useExpenses'
 import { usePayoutSchedule } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 
-const PIE_COLORS = ['#8B1A1A', '#C4A24D', '#E2946B', '#94a3b8', '#1a2a4a', '#CC5555', '#6B8E23']
+const PIE_COLORS = ['#8B1A1A', '#C4A24D', '#1a2a4a', '#E2946B', '#059669', '#CC5555', '#94a3b8']
 
 // Current financial year + quarter label (India FY: Apr–Mar)
 function currentFYLabel() {

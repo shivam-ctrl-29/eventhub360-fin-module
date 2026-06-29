@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 
 const LEVEL_COLORS: Record<string, { bg: string; color: string }> = {
   L1: { bg: '#FEF3C7', color: '#92400E' },
-  L2: { bg: '#FED7AA', color: '#7C2D12' },
+  L2: { bg: '#F7EFD9', color: '#8B6B1A' },
   L3: { bg: '#FEE2E2', color: '#991B1B' },
 }
 
