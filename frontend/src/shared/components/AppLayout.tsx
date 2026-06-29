@@ -6,6 +6,7 @@ import { useInvoiceList } from '../../modules/finance/hooks/useInvoices'
 import { formatINR } from '../../modules/finance/utils/currencyFormatter'
 import { useFinanceUIStore } from '../../modules/finance/store/financeUIStore'
 import { CURRENCY_OPTIONS } from '../../modules/finance/utils/currencyFormatter'
+import { useViewport } from '../hooks/useViewport'
 
 function InsightsPanel() {
   const navigate = useNavigate()
@@ -109,50 +110,73 @@ export default function AppLayout() {
   const toggleSidebar = useFinanceUIStore((s) => s.toggleSidebar)
   const currency = useFinanceUIStore((s) => s.currency)
   const setCurrency = useFinanceUIStore((s) => s.setCurrency)
+  const { isMobile, isDesktop } = useViewport()
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const isFinance = location.pathname.startsWith('/finance')
-  const sidebarW = collapsed ? 64 : 220
+  const navCollapsed = collapsed && !isMobile            // icon-rail only on tablet/desktop
+  const sidebarW = navCollapsed ? 64 : 220
+  const showRightPanel = isDesktop                       // hide secondary panel on tablet/mobile
+  const closeMobileNav = () => setMobileNavOpen(false)
+  const go = (path: string) => { navigate(path); closeMobileNav() }
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#F5F0EB' }}>
 
+      {/* ── MOBILE TOP BAR ── */}
+      {isMobile && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 52, background: '#fff', borderBottom: '1px solid #E8E0D8', display: 'flex', alignItems: 'center', gap: 12, padding: '0 14px', zIndex: 90 }}>
+          <button onClick={() => setMobileNavOpen(true)} aria-label="Open menu" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#8B1A1A', fontSize: 20, display: 'flex', alignItems: 'center' }}>
+            <MenuUnfoldOutlined />
+          </button>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#8B1A1A' }}>EventHub360</div>
+        </div>
+      )}
+
+      {/* ── MOBILE BACKDROP ── */}
+      {isMobile && mobileNavOpen && (
+        <div onClick={closeMobileNav} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 110 }} />
+      )}
+
       {/* ── LEFT SIDEBAR ── */}
       <aside style={{
-        width: sidebarW, minHeight: '100vh', background: '#FFFFFF',
+        width: isMobile ? 240 : sidebarW, minHeight: '100vh', background: '#FFFFFF',
         borderRight: '1px solid #E8E0D8', display: 'flex', flexDirection: 'column',
-        position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 100, overflowY: 'auto',
-        transition: 'width 0.2s ease',
+        position: 'fixed', left: 0, top: 0, bottom: 0,
+        zIndex: isMobile ? 120 : 100, overflowY: 'auto',
+        transform: isMobile && !mobileNavOpen ? 'translateX(-100%)' : 'translateX(0)',
+        transition: 'transform 0.25s ease, width 0.2s ease',
       }}>
 
-        {/* Brand + collapse toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', padding: collapsed ? '20px 0 14px' : '20px 16px 14px', borderBottom: '1px solid #E8E0D8', flexShrink: 0 }}>
-          {!collapsed && (
+        {/* Brand + collapse / close toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: navCollapsed ? 'center' : 'space-between', padding: navCollapsed ? '20px 0 14px' : '20px 16px 14px', borderBottom: '1px solid #E8E0D8', flexShrink: 0 }}>
+          {!navCollapsed && (
             <div>
               <div style={{ fontSize: 16, fontWeight: 700, color: '#8B1A1A' }}>EventHub360</div>
               <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Premium Concierge ERP</div>
             </div>
           )}
           <button
-            onClick={toggleSidebar}
-            title={collapsed ? 'Expand menu' : 'Collapse menu'}
-            aria-label={collapsed ? 'Expand menu' : 'Collapse menu'}
+            onClick={isMobile ? closeMobileNav : toggleSidebar}
+            title={isMobile ? 'Close menu' : navCollapsed ? 'Expand menu' : 'Collapse menu'}
+            aria-label={isMobile ? 'Close menu' : navCollapsed ? 'Expand menu' : 'Collapse menu'}
             style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#8B1A1A', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 4 }}
           >
-            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            {navCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </button>
         </div>
 
         {/* Currency selector */}
-        <div style={{ padding: collapsed ? '10px 8px' : '10px 16px', borderBottom: '1px solid #E8E0D8', flexShrink: 0 }}>
-          {!collapsed && <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#94a3b8', marginBottom: 5 }}>Currency</div>}
+        <div style={{ padding: navCollapsed ? '10px 8px' : '10px 16px', borderBottom: '1px solid #E8E0D8', flexShrink: 0 }}>
+          {!navCollapsed && <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#94a3b8', marginBottom: 5 }}>Currency</div>}
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value as any)}
             title="Display currency"
-            style={{ width: '100%', padding: collapsed ? '5px 2px' : '6px 8px', border: '1px solid #E8E0D8', borderRadius: 6, fontSize: collapsed ? 11 : 12, color: '#334155', background: '#fff', cursor: 'pointer', textAlign: collapsed ? 'center' : 'left' }}
+            style={{ width: '100%', padding: navCollapsed ? '5px 2px' : '6px 8px', border: '1px solid #E8E0D8', borderRadius: 6, fontSize: navCollapsed ? 11 : 12, color: '#334155', background: '#fff', cursor: 'pointer', textAlign: navCollapsed ? 'center' : 'left' }}
           >
             {CURRENCY_OPTIONS.map((c) => (
-              <option key={c.value} value={c.value}>{collapsed ? c.value : c.label}</option>
+              <option key={c.value} value={c.value}>{navCollapsed ? c.value : c.label}</option>
             ))}
           </select>
         </div>
@@ -167,21 +191,21 @@ export default function AppLayout() {
               title={item.label}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                justifyContent: collapsed ? 'center' : 'flex-start',
+                justifyContent: navCollapsed ? 'center' : 'flex-start',
                 padding: '9px 16px', fontSize: 14, color: '#334155', cursor: 'pointer',
               }}
             >
               <span style={{ fontSize: 14 }}>{item.icon}</span>
-              {!collapsed && <span>{item.label}</span>}
+              {!navCollapsed && <span>{item.label}</span>}
             </div>
           ))}
 
-          {/* Finance & Accounting — collapsible (in expanded mode) / icon (collapsed) */}
+          {/* Finance & Accounting — collapsible (expanded) / icon (collapsed) */}
           <div
-            onClick={() => collapsed ? navigate('/finance/dashboard') : setFinanceOpen((o) => !o)}
+            onClick={() => navCollapsed ? go('/finance/dashboard') : setFinanceOpen((o) => !o)}
             title="Finance & Accounting"
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between',
+              display: 'flex', alignItems: 'center', justifyContent: navCollapsed ? 'center' : 'space-between',
               padding: '9px 16px', fontSize: 14, fontWeight: 600,
               color: isFinance ? '#8B1A1A' : '#334155',
               borderRight: isFinance ? '3px solid #8B1A1A' : '3px solid transparent',
@@ -191,13 +215,13 @@ export default function AppLayout() {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 14 }}>🏦</span>
-              {!collapsed && <span>Finance &amp; Accounting</span>}
+              {!navCollapsed && <span>Finance &amp; Accounting</span>}
             </div>
-            {!collapsed && <span style={{ fontSize: 11, color: '#94a3b8' }}>{financeOpen ? '▲' : '▼'}</span>}
+            {!navCollapsed && <span style={{ fontSize: 11, color: '#94a3b8' }}>{financeOpen ? '▲' : '▼'}</span>}
           </div>
 
           {/* Finance Sub-links (hidden when collapsed) */}
-          {financeOpen && !collapsed && (
+          {financeOpen && !navCollapsed && (
             <div style={{ background: '#FAFAF9', borderBottom: '1px solid #E8E0D8' }}>
               {financeSubLinks.map((sub) => {
                 const active = location.pathname === sub.path
@@ -205,6 +229,7 @@ export default function AppLayout() {
                   <NavLink
                     key={sub.path}
                     to={sub.path}
+                    onClick={closeMobileNav}
                     style={{
                       display: 'block',
                       padding: '7px 16px 7px 40px',
@@ -226,9 +251,9 @@ export default function AppLayout() {
         </nav>
 
         {/* Quick Action */}
-        <div style={{ padding: collapsed ? '12px 8px' : '12px 16px', flexShrink: 0 }}>
+        <div style={{ padding: navCollapsed ? '12px 8px' : '12px 16px', flexShrink: 0 }}>
           <button
-            onClick={() => navigate('/finance/invoices/new')}
+            onClick={() => go('/finance/invoices/new')}
             title="New Invoice"
             style={{
               width: '100%', background: '#8B1A1A', color: '#fff',
@@ -236,7 +261,7 @@ export default function AppLayout() {
               fontSize: 14, fontWeight: 600, cursor: 'pointer',
             }}
           >
-            {collapsed ? '+' : '+ Quick Action'}
+            {navCollapsed ? '+' : '+ Quick Action'}
           </button>
         </div>
 
@@ -245,10 +270,10 @@ export default function AppLayout() {
           {[{ label: 'Help Center', icon: '❓' }, { label: 'Logout', icon: '↪' }].map((l) => (
             <div key={l.label} title={l.label} style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              justifyContent: collapsed ? 'center' : 'flex-start',
+              justifyContent: navCollapsed ? 'center' : 'flex-start',
               padding: '10px 16px', fontSize: 14, color: '#64748b', cursor: 'pointer',
             }}>
-              <span>{l.icon}</span>{!collapsed && <span>{l.label}</span>}
+              <span>{l.icon}</span>{!navCollapsed && <span>{l.label}</span>}
             </div>
           ))}
         </div>
@@ -256,9 +281,13 @@ export default function AppLayout() {
 
       {/* ── MAIN CONTENT ── */}
       <main style={{
-        marginLeft: sidebarW, marginRight: 280, flex: 1,
-        padding: 24, minHeight: '100vh', background: '#F5F0EB',
-        transition: 'margin-left 0.2s ease',
+        marginLeft: isMobile ? 0 : sidebarW,
+        marginRight: showRightPanel ? 280 : 0,
+        flex: 1,
+        padding: isMobile ? '64px 12px 16px' : 24,
+        minHeight: '100vh', background: '#F5F0EB',
+        transition: 'margin 0.2s ease',
+        minWidth: 0,
       }}>
         {/* key on currency forces money figures to re-format app-wide when currency changes */}
         <div key={currency}>
@@ -266,8 +295,8 @@ export default function AppLayout() {
         </div>
       </main>
 
-      {/* ── RIGHT INSIGHTS PANEL (live data) ── */}
-      <InsightsPanel />
+      {/* ── RIGHT INSIGHTS PANEL (desktop only) ── */}
+      {showRightPanel && <InsightsPanel />}
     </div>
   )
 }
