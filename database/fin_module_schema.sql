@@ -290,12 +290,45 @@ CREATE INDEX IF NOT EXISTS idx_audit_severity ON fin_audit_trail (severity);
 
 
 -- ──────────────────────────────────────────────────────────
--- STEP 11: GRANT PERMISSIONS to app user
+-- STEP 11: VENDOR BILL (Accounts Payable — uploaded vendor bills)
+-- ──────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS vendor_bill (
+  vendor_bill_id BIGSERIAL PRIMARY KEY,
+  tenant_id    BIGINT NOT NULL DEFAULT 1 REFERENCES tenant(tenant_id)   ON DELETE RESTRICT,
+  company_id   BIGINT NOT NULL DEFAULT 1 REFERENCES company(company_id) ON DELETE RESTRICT,
+  branch_id    BIGINT REFERENCES branch(branch_id) ON DELETE RESTRICT,
+  bill_number  VARCHAR(40)  NOT NULL,
+  vendor_name  VARCHAR(160) NOT NULL,
+  category     VARCHAR(40)  DEFAULT 'miscellaneous',
+  amount       NUMERIC(14,2) NOT NULL DEFAULT 0,
+  gst_amount   NUMERIC(14,2) NOT NULL DEFAULT 0,
+  total_amount NUMERIC(14,2) NOT NULL,
+  bill_date    DATE,
+  due_date     DATE,
+  status       VARCHAR(15)  NOT NULL DEFAULT 'pending'
+               CHECK (status IN ('pending','approved','paid','overdue')),
+  file_name    TEXT,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_by   BIGINT REFERENCES user_account(user_id),
+  updated_by   BIGINT REFERENCES user_account(user_id),
+  is_active    BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE INDEX IF NOT EXISTS idx_vendor_bill_status ON vendor_bill (status) WHERE is_active;
+
+CREATE OR REPLACE TRIGGER trg_vendor_bill_updated_at
+  BEFORE UPDATE ON vendor_bill
+  FOR EACH ROW EXECUTE FUNCTION fin_set_updated_at();
+
+
+-- ──────────────────────────────────────────────────────────
+-- STEP 12: GRANT PERMISSIONS to app user
 --   Run this after all tables are created
 -- ──────────────────────────────────────────────────────────
 GRANT SELECT, INSERT, UPDATE ON
   tax_rule, invoice, invoice_line, payment,
-  expense, payout, credit_note, pnl, fin_audit_trail
+  expense, payout, credit_note, pnl, fin_audit_trail, vendor_bill
 TO eventhub_dev;
 
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO eventhub_dev;

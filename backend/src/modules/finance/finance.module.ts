@@ -7,6 +7,7 @@ import { Payout } from './entities/payout-schedule.entity';
 import { CreditNote } from './entities/credit-note.entity';
 import { Pnl } from './entities/pnl.entity';
 import { FinAuditTrail } from './entities/fin-audit.entity';
+import { VendorBill } from './entities/vendor-bill.entity';
 import { InvoiceService } from './services/invoice.service';
 import { PaymentService } from './services/payment.service';
 import { ExpenseService } from './services/expense.service';
@@ -27,7 +28,7 @@ import { DashboardController } from './controllers/dashboard.controller';
   imports: [
     TypeOrmModule.forFeature([
       Invoice, InvoiceLine, Payment, Expense, Payout,
-      CreditNote, Pnl, FinAuditTrail,
+      CreditNote, Pnl, FinAuditTrail, VendorBill,
     ]),
   ],
   controllers: [

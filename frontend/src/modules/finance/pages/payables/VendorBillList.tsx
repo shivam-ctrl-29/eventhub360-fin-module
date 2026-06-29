@@ -1,23 +1,73 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   SearchOutlined, CloudUploadOutlined, CheckCircleFilled,
   FileTextOutlined, StarFilled,
 } from '@ant-design/icons'
-import { Skeleton, message, Modal } from 'antd'
-import { useVendorBills, useApprovePayouts } from '../../hooks/useAPDashboard'
+import { Skeleton, message, Modal, Form, Input, InputNumber, Select, DatePicker } from 'antd'
+import { useVendorBills, useApprovePayouts, useUploadBill } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 import { downloadCSV } from '../../utils/exportHelper'
 import dayjs from 'dayjs'
 
+const ALLOWED = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg']
+const MAX_BYTES = 5 * 1024 * 1024
+
+const CATEGORY_OPTS = [
+  { value: 'food_beverage', label: 'Food & Beverage' },
+  { value: 'logistics', label: 'Logistics' },
+  { value: 'travel', label: 'Travel' },
+  { value: 'marketing', label: 'Marketing' },
+  { value: 'venue', label: 'Venue' },
+  { value: 'decor', label: 'Decor' },
+  { value: 'miscellaneous', label: 'Miscellaneous' },
+]
+
 export default function VendorBillList() {
   const [selected, setSelected] = useState<string[]>([])
   const [dragOver, setDragOver] = useState(false)
-  const [uploaded, setUploaded] = useState(false)
   const [localSearch, setLocalSearch] = useState('')
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [formOpen, setFormOpen] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [form] = Form.useForm()
 
   const { data: page, isLoading } = useVendorBills({ page: 1, limit: 20, search: localSearch || undefined })
   const approveMutation = useApprovePayouts()
+  const uploadMutation = useUploadBill()
   const bills = page?.data ?? []
+
+  const validateFile = (file: File): boolean => {
+    if (!ALLOWED.includes(file.type)) { message.error('Unsupported file type. Please upload a PDF, PNG, or JPG.'); return false }
+    if (file.size > MAX_BYTES) { message.error('File too large. Maximum size is 5 MB.'); return false }
+    return true
+  }
+
+  const onFilePicked = (file: File | undefined) => {
+    if (!file) return
+    if (!validateFile(file)) return
+    setPendingFile(file)
+    setFormOpen(true)
+  }
+
+  const submitUpload = async () => {
+    try {
+      const v = await form.validateFields()
+      if (!pendingFile) { message.error('No file selected'); return }
+      const fd = new FormData()
+      fd.append('file', pendingFile)
+      fd.append('vendorName', v.vendorName)
+      fd.append('amount', String(v.amount))
+      fd.append('gstAmount', String(v.gstAmount ?? 0))
+      fd.append('category', v.category)
+      if (v.dueDate) fd.append('dueDate', v.dueDate.format('YYYY-MM-DD'))
+      await uploadMutation.mutateAsync(fd)
+      message.success('Bill uploaded successfully')
+      setFormOpen(false); setPendingFile(null); form.resetFields()
+    } catch (e: any) {
+      if (e?.errorFields) return
+      message.error(e?.response?.data?.message ?? 'Upload failed')
+    }
+  }
 
   const toggleCheck = (id: string) => setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])
   const allChecked = bills.length > 0 && bills.every((b) => selected.includes(b.id))
@@ -79,11 +129,21 @@ export default function VendorBillList() {
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 18 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a', marginBottom: 14 }}>Upload Bill</div>
 
+          {/* Hidden real file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg"
+            style={{ display: 'none' }}
+            onChange={(e) => { onFilePicked(e.target.files?.[0]); e.target.value = '' }}
+          />
+
           {/* Drop Zone */}
           <div
+            onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
             onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => { e.preventDefault(); setDragOver(false); setUploaded(true) }}
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); onFilePicked(e.dataTransfer.files?.[0]) }}
             style={{
               border: `2px dashed ${dragOver ? '#8B1A1A' : '#E2C4C4'}`,
               borderRadius: 10,
@@ -97,25 +157,19 @@ export default function VendorBillList() {
           >
             <CloudUploadOutlined style={{ fontSize: 28, color: '#C4A24D', display: 'block', marginBottom: 10 }} />
             <div style={{ fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-              Drag & drop PDF here
+              Click or drag a file to upload
             </div>
             <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
-              AI will auto-extract<br />vendor and amount
+              PDF, PNG or JPG · up to 5 MB
             </div>
           </div>
 
-          {/* Uploaded File */}
-          {uploaded && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              background: '#FDF9F7', border: '1px solid #E8E0D8',
-              borderRadius: 8, padding: '10px 12px',
-            }}>
-              <FileTextOutlined style={{ color: '#8B1A1A', fontSize: 16 }} />
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#334155', flex: 1 }}>INV_9921.pdf</span>
-              <CheckCircleFilled style={{ color: '#059669', fontSize: 14 }} />
-            </div>
-          )}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            style={{ width: '100%', padding: '9px 0', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Select Bill File
+          </button>
         </div>
 
         {/* Vendor Payout Queue */}
@@ -182,6 +236,47 @@ export default function VendorBillList() {
           </div>
         ))}
       </div>
+
+      {/* Upload Bill — details modal (file already selected & validated) */}
+      <Modal
+        title="Upload Vendor Bill"
+        open={formOpen}
+        onCancel={() => { setFormOpen(false); setPendingFile(null); form.resetFields() }}
+        onOk={submitUpload}
+        okText="Upload Bill"
+        confirmLoading={uploadMutation.isPending}
+        okButtonProps={{ style: { background: '#8B1A1A', borderColor: '#8B1A1A' } }}
+      >
+        {pendingFile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FDF9F7', border: '1px solid #E8E0D8', borderRadius: 8, padding: '10px 12px', marginBottom: 16 }}>
+            <FileTextOutlined style={{ color: '#8B1A1A', fontSize: 16 }} />
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#334155', flex: 1 }}>{pendingFile.name}</span>
+            <span style={{ fontSize: 12, color: '#94a3b8' }}>{(pendingFile.size / 1024).toFixed(0)} KB</span>
+            <CheckCircleFilled style={{ color: '#059669', fontSize: 14 }} />
+          </div>
+        )}
+        <Form form={form} layout="vertical" initialValues={{ category: 'miscellaneous', gstAmount: 0 }}>
+          <Form.Item name="vendorName" label="Vendor Name" rules={[{ required: true, message: 'Vendor name is required' }]}>
+            <Input placeholder="e.g. Sound & Stage Co." />
+          </Form.Item>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <Form.Item name="amount" label="Amount (₹)" rules={[{ required: true, message: 'Amount is required' }]}>
+              <InputNumber min={1} style={{ width: '100%' }} placeholder="80000" />
+            </Form.Item>
+            <Form.Item name="gstAmount" label="GST Amount (₹)">
+              <InputNumber min={0} style={{ width: '100%' }} placeholder="14400" />
+            </Form.Item>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <Form.Item name="category" label="Category" rules={[{ required: true }]}>
+              <Select options={CATEGORY_OPTS} />
+            </Form.Item>
+            <Form.Item name="dueDate" label="Due Date">
+              <DatePicker style={{ width: '100%' }} />
+            </Form.Item>
+          </div>
+        </Form>
+      </Modal>
     </div>
   )
 }

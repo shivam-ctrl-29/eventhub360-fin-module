@@ -23,6 +23,14 @@ export function usePayoutSchedule(params: TableParams) {
   })
 }
 
+export function useUploadBill() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (formData: FormData) => payableApi.uploadBill(formData).then((r) => r.data.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['finance', 'vendor-bills'] }) },
+  })
+}
+
 export function useApprovePayouts() {
   const qc = useQueryClient()
   return useMutation({
