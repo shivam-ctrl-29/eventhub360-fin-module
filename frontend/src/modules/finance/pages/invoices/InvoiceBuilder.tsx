@@ -5,6 +5,7 @@ import { PlusOutlined, DeleteOutlined, SaveOutlined, SendOutlined } from '@ant-d
 import { useNavigate } from 'react-router-dom'
 import { message } from 'antd'
 import { useCreateInvoice } from '../../hooks/useInvoices'
+import { INDIAN_STATES, CITIES_BY_STATE } from '@shared/constants/indianLocations'
 
 const lineItemSchema = z.object({
   desc:  z.string().min(1, 'Description is required'),
@@ -21,7 +22,8 @@ const invoiceSchema = z.object({
   clientName:    z.string().min(1, 'Client name is required'),
   gstin:         z.string().optional(),
   address:       z.string().min(1, 'Address is required'),
-  cityState:     z.string().min(1, 'City & State is required'),
+  state:         z.string().min(1, 'State is required'),
+  city:          z.string().min(1, 'City is required'),
   notes:         z.string().optional(),
   paymentMode:   z.enum(['bank_transfer', 'upi', 'cheque', 'cash', 'card']),
   items:         z.array(lineItemSchema).min(1, 'At least one line item is required'),
@@ -37,7 +39,7 @@ export default function InvoiceBuilder() {
   const navigate = useNavigate()
   const createInvoice = useCreateInvoice()
 
-  const { register, control, handleSubmit, watch, formState: { errors } } = useForm<InvoiceFormData>({
+  const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm<InvoiceFormData>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
       paymentMode: 'bank_transfer',
@@ -62,7 +64,7 @@ export default function InvoiceBuilder() {
         issueDate:     data.invoiceDate,
         dueDate:       data.dueDate,
         poNumber:      data.poNumber,
-        customer: { name: data.clientName, gstin: data.gstin, address: data.address, cityState: data.cityState },
+        customer: { name: data.clientName, gstin: data.gstin, address: data.address, city: data.city, state: data.state, cityState: `${data.city}, ${data.state}` },
         lineItems:    data.items.map((i) => ({ description: i.desc, quantity: i.qty, unitPrice: i.rate, gstRate: i.gst })),
         notes:        data.notes,
         paymentMode:  data.paymentMode,
@@ -133,15 +135,43 @@ export default function InvoiceBuilder() {
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>GSTIN</label>
                 <input {...register('gstin')} placeholder="GSTIN" style={INPUT} />
               </div>
-              <div>
+              <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Address *</label>
-                <input {...register('address')} placeholder="Address" style={errors.address ? INPUT_ERR : INPUT} />
+                <input {...register('address')} placeholder="Street address" style={errors.address ? INPUT_ERR : INPUT} />
                 {errors.address && <div style={ERR}>{errors.address.message}</div>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>City & State *</label>
-                <input {...register('cityState')} placeholder="City & State" style={errors.cityState ? INPUT_ERR : INPUT} />
-                {errors.cityState && <div style={ERR}>{errors.cityState.message}</div>}
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>State *</label>
+                <Controller control={control} name="state" render={({ field }) => (
+                  <select
+                    value={field.value ?? ''}
+                    onChange={(e) => { field.onChange(e.target.value); setValue('city', '') }}
+                    style={{ ...(errors.state ? INPUT_ERR : INPUT), cursor: 'pointer' }}
+                  >
+                    <option value="">Select state</option>
+                    {INDIAN_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                )} />
+                {errors.state && <div style={ERR}>{errors.state.message}</div>}
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>City *</label>
+                <Controller control={control} name="city" render={({ field }) => {
+                  const selectedState = watch('state')
+                  const cities = selectedState ? (CITIES_BY_STATE[selectedState] ?? []) : []
+                  return (
+                    <select
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      disabled={!selectedState}
+                      style={{ ...(errors.city ? INPUT_ERR : INPUT), cursor: selectedState ? 'pointer' : 'not-allowed', opacity: selectedState ? 1 : 0.6 }}
+                    >
+                      <option value="">{selectedState ? 'Select city' : 'Select state first'}</option>
+                      {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  )
+                }} />
+                {errors.city && <div style={ERR}>{errors.city.message}</div>}
               </div>
             </div>
           </div>
