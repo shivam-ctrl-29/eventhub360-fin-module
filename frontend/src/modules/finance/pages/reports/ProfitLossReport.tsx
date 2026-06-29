@@ -39,7 +39,7 @@ export default function ProfitLossReport() {
 
   return (
     <div>
-      <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+      <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8 }}>
         <span>Financials</span><span style={{ margin: '0 6px' }}>›</span><span style={{ color: '#334155' }}>Event P&L</span>
       </div>
 
@@ -55,19 +55,19 @@ export default function ProfitLossReport() {
               </h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
                 {pnl?.eventDate && (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#334155', background: '#fff', border: '1px solid #E8E0D8', borderRadius: 6, padding: '5px 10px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#334155', background: '#fff', border: '1px solid #E8E0D8', borderRadius: 6, padding: '5px 10px' }}>
                     📅 {dayjs(pnl.eventDate).format('MMM DD, YYYY')}
                   </span>
                 )}
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#334155', background: '#F5F0EB', borderRadius: 6, padding: '5px 10px', fontWeight: 600 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#334155', background: '#F5F0EB', borderRadius: 6, padding: '5px 10px', fontWeight: 600 }}>
                   {(pnl?.lineItems?.length ?? 0)} cost line{(pnl?.lineItems?.length ?? 0) === 1 ? '' : 's'}
                 </span>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-                  <button onClick={exportPnL} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
-                    <DownloadOutlined style={{ fontSize: 12 }} /> Export P&L
+                  <button onClick={exportPnL} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 13, fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
+                    <DownloadOutlined style={{ fontSize: 13 }} /> Export P&L
                   </button>
-                  <button onClick={() => message.info('Adjustments require finance-manager approval — coming in the next sprint')} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', fontSize: 12, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>
-                    <SettingOutlined style={{ fontSize: 12 }} /> Manage Adjustments
+                  <button onClick={() => message.info('Adjustments require finance-manager approval — coming in the next sprint')} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', fontSize: 13, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>
+                    <SettingOutlined style={{ fontSize: 13 }} /> Manage Adjustments
                   </button>
                 </div>
               </div>
@@ -85,9 +85,9 @@ export default function ProfitLossReport() {
                 { label: 'PROFIT MARGIN',  value: `${pnl ? pnl.netMargin.toFixed(1) : '0'}%`, delta: 'Industry Benchmark: 28%', deltaColor: '#94a3b8', bg: '#FEF3C7', valueColor: '#1a2a4a' },
               ].map((k) => (
                 <div key={k.label} style={{ background: k.bg, border: '1px solid #E8E0D8', borderRadius: 12, padding: '16px 18px' }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8', marginBottom: 8 }}>{k.label}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8', marginBottom: 8 }}>{k.label}</div>
                   <div style={{ fontSize: 22, fontWeight: 800, color: k.valueColor, lineHeight: 1.1, marginBottom: 6 }}>{k.value}</div>
-                  <div style={{ fontSize: 11, color: k.deltaColor, fontWeight: 500 }}>{k.delta}</div>
+                  <div style={{ fontSize: 12, color: k.deltaColor, fontWeight: 500 }}>{k.delta}</div>
                 </div>
               ))
           }
@@ -101,7 +101,7 @@ export default function ProfitLossReport() {
             <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>Category Allocation</div>
             <div style={{ display: 'flex', background: '#F5F0EB', borderRadius: 8, padding: 3 }}>
               {(['Actual', 'Projected'] as const).map((t) => (
-                <button key={t} onClick={() => setAllocationTab(t)} style={{ padding: '4px 12px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600, background: allocationTab === t ? '#fff' : 'transparent', color: allocationTab === t ? '#1a2a4a' : '#94a3b8' }}>
+                <button key={t} onClick={() => setAllocationTab(t)} style={{ padding: '4px 12px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: allocationTab === t ? '#fff' : 'transparent', color: allocationTab === t ? '#1a2a4a' : '#94a3b8' }}>
                   {t}
                 </button>
               ))}
@@ -119,11 +119,11 @@ export default function ProfitLossReport() {
                         <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={2} dataKey="value">
                           {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                         </Pie>
-                        <Tooltip formatter={(v: number) => [formatINR(v, { compact: true })]} contentStyle={{ borderRadius: 8, fontSize: 11 }} />
+                        <Tooltip formatter={(v: number) => [formatINR(v, { compact: true })]} contentStyle={{ borderRadius: 8, fontSize: 12 }} />
                       </PieChart>
                     </ResponsiveContainer>
                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
-                      <div style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>COSTS</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>COSTS</div>
                       <div style={{ fontSize: 16, fontWeight: 800, color: '#1a2a4a' }}>{formatINR(totalCosts, { compact: true })}</div>
                     </div>
                   </div>
@@ -131,11 +131,11 @@ export default function ProfitLossReport() {
                     {pieData.map((c, i) => (
                       <div key={c.name} style={{ marginBottom: 16 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: '#334155' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#334155' }}>
                             <span style={{ width: 10, height: 10, borderRadius: '50%', background: PIE_COLORS[i % PIE_COLORS.length], display: 'inline-block', flexShrink: 0 }} />
                             {c.name}
                           </div>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(c.value, { compact: true })}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(c.value, { compact: true })}</span>
                         </div>
                         <div style={{ height: 5, background: '#F1F5F9', borderRadius: 3 }}>
                           <div style={{ height: '100%', width: `${totalCosts > 0 ? Math.round((c.value / totalCosts) * 100) : 0}%`, background: PIE_COLORS[i % PIE_COLORS.length], borderRadius: 3 }} />
@@ -145,13 +145,13 @@ export default function ProfitLossReport() {
                   </div>
                 </div>
               )
-              : <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8', fontSize: 13 }}>No line items available</div>
+              : <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8', fontSize: 14 }}>No line items available</div>
           }
         </div>
 
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 8 }}>Profit Breakdown</div>
-          <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5, marginBottom: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a', marginBottom: 8 }}>Profit Breakdown</div>
+          <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.5, marginBottom: 16 }}>
             Revenue, costs and net profit for this view.
           </div>
           {(() => {
@@ -167,8 +167,8 @@ export default function ProfitLossReport() {
             return bars.map((b) => (
               <div key={b.label} style={{ marginBottom: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, color: '#334155' }}>{b.label}</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.value, { compact: true })}</span>
+                  <span style={{ fontSize: 12, color: '#334155' }}>{b.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.value, { compact: true })}</span>
                 </div>
                 <div style={{ height: 9, background: '#F1F5F9', borderRadius: 5 }}>
                   <div style={{ height: '100%', width: `${Math.round((Math.abs(b.value) / max) * 100)}%`, background: b.color, borderRadius: 5 }} />
@@ -177,7 +177,7 @@ export default function ProfitLossReport() {
             ))
           })()}
           <div style={{ marginTop: 8, paddingTop: 12, borderTop: '1px solid #F5F0EB', display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 12, color: '#64748b' }}>Net Margin</span>
+            <span style={{ fontSize: 13, color: '#64748b' }}>Net Margin</span>
             <span style={{ fontSize: 14, fontWeight: 800, color: '#8B1A1A' }}>{(pnl?.netMargin ?? 0).toFixed(1)}%</span>
           </div>
         </div>
@@ -190,18 +190,18 @@ export default function ProfitLossReport() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 130px', padding: '8px 20px', background: '#1a2a4a' }}>
           {['DESCRIPTION', 'CATEGORY', 'AMOUNT'].map((h) => (
-            <div key={h} style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>{h}</div>
+            <div key={h} style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>{h}</div>
           ))}
         </div>
         {isLoading && <div style={{ padding: 20 }}><Skeleton active paragraph={{ rows: 5 }} /></div>}
         {!isLoading && lineItems.length === 0 && (
-          <div style={{ padding: '32px', textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>No line items available</div>
+          <div style={{ padding: '32px', textAlign: 'center', fontSize: 14, color: '#94a3b8' }}>No line items available</div>
         )}
         {!isLoading && lineItems.map((item, i) => (
           <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 130px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
-            <div style={{ fontSize: 12, color: '#334155' }}>{item.description}</div>
-            <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: '#F1F5F9', color: '#475569', width: 'fit-content' }}>{item.category}</span>
-            <div style={{ fontSize: 13, fontWeight: 700, color: item.actual < 0 ? '#DC2626' : '#059669' }}>{formatINR(Math.abs(item.actual))}</div>
+            <div style={{ fontSize: 13, color: '#334155' }}>{item.description}</div>
+            <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: '#F1F5F9', color: '#475569', width: 'fit-content' }}>{item.category}</span>
+            <div style={{ fontSize: 14, fontWeight: 700, color: item.actual < 0 ? '#DC2626' : '#059669' }}>{formatINR(Math.abs(item.actual))}</div>
           </div>
         ))}
       </div>

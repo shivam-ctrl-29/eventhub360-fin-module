@@ -8,7 +8,7 @@ export default function StatusBadge({ label, color, background }: StatusBadgePro
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 5,
-      fontSize: 11, fontWeight: 600, color,
+      fontSize: 12, fontWeight: 600, color,
       background: background ?? `${color}18`,
       padding: '3px 10px', borderRadius: 20,
     }}>

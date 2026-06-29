@@ -88,14 +88,14 @@ export default function InvoiceList() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2a4a' }}>Invoice Register</div>
-          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>Manage all GST-compliant invoices and proforma documents</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 3 }}>Manage all GST-compliant invoices and proforma documents</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}>
+          <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 13, color: '#334155', cursor: 'pointer' }}>
             <DownloadOutlined /> Export
           </button>
           {can('invoice.create') && (
-            <button onClick={() => navigate('/finance/invoices/new')} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={() => navigate('/finance/invoices/new')} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               <PlusOutlined /> New Invoice
             </button>
           )}
@@ -106,14 +106,14 @@ export default function InvoiceList() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ display: 'flex', background: '#F5F0EB', borderRadius: 8, padding: 3 }}>
           {FILTERS.map((f) => (
-            <button key={f.value} onClick={() => { setStatusFilter(f.value); setCurrentPage(1) }} style={{ padding: '5px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600, background: statusFilter === f.value ? '#fff' : 'transparent', color: statusFilter === f.value ? '#8B1A1A' : '#64748b', boxShadow: statusFilter === f.value ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>
+            <button key={f.value} onClick={() => { setStatusFilter(f.value); setCurrentPage(1) }} style={{ padding: '5px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: statusFilter === f.value ? '#fff' : 'transparent', color: statusFilter === f.value ? '#8B1A1A' : '#64748b', boxShadow: statusFilter === f.value ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>
               {f.label}
             </button>
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1px solid #E8E0D8', borderRadius: 8, padding: '7px 12px', width: 240 }}>
-          <SearchOutlined style={{ color: '#94a3b8', fontSize: 13 }} />
-          <input value={localSearch} onChange={(e) => handleSearch(e.target.value)} placeholder="Search invoices..." style={{ border: 'none', outline: 'none', fontSize: 12, background: 'transparent', width: '100%', color: '#334155' }} />
+          <SearchOutlined style={{ color: '#94a3b8', fontSize: 14 }} />
+          <input value={localSearch} onChange={(e) => handleSearch(e.target.value)} placeholder="Search invoices..." style={{ border: 'none', outline: 'none', fontSize: 13, background: 'transparent', width: '100%', color: '#334155' }} />
         </div>
       </div>
 
@@ -131,7 +131,7 @@ export default function InvoiceList() {
             const colKey = h === 'DATE' ? 'issueDate' : h === 'AMOUNT' ? 'grandTotal' : null
             const isActive = colKey && sortBy === colKey
             return (
-              <div key={h} onClick={colKey ? () => handleSort(colKey) : undefined} style={{ fontSize: 10, fontWeight: 700, color: isActive ? '#fff' : '#94a3b8', letterSpacing: '0.5px', cursor: colKey ? 'pointer' : 'default', userSelect: 'none' }}>
+              <div key={h} onClick={colKey ? () => handleSort(colKey) : undefined} style={{ fontSize: 11, fontWeight: 700, color: isActive ? '#fff' : '#94a3b8', letterSpacing: '0.5px', cursor: colKey ? 'pointer' : 'default', userSelect: 'none' }}>
                 {h}{isActive ? (sortOrder === 'asc' ? ' ↑' : ' ↓') : ''}
               </div>
             )
@@ -150,7 +150,7 @@ export default function InvoiceList() {
           <div style={{ padding: '48px 20px', textAlign: 'center' }}>
             <FileTextOutlined style={{ fontSize: 36, color: '#cbd5e1', marginBottom: 12 }} />
             <div style={{ fontSize: 14, fontWeight: 600, color: '#64748b' }}>No invoices found</div>
-            <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>Try changing the filters or create a new invoice</div>
+            <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>Try changing the filters or create a new invoice</div>
           </div>
         )}
 
@@ -159,23 +159,23 @@ export default function InvoiceList() {
           const style = STATUS_STYLE[inv.status] ?? STATUS_STYLE['draft']
           return (
             <div key={inv.id} style={{ display: 'grid', gridTemplateColumns: '140px 1.5fr 1.5fr 100px 100px 130px 100px 80px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#8B1A1A' }}>{inv.invoiceNumber}</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{(inv as any).customer?.name ?? '—'}</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>—</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{(inv as any).issueDate ? dayjs((inv as any).issueDate).format('MMM DD, YYYY') : dayjs(inv.createdAt).format('MMM DD, YYYY')}</div>
-              <div style={{ fontSize: 11, color: inv.status === 'overdue' ? '#DC2626' : '#64748b', fontWeight: inv.status === 'overdue' ? 600 : 400 }}>{(inv as any).dueDate ? dayjs((inv as any).dueDate).format('MMM DD, YYYY') : '—'}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR((inv as any).grandTotal ?? inv.total)}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#8B1A1A' }}>{inv.invoiceNumber}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{(inv as any).customer?.name ?? '—'}</div>
+              <div style={{ fontSize: 12, color: '#64748b' }}>—</div>
+              <div style={{ fontSize: 12, color: '#64748b' }}>{(inv as any).issueDate ? dayjs((inv as any).issueDate).format('MMM DD, YYYY') : dayjs(inv.createdAt).format('MMM DD, YYYY')}</div>
+              <div style={{ fontSize: 12, color: inv.status === 'overdue' ? '#DC2626' : '#64748b', fontWeight: inv.status === 'overdue' ? 600 : 400 }}>{(inv as any).dueDate ? dayjs((inv as any).dueDate).format('MMM DD, YYYY') : '—'}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#1a2a4a' }}>{formatINR((inv as any).grandTotal ?? inv.total)}</div>
               <div>
-                <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: style.bg, color: style.color, textTransform: 'capitalize' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: style.bg, color: style.color, textTransform: 'capitalize' }}>
                   {inv.status}
                 </span>
               </div>
               <div style={{ display: 'flex', gap: 5 }}>
                 <button onClick={() => navigate(`/finance/invoices/${inv.id}`)} style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <EyeOutlined style={{ fontSize: 11, color: '#64748b' }} />
+                  <EyeOutlined style={{ fontSize: 12, color: '#64748b' }} />
                 </button>
                 <button onClick={() => navigate(`/finance/invoices/${inv.id}/edit`)} style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <EditOutlined style={{ fontSize: 11, color: '#64748b' }} />
+                  <EditOutlined style={{ fontSize: 12, color: '#64748b' }} />
                 </button>
                 <Dropdown
                   trigger={['click']}
@@ -186,7 +186,7 @@ export default function InvoiceList() {
                   ] }}
                 >
                   <button style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <MoreOutlined style={{ fontSize: 11, color: '#64748b' }} />
+                    <MoreOutlined style={{ fontSize: 12, color: '#64748b' }} />
                   </button>
                 </Dropdown>
               </div>
@@ -197,12 +197,12 @@ export default function InvoiceList() {
         </div></div>
         {/* Pagination footer */}
         <div style={{ padding: '12px 20px', borderTop: '1px solid #F5F0EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: '#94a3b8' }}>
+          <span style={{ fontSize: 12, color: '#94a3b8' }}>
             {isLoading ? 'Loading...' : `Showing ${invoices.length} of ${total} invoices`}
           </span>
           <div style={{ display: 'flex', gap: 6 }}>
-            <button disabled={currentPage <= 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: currentPage <= 1 ? 'not-allowed' : 'pointer', fontSize: 13, color: '#334155', opacity: currentPage <= 1 ? 0.4 : 1 }}>‹</button>
-            <button disabled={currentPage >= totalPages} onClick={() => setCurrentPage(currentPage + 1)} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer', fontSize: 13, color: '#334155', opacity: currentPage >= totalPages ? 0.4 : 1 }}>›</button>
+            <button disabled={currentPage <= 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: currentPage <= 1 ? 'not-allowed' : 'pointer', fontSize: 14, color: '#334155', opacity: currentPage <= 1 ? 0.4 : 1 }}>‹</button>
+            <button disabled={currentPage >= totalPages} onClick={() => setCurrentPage(currentPage + 1)} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer', fontSize: 14, color: '#334155', opacity: currentPage >= totalPages ? 0.4 : 1 }}>›</button>
           </div>
         </div>
       </div>

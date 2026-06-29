@@ -13,7 +13,7 @@ export default function ProgressBar({ value, max = 100, color = '#8B1A1A', heigh
       <div style={{ flex: 1, height, background: '#F1EDE8', borderRadius: height }}>
         <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: height, transition: 'width 0.3s' }} />
       </div>
-      {showLabel && <span style={{ fontSize: 12, color: '#64748b', minWidth: 36 }}>{pct.toFixed(0)}%</span>}
+      {showLabel && <span style={{ fontSize: 13, color: '#64748b', minWidth: 36 }}>{pct.toFixed(0)}%</span>}
     </div>
   )
 }

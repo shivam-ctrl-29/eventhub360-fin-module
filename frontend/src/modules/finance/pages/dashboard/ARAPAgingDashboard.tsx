@@ -35,7 +35,7 @@ export default function ARAPAgingDashboard() {
     Modal.info({
       title: c.customerName,
       content: (
-        <div style={{ fontSize: 13, lineHeight: 1.9 }}>
+        <div style={{ fontSize: 14, lineHeight: 1.9 }}>
           <div>Total outstanding: <b>{formatINR(c.total)}</b></div>
           <div>Current: {formatINR(c.current)}</div>
           <div>1–30 days: {formatINR(c.days1to30)}</div>
@@ -60,8 +60,8 @@ export default function ARAPAgingDashboard() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1.5px', color: '#94a3b8', textTransform: 'uppercase' }}>Enterprise Ledger</div>
-        <button onClick={exportAccounts} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #E8E0D8', borderRadius: 8, padding: '6px 14px', fontSize: 12, color: '#334155', cursor: 'pointer' }}>
+        <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: '1.5px', color: '#94a3b8', textTransform: 'uppercase' }}>Enterprise Ledger</div>
+        <button onClick={exportAccounts} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #E8E0D8', borderRadius: 8, padding: '6px 14px', fontSize: 13, color: '#334155', cursor: 'pointer' }}>
           <DownloadOutlined style={{ color: '#8B1A1A' }} /> Export Accounts
         </button>
       </div>
@@ -73,20 +73,20 @@ export default function ARAPAgingDashboard() {
       {/* Hero KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: '20px 24px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Total Outstanding</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Total Outstanding</div>
           {summaryLoading
             ? <Skeleton active paragraph={{ rows: 1 }} title={false} />
             : <div style={{ fontSize: 28, fontWeight: 800, color: '#1a2a4a', lineHeight: 1 }}>{formatINR(totalOut, { compact: true })}</div>
           }
         </div>
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: '20px 24px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Avg Collection Days</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Avg Collection Days</div>
           {summaryLoading
             ? <Skeleton active paragraph={{ rows: 1 }} title={false} />
             : (
               <>
                 <div style={{ fontSize: 28, fontWeight: 800, color: '#1a2a4a', lineHeight: 1 }}>{summary?.avgCollectionDays?.toFixed(1) ?? '—'} Days</div>
-                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6 }}>Across {entriesPage?.total ?? 0} outstanding invoice{(entriesPage?.total ?? 0) === 1 ? '' : 's'}</div>
+                <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>Across {entriesPage?.total ?? 0} outstanding invoice{(entriesPage?.total ?? 0) === 1 ? '' : 's'}</div>
               </>
             )
           }
@@ -95,7 +95,7 @@ export default function ARAPAgingDashboard() {
 
       {/* Aging Buckets Distribution */}
       <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20, marginBottom: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 18 }}>Aging Buckets Distribution</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a', marginBottom: 18 }}>Aging Buckets Distribution</div>
         {summaryLoading
           ? <Skeleton active paragraph={{ rows: 4 }} />
           : buckets.map((b, i) => {
@@ -103,14 +103,14 @@ export default function ARAPAgingDashboard() {
               return (
                 <div key={b.bucket} style={{ marginBottom: 16 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <span style={{ fontSize: 12, color: '#334155' }}>{b.bucket}</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.amount, { compact: true })}</span>
+                    <span style={{ fontSize: 13, color: '#334155' }}>{b.bucket}</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.amount, { compact: true })}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ flex: 1, height: 10, background: '#F1F5F9', borderRadius: 5, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${pct}%`, background: BUCKET_COLORS[i] ?? '#94a3b8', borderRadius: 5 }} />
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b', width: 28, textAlign: 'right' }}>{pct}%</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b', width: 28, textAlign: 'right' }}>{pct}%</span>
                   </div>
                 </div>
               )
@@ -123,11 +123,11 @@ export default function ARAPAgingDashboard() {
         <div style={{ padding: '18px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>Customer Accounts Ledger</div>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Real-time outstanding balance tracking and automated recovery actions</div>
+            <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Real-time outstanding balance tracking and automated recovery actions</div>
           </div>
           <div style={{ display: 'flex', background: '#F5F0EB', borderRadius: 8, padding: 3 }}>
             {(['All Clients', 'Overdue Only'] as const).map((tab) => (
-              <button key={tab} onClick={() => setView(tab)} style={{ padding: '5px 12px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600, background: view === tab ? '#fff' : 'transparent', color: view === tab ? '#1a2a4a' : '#94a3b8', boxShadow: view === tab ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>
+              <button key={tab} onClick={() => setView(tab)} style={{ padding: '5px 12px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: view === tab ? '#fff' : 'transparent', color: view === tab ? '#1a2a4a' : '#94a3b8', boxShadow: view === tab ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>
                 {tab}
               </button>
             ))}
@@ -136,13 +136,13 @@ export default function ARAPAgingDashboard() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr 1fr 80px', padding: '8px 20px', background: '#1a2a4a' }}>
           {['CLIENT NAME', 'TOTAL O/S', 'CURRENT', '31-60 DAYS', '60+ DAYS', 'ACTIONS'].map((h) => (
-            <div key={h} style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>{h}</div>
+            <div key={h} style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>{h}</div>
           ))}
         </div>
 
         {entriesLoading && <div style={{ padding: 20 }}><Skeleton active paragraph={{ rows: 5 }} /></div>}
         {!entriesLoading && displayed.length === 0 && (
-          <div style={{ padding: '32px', textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>No accounts found</div>
+          <div style={{ padding: '32px', textAlign: 'center', fontSize: 14, color: '#94a3b8' }}>No accounts found</div>
         )}
         {!entriesLoading && displayed.map((entry, i) => {
           const isOverdue = entry.days31to60 > 0 || entry.days61to90 > 0 || entry.days90plus > 0
@@ -152,22 +152,22 @@ export default function ARAPAgingDashboard() {
           return (
             <div key={entry.customerId} style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr 1fr 80px', padding: '16px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#1a2a4a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{initials}</div>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#1a2a4a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{initials}</div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{entry.customerName}</div>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 600, background: statusStyle.bg, color: statusStyle.color, marginTop: 3 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>{entry.customerName}</div>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: statusStyle.bg, color: statusStyle.color, marginTop: 3 }}>
                     <span style={{ width: 5, height: 5, borderRadius: '50%', background: statusStyle.color, display: 'inline-block' }} />
                     {statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}
                   </span>
                 </div>
               </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(entry.total)}</div>
-              <div style={{ fontSize: 12, color: '#334155' }}>{formatINR(entry.current)}</div>
-              <div style={{ fontSize: 12, fontWeight: entry.days31to60 > 0 ? 700 : 400, color: entry.days31to60 > 0 ? '#DC2626' : '#334155' }}>{formatINR(entry.days31to60)}</div>
-              <div style={{ fontSize: 12, fontWeight: (entry.days61to90 + entry.days90plus) > 0 ? 700 : 400, color: (entry.days61to90 + entry.days90plus) > 0 ? '#991B1B' : '#334155' }}>{formatINR(entry.days61to90 + entry.days90plus)}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(entry.total)}</div>
+              <div style={{ fontSize: 13, color: '#334155' }}>{formatINR(entry.current)}</div>
+              <div style={{ fontSize: 13, fontWeight: entry.days31to60 > 0 ? 700 : 400, color: entry.days31to60 > 0 ? '#DC2626' : '#334155' }}>{formatINR(entry.days31to60)}</div>
+              <div style={{ fontSize: 13, fontWeight: (entry.days61to90 + entry.days90plus) > 0 ? 700 : 400, color: (entry.days61to90 + entry.days90plus) > 0 ? '#991B1B' : '#334155' }}>{formatINR(entry.days61to90 + entry.days90plus)}</div>
               <div style={{ display: 'flex', gap: 6 }}>
                 <button onClick={() => showAccount(entry)} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <CaretRightOutlined style={{ fontSize: 11, color: '#8B1A1A' }} />
+                  <CaretRightOutlined style={{ fontSize: 12, color: '#8B1A1A' }} />
                 </button>
                 <Dropdown
                   trigger={['click']}
@@ -177,7 +177,7 @@ export default function ARAPAgingDashboard() {
                   ] }}
                 >
                   <button style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <MoreOutlined style={{ fontSize: 11, color: '#64748b' }} />
+                    <MoreOutlined style={{ fontSize: 12, color: '#64748b' }} />
                   </button>
                 </Dropdown>
               </div>
@@ -186,10 +186,10 @@ export default function ARAPAgingDashboard() {
         })}
 
         <div style={{ padding: '12px 20px', borderTop: '1px solid #F5F0EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: '#94a3b8' }}>Showing {displayed.length} of {entriesPage?.total ?? 0} accounts</span>
+          <span style={{ fontSize: 12, color: '#94a3b8' }}>Showing {displayed.length} of {entriesPage?.total ?? 0} accounts</span>
           <div style={{ display: 'flex', gap: 6 }}>
             {['‹', '›'].map((a) => (
-              <button key={a} onClick={() => message.info('All accounts are shown on a single page')} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', fontSize: 13, color: '#334155' }}>{a}</button>
+              <button key={a} onClick={() => message.info('All accounts are shown on a single page')} style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', cursor: 'pointer', fontSize: 14, color: '#334155' }}>{a}</button>
             ))}
           </div>
         </div>
@@ -198,14 +198,14 @@ export default function ARAPAgingDashboard() {
       {/* Accounts Payable Aging — real, from scheduled vendor payouts */}
       <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>Accounts Payable Aging</div>
-          <span style={{ fontSize: 11, color: '#94a3b8' }}>Total payable {formatINR(apAging?.totalPayable ?? 0, { compact: true })} · {apAging?.openCount ?? 0} open</span>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>Accounts Payable Aging</div>
+          <span style={{ fontSize: 12, color: '#94a3b8' }}>Total payable {formatINR(apAging?.totalPayable ?? 0, { compact: true })} · {apAging?.openCount ?? 0} open</span>
         </div>
-        <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 16 }}>Unpaid vendor payouts bucketed by days past their scheduled date</div>
+        <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 16 }}>Unpaid vendor payouts bucketed by days past their scheduled date</div>
         {apLoading
           ? <Skeleton active paragraph={{ rows: 3 }} />
           : (apAging?.totalPayable ?? 0) === 0
-            ? <div style={{ textAlign: 'center', padding: '24px 0', color: '#94a3b8', fontSize: 12 }}>No outstanding payables</div>
+            ? <div style={{ textAlign: 'center', padding: '24px 0', color: '#94a3b8', fontSize: 13 }}>No outstanding payables</div>
             : (() => {
                 const apBuckets = apAging?.buckets ?? []
                 const apMax = Math.max(...apBuckets.map((b) => b.amount), 1)
@@ -213,8 +213,8 @@ export default function ARAPAgingDashboard() {
                 return apBuckets.map((b, i) => (
                   <div key={b.bucket} style={{ marginBottom: 14 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                      <span style={{ fontSize: 12, color: '#334155' }}>{b.bucket}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.amount, { compact: true })}</span>
+                      <span style={{ fontSize: 13, color: '#334155' }}>{b.bucket}</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.amount, { compact: true })}</span>
                     </div>
                     <div style={{ height: 10, background: '#F1F5F9', borderRadius: 5, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${Math.round((b.amount / apMax) * 100)}%`, background: apColors[i % apColors.length], borderRadius: 5 }} />

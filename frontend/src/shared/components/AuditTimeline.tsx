@@ -36,9 +36,9 @@ export default function AuditTimeline({ entries }: AuditTimelineProps) {
             {i < entries.length - 1 && (
               <div style={{ position: 'absolute', left: -18, top: 16, bottom: 0, width: 1, background: '#E8E0D8' }} />
             )}
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{entry.action}</div>
-            <div style={{ fontSize: 12, color: '#64748b', margin: '2px 0' }}>{entry.description}</div>
-            <div style={{ fontSize: 11, color: '#94a3b8' }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>{entry.action}</div>
+            <div style={{ fontSize: 13, color: '#64748b', margin: '2px 0' }}>{entry.description}</div>
+            <div style={{ fontSize: 12, color: '#94a3b8' }}>
               {entry.user} · {formatDateTime(entry.timestamp)}
             </div>
           </div>

@@ -25,12 +25,12 @@ export default function ReceiptView() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 12, color: '#94a3b8', cursor: 'pointer', marginBottom: 4 }} onClick={() => navigate('/finance/payments')}>← Back to Payments</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', cursor: 'pointer', marginBottom: 4 }} onClick={() => navigate('/finance/payments')}>← Back to Payments</div>
           <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2a4a' }}>Payment Receipt</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, color: '#334155', cursor: 'pointer' }}><PrinterOutlined /> Print</button>
-          <button onClick={() => { message.info('Use the print dialog and choose "Save as PDF"'); window.print() }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}><DownloadOutlined /> Download</button>
+          <button onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 13, color: '#334155', cursor: 'pointer' }}><PrinterOutlined /> Print</button>
+          <button onClick={() => { message.info('Use the print dialog and choose "Save as PDF"'); window.print() }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}><DownloadOutlined /> Download</button>
         </div>
       </div>
 
@@ -38,23 +38,23 @@ export default function ReceiptView() {
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#8B1A1A', marginBottom: 4 }}>EventHub360</div>
           <div style={{ fontSize: 24, fontWeight: 800, color: '#1a2a4a' }}>PAYMENT RECEIPT</div>
-          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>Receipt No: RCP-{receipt.paymentId}</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>Receipt No: RCP-{receipt.paymentId}</div>
         </div>
 
         <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 10, padding: '14px 20px', textAlign: 'center', marginBottom: 24 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#065F46', marginBottom: 4 }}>✓ Payment Received Successfully</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#065F46', marginBottom: 4 }}>✓ Payment Received Successfully</div>
           <div style={{ fontSize: 28, fontWeight: 800, color: '#059669' }}>{formatINR(receipt.amount)}</div>
         </div>
 
         {rows.map((r) => (
           <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F5F0EB' }}>
-            <span style={{ fontSize: 12, color: '#64748b' }}>{r.label}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{r.value}</span>
+            <span style={{ fontSize: 13, color: '#64748b' }}>{r.label}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{r.value}</span>
           </div>
         ))}
 
         <div style={{ textAlign: 'center', marginTop: 24, padding: '16px', background: '#F8F5F1', borderRadius: 8 }}>
-          <div style={{ fontSize: 11, color: '#94a3b8' }}>This is a computer-generated receipt and does not require a signature.</div>
+          <div style={{ fontSize: 12, color: '#94a3b8' }}>This is a computer-generated receipt and does not require a signature.</div>
         </div>
       </div>
     </div>

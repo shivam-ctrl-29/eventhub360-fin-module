@@ -25,7 +25,7 @@ export default function DataTable<T>({ columns, data, rowKey, loading, emptyText
           <tr style={{ background: '#F8F5F1', borderBottom: '1px solid #E8E0D8' }}>
             {columns.map((col) => (
               <th key={col.key} style={{
-                padding: '10px 14px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                padding: '10px 14px', fontSize: 12, fontWeight: 700, textTransform: 'uppercase',
                 letterSpacing: '0.6px', color: '#94a3b8', textAlign: col.align ?? 'left',
                 width: col.width,
               }}>
@@ -36,14 +36,14 @@ export default function DataTable<T>({ columns, data, rowKey, loading, emptyText
         </thead>
         <tbody>
           {loading ? (
-            <tr><td colSpan={columns.length} style={{ padding: 32, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>Loading...</td></tr>
+            <tr><td colSpan={columns.length} style={{ padding: 32, textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>Loading...</td></tr>
           ) : data.length === 0 ? (
-            <tr><td colSpan={columns.length} style={{ padding: 32, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>{emptyText}</td></tr>
+            <tr><td colSpan={columns.length} style={{ padding: 32, textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>{emptyText}</td></tr>
           ) : (
             data.map((row) => (
               <tr key={getKey(row)} style={{ borderBottom: '1px solid #F1EDE8' }}>
                 {columns.map((col) => (
-                  <td key={col.key} style={{ padding: '11px 14px', fontSize: 13, color: '#334155', textAlign: col.align ?? 'left' }}>
+                  <td key={col.key} style={{ padding: '11px 14px', fontSize: 14, color: '#334155', textAlign: col.align ?? 'left' }}>
                     {col.render ? col.render(row) : String((row as Record<string, unknown>)[col.key] ?? '')}
                   </td>
                 ))}

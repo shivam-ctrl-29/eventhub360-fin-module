@@ -20,7 +20,7 @@ export default function FilterBar({ options, active, onChange }: FilterBarProps)
             key={opt.value}
             onClick={() => onChange(opt.value)}
             style={{
-              padding: '6px 14px', fontSize: 12, fontWeight: isActive ? 700 : 500,
+              padding: '6px 14px', fontSize: 13, fontWeight: isActive ? 700 : 500,
               borderRadius: 20, border: 'none', cursor: 'pointer',
               background: isActive ? '#8B1A1A' : '#F1EDE8',
               color: isActive ? '#fff' : '#64748b',

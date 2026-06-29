@@ -116,9 +116,9 @@ export default function CreditDebitNote() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2a4a' }}>Credit / Debit Notes</div>
-          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>Manage invoice adjustments and reversals</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 3 }}>Manage invoice adjustments and reversals</div>
         </div>
-        <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+        <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           <PlusOutlined /> New Note
         </button>
       </div>
@@ -134,9 +134,9 @@ export default function CreditDebitNote() {
               { label: 'Net Adjustment',     value: formatINR(Math.abs(creditTotal - debitTotal)), count: creditTotal >= debitTotal ? 'Credit' : 'Debit', color: '#8B1A1A' },
             ].map((k) => (
               <div key={k.label} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: '16px 18px' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8', marginBottom: 6 }}>{k.label}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8', marginBottom: 6 }}>{k.label}</div>
                 <div style={{ fontSize: 20, fontWeight: 800, color: k.color }}>{k.value}</div>
-                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>{k.count}</div>
+                <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>{k.count}</div>
               </div>
             ))
         }
@@ -144,10 +144,10 @@ export default function CreditDebitNote() {
 
       {showForm && (
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20, marginBottom: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 16 }}>Create New Note</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a', marginBottom: 16 }}>Create New Note</div>
           <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
             {(['Credit', 'Debit'] as const).map((t) => (
-              <button key={t} onClick={() => setNoteType(t)} style={{ padding: '7px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: noteType === t ? (t === 'Credit' ? '#D1FAE5' : '#FEE2E2') : '#F5F0EB', color: noteType === t ? (t === 'Credit' ? '#065F46' : '#991B1B') : '#64748b' }}>
+              <button key={t} onClick={() => setNoteType(t)} style={{ padding: '7px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: noteType === t ? (t === 'Credit' ? '#D1FAE5' : '#FEE2E2') : '#F5F0EB', color: noteType === t ? (t === 'Credit' ? '#065F46' : '#991B1B') : '#64748b' }}>
                 {t} Note
               </button>
             ))}
@@ -159,18 +159,18 @@ export default function CreditDebitNote() {
               { field: 'amount' as const,       label: 'Amount (₹)' },
             ].map(({ field, label }) => (
               <div key={field}>
-                <label style={{ fontSize: 11, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>{label}</label>
-                <input value={formData[field]} onChange={(e) => setFormData((p) => ({ ...p, [field]: e.target.value }))} placeholder={label} style={{ width: '100%', padding: '8px 12px', border: '1px solid #E8E0D8', borderRadius: 8, fontSize: 12, color: '#334155', outline: 'none', boxSizing: 'border-box' }} />
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>{label}</label>
+                <input value={formData[field]} onChange={(e) => setFormData((p) => ({ ...p, [field]: e.target.value }))} placeholder={label} style={{ width: '100%', padding: '8px 12px', border: '1px solid #E8E0D8', borderRadius: 8, fontSize: 13, color: '#334155', outline: 'none', boxSizing: 'border-box' }} />
               </div>
             ))}
           </div>
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Reason</label>
-            <textarea value={formData.reason} onChange={(e) => setFormData((p) => ({ ...p, reason: e.target.value }))} placeholder="Reason for adjustment..." rows={2} style={{ width: '100%', padding: '8px 12px', border: '1px solid #E8E0D8', borderRadius: 8, fontSize: 12, color: '#334155', outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
+            <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Reason</label>
+            <textarea value={formData.reason} onChange={(e) => setFormData((p) => ({ ...p, reason: e.target.value }))} placeholder="Reason for adjustment..." rows={2} style={{ width: '100%', padding: '8px 12px', border: '1px solid #E8E0D8', borderRadius: 8, fontSize: 13, color: '#334155', outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
           </div>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <button onClick={() => setShowForm(false)} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 12, cursor: 'pointer', color: '#334155' }}>Cancel</button>
-            <button onClick={handleCreate} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Create {noteType} Note</button>
+            <button onClick={() => setShowForm(false)} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 13, cursor: 'pointer', color: '#334155' }}>Cancel</button>
+            <button onClick={handleCreate} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Create {noteType} Note</button>
           </div>
         </div>
       )}
@@ -178,27 +178,27 @@ export default function CreditDebitNote() {
       <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '130px 80px 110px 1.5fr 1.5fr 110px 100px 90px', padding: '8px 20px', background: '#1a2a4a' }}>
           {['NOTE ID', 'TYPE', 'REF INV', 'CLIENT/VENDOR', 'REASON', 'AMOUNT', 'DATE', 'STATUS'].map((h) => (
-            <div key={h} style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>{h}</div>
+            <div key={h} style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>{h}</div>
           ))}
         </div>
 
         {isLoading && <div style={{ padding: 20 }}><Skeleton active paragraph={{ rows: 4 }} /></div>}
         {!isLoading && allNotes.length === 0 && (
-          <div style={{ padding: '32px', textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>No notes found</div>
+          <div style={{ padding: '32px', textAlign: 'center', fontSize: 14, color: '#94a3b8' }}>No notes found</div>
         )}
         {!isLoading && allNotes.map((n, i) => {
           const typeStyle   = TYPE_STYLE[n.type]
           const statusStyle = STATUS_STYLE[n.status] ?? STATUS_STYLE['issued']
           return (
             <div key={n.id} style={{ display: 'grid', gridTemplateColumns: '130px 80px 110px 1.5fr 1.5fr 110px 100px 90px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#8B1A1A' }}>{n.noteNumber}</div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: typeStyle.bg, color: typeStyle.color, width: 'fit-content' }}>{n.type}</span>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{n.refNumber}</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a2a4a' }}>{n.clientOrVendor}</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{n.reason}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(n.grandTotal)}</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{dayjs(n.date).format('MMM DD, YYYY')}</div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: statusStyle.bg, color: statusStyle.color, textTransform: 'capitalize' }}>{n.status}</span>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#8B1A1A' }}>{n.noteNumber}</div>
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: typeStyle.bg, color: typeStyle.color, width: 'fit-content' }}>{n.type}</span>
+              <div style={{ fontSize: 12, color: '#64748b' }}>{n.refNumber}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{n.clientOrVendor}</div>
+              <div style={{ fontSize: 12, color: '#64748b' }}>{n.reason}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(n.grandTotal)}</div>
+              <div style={{ fontSize: 12, color: '#64748b' }}>{dayjs(n.date).format('MMM DD, YYYY')}</div>
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: statusStyle.bg, color: statusStyle.color, textTransform: 'capitalize' }}>{n.status}</span>
             </div>
           )
         })}

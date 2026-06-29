@@ -29,7 +29,7 @@ export default function CircularGauge({ value, max = 100, size = 120, strokeWidt
           {value}
         </text>
       </svg>
-      {label && <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>{label}</div>}
+      {label && <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{label}</div>}
     </div>
   )
 }

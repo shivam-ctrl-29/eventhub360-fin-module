@@ -79,14 +79,14 @@ export default function FinanceDashboard() {
       {/* ── Page Header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 13, color: '#64748b', marginBottom: 4 }}>Executive CFO Cockpit</div>
-          <div style={{ fontSize: 13, color: '#94a3b8' }}>Real-time fiscal oversight and event profitability metrics.</div>
+          <div style={{ fontSize: 14, color: '#64748b', marginBottom: 4 }}>Executive CFO Cockpit</div>
+          <div style={{ fontSize: 14, color: '#94a3b8' }}>Real-time fiscal oversight and event profitability metrics.</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
             background: '#fff', border: '1px solid #E8E0D8',
-            borderRadius: 8, padding: '6px 12px', fontSize: 12, color: '#334155',
+            borderRadius: 8, padding: '6px 12px', fontSize: 13, color: '#334155',
           }}>
             <CalendarOutlined style={{ color: '#8B1A1A' }} /> {currentFYLabel()}
           </div>
@@ -122,13 +122,13 @@ export default function FinanceDashboard() {
                   <div style={{ width: 32, height: 32, background: k.iconBg, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, marginBottom: 10 }}>
                     {k.icon}
                   </div>
-                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8', marginBottom: 4 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8', marginBottom: 4 }}>
                     {k.label}
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: '#1a2a4a', lineHeight: 1.2 }}>
                     {display}
                   </div>
-                  <div style={{ fontSize: 11, marginTop: 5, fontWeight: 500, color: cap.color }}>
+                  <div style={{ fontSize: 12, marginTop: 5, fontWeight: 500, color: cap.color }}>
                     {cap.text}
                   </div>
                 </div>
@@ -144,8 +144,8 @@ export default function FinanceDashboard() {
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{revenueTab} Trends</div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Monthly {revenueTab.toLowerCase()} · FY {currentYear}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>{revenueTab} Trends</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Monthly {revenueTab.toLowerCase()} · FY {currentYear}</div>
             </div>
             <div style={{ display: 'flex', gap: 4 }}>
               {(['Revenue', 'Expenses'] as const).map((tab) => (
@@ -154,7 +154,7 @@ export default function FinanceDashboard() {
                   onClick={() => setRevenueTab(tab)}
                   style={{
                     padding: '4px 12px', borderRadius: 6, border: 'none',
-                    fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
                     background: revenueTab === tab ? '#8B1A1A' : '#F5F0EB',
                     color: revenueTab === tab ? '#fff' : '#64748b',
                   }}
@@ -169,11 +169,11 @@ export default function FinanceDashboard() {
             : null}
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={revenueTrends ?? []} barSize={18}>
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis hide />
               <Tooltip
                 formatter={(v: number) => [formatINR(v, { compact: true }), revenueTab]}
-                contentStyle={{ borderRadius: 8, border: '1px solid #E8E0D8', fontSize: 11 }}
+                contentStyle={{ borderRadius: 8, border: '1px solid #E8E0D8', fontSize: 12 }}
               />
               <Bar
                 dataKey={revenueTab === 'Revenue' ? 'revenue' : 'expenses'}
@@ -187,11 +187,11 @@ export default function FinanceDashboard() {
 
         {/* Expense Distribution */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 4 }}>Expense Distribution</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a', marginBottom: 4 }}>Expense Distribution</div>
           {expenseLoading
             ? <Skeleton active paragraph={{ rows: 3 }} />
             : expenseData.length === 0
-              ? <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8', fontSize: 12 }}>No expense data yet</div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8', fontSize: 13 }}>No expense data yet</div>
               : (
             <>
               <ResponsiveContainer width="100%" height={140}>
@@ -199,17 +199,17 @@ export default function FinanceDashboard() {
                   <Pie data={expenseData} cx="50%" cy="50%" innerRadius={42} outerRadius={65} paddingAngle={2} dataKey="value" isAnimationActive={false}>
                     {expenseData.map((entry) => (<Cell key={entry.name} fill={entry.color} />))}
                   </Pie>
-                  <Tooltip formatter={(_v: number, _n, p: any) => [formatINR(p.payload.amount), p.payload.name]} contentStyle={{ borderRadius: 8, border: '1px solid #E8E0D8', fontSize: 11 }} />
+                  <Tooltip formatter={(_v: number, _n, p: any) => [formatINR(p.payload.amount), p.payload.name]} contentStyle={{ borderRadius: 8, border: '1px solid #E8E0D8', fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
               <div style={{ marginTop: 8 }}>
                 {expenseData.map((e) => (
                   <div key={e.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#334155' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#334155' }}>
                       <span style={{ width: 8, height: 8, borderRadius: '50%', background: e.color, display: 'inline-block' }} />
                       {e.name}
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#1a2a4a' }}>{e.value}%</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#1a2a4a' }}>{e.value}%</span>
                   </div>
                 ))}
               </div>
@@ -224,19 +224,19 @@ export default function FinanceDashboard() {
         {/* Invoice Aging — real AR aging buckets from the DB */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>Invoice Aging</div>
-            <span style={{ fontSize: 11, color: '#94a3b8' }}>Total {formatINR((agingSummary?.buckets ?? []).reduce((s, b) => s + b.amount, 0), { compact: true })}</span>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>Invoice Aging</div>
+            <span style={{ fontSize: 12, color: '#94a3b8' }}>Total {formatINR((agingSummary?.buckets ?? []).reduce((s, b) => s + b.amount, 0), { compact: true })}</span>
           </div>
           {(() => {
             const buckets = agingSummary?.buckets ?? []
             const max = Math.max(...buckets.map((b) => b.amount), 1)
             const colors = ['#F5C6C6', '#EE9999', '#E06666', '#CC3333', '#8B1A1A']
-            if (buckets.length === 0) return <div style={{ textAlign: 'center', padding: '28px 0', color: '#94a3b8', fontSize: 12 }}>No outstanding invoices</div>
+            if (buckets.length === 0) return <div style={{ textAlign: 'center', padding: '28px 0', color: '#94a3b8', fontSize: 13 }}>No outstanding invoices</div>
             return buckets.map((b, i) => (
               <div key={b.bucket} style={{ marginBottom: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, color: '#334155' }}>{b.bucket}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.amount, { compact: true })}</span>
+                  <span style={{ fontSize: 12, color: '#334155' }}>{b.bucket}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(b.amount, { compact: true })}</span>
                 </div>
                 <div style={{ height: 10, background: '#F5F0EB', borderRadius: 5, overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${Math.round((b.amount / max) * 100)}%`, background: colors[i % colors.length], borderRadius: 5 }} />
@@ -248,25 +248,25 @@ export default function FinanceDashboard() {
 
         {/* Branch Performance */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a', marginBottom: 14 }}>Branch Performance</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a', marginBottom: 14 }}>Branch Performance</div>
           <div style={{
             display: 'grid', gridTemplateColumns: '1fr 90px 70px 60px',
             gap: 8, marginBottom: 10,
           }}>
             {['BRANCH NAME', 'REVENUE', 'INVOICES', 'SHARE'].map((h) => (
-              <div key={h} style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px' }}>{h}</div>
+              <div key={h} style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px' }}>{h}</div>
             ))}
           </div>
           {branchesLoading
             ? <Skeleton active paragraph={{ rows: 3 }} />
             : (branches ?? []).length === 0
-              ? <div style={{ textAlign: 'center', padding: '24px 0', color: '#94a3b8', fontSize: 12 }}>No branch data</div>
+              ? <div style={{ textAlign: 'center', padding: '24px 0', color: '#94a3b8', fontSize: 13 }}>No branch data</div>
               : (branches ?? []).map((b: any) => (
               <div key={b.branchId} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 70px 60px', gap: 8, alignItems: 'center', padding: '12px 0', borderTop: '1px solid #F5F0EB' }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{b.branchName}</div>
-                <div style={{ fontSize: 13, color: '#334155' }}>{formatINR(b.revenue ?? 0, { compact: true })}</div>
-                <div style={{ fontSize: 13, color: '#334155' }}>{b.events ?? 0}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#8B1A1A' }}>{b.sharePct ?? 0}%</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>{b.branchName}</div>
+                <div style={{ fontSize: 14, color: '#334155' }}>{formatINR(b.revenue ?? 0, { compact: true })}</div>
+                <div style={{ fontSize: 14, color: '#334155' }}>{b.events ?? 0}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#8B1A1A' }}>{b.sharePct ?? 0}%</div>
               </div>
             ))
           }

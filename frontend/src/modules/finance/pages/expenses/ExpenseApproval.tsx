@@ -112,14 +112,14 @@ export default function ExpenseApproval() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 26, fontWeight: 800, color: '#1a2a4a', lineHeight: 1.2 }}>Expense Management</div>
-          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>Real-time financial reconciliation & employee claims.</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>Real-time financial reconciliation & employee claims.</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1px solid #E8E0D8', borderRadius: 10, padding: '8px 14px', width: 220 }}>
-            <SearchOutlined style={{ color: '#94a3b8', fontSize: 13 }} />
-            <input value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} placeholder="Search transactions..." style={{ border: 'none', outline: 'none', fontSize: 12, color: '#334155', background: 'transparent', width: '100%' }} />
+            <SearchOutlined style={{ color: '#94a3b8', fontSize: 14 }} />
+            <input value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} placeholder="Search transactions..." style={{ border: 'none', outline: 'none', fontSize: 13, color: '#334155', background: 'transparent', width: '100%' }} />
           </div>
-          <button onClick={() => setCreateOpen(true)} style={{ background: '#8B1A1A', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={() => setCreateOpen(true)} style={{ background: '#8B1A1A', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
             + Quick Create
           </button>
           <div style={{ width: 34, height: 34, background: '#fff', border: '1px solid #E8E0D8', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -141,7 +141,7 @@ export default function ExpenseApproval() {
                 return (
                   <div key={cat} style={{ background: meta.color, borderRadius: 10, padding: '16px 14px' }}>
                     <div style={{ fontSize: 22, marginBottom: 10 }}>{meta.icon}</div>
-                    <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>{meta.label}</div>
+                    <div style={{ fontSize: 13, color: '#64748b', marginBottom: 4 }}>{meta.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: '#1a2a4a', marginBottom: 10 }}>{formatINR(total, { compact: true })}</div>
                     <div style={{ height: 4, background: 'rgba(0,0,0,0.08)', borderRadius: 2 }}>
                       <div style={{ height: '100%', width: `${pct}%`, background: meta.bar, borderRadius: 2 }} />
@@ -150,7 +150,7 @@ export default function ExpenseApproval() {
                 )
               })}
               {Object.keys(categoryTotals).length === 0 && (
-                <div style={{ gridColumn: '1/-1', textAlign: 'center', color: '#94a3b8', fontSize: 13, padding: '20px 0' }}>No spending data</div>
+                <div style={{ gridColumn: '1/-1', textAlign: 'center', color: '#94a3b8', fontSize: 14, padding: '20px 0' }}>No spending data</div>
               )}
             </div>
           )
@@ -162,22 +162,22 @@ export default function ExpenseApproval() {
         <div style={{ padding: '18px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>Employee Reimbursement Claims</div>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Manage and approve multi-step claim workflows.</div>
+            <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Manage and approve multi-step claim workflows.</div>
           </div>
-          <button onClick={cycleFilter} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: statusFilter ? '#FBEAEA' : '#fff', fontSize: 12, color: statusFilter ? '#8B1A1A' : '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, textTransform: 'capitalize' }}>
-            <FilterOutlined style={{ fontSize: 11 }} /> {statusFilter ?? 'Filter'}
+          <button onClick={cycleFilter} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid #E8E0D8', background: statusFilter ? '#FBEAEA' : '#fff', fontSize: 13, color: statusFilter ? '#8B1A1A' : '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, textTransform: 'capitalize' }}>
+            <FilterOutlined style={{ fontSize: 12 }} /> {statusFilter ?? 'Filter'}
           </button>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 120px 160px 140px', padding: '8px 20px', background: '#1a2a4a' }}>
           {['EMPLOYEE', 'DESCRIPTION', 'AMOUNT', 'POLICY STATUS', 'ACTIONS'].map((h) => (
-            <div key={h} style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>{h}</div>
+            <div key={h} style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>{h}</div>
           ))}
         </div>
 
         {isLoading && <div style={{ padding: 20 }}><Skeleton active paragraph={{ rows: 5 }} /></div>}
         {!isLoading && filtered.length === 0 && (
-          <div style={{ padding: '32px', textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>No expense claims found</div>
+          <div style={{ padding: '32px', textAlign: 'center', fontSize: 14, color: '#94a3b8' }}>No expense claims found</div>
         )}
 
         {!isLoading && filtered.map((e, i) => {
@@ -187,27 +187,27 @@ export default function ExpenseApproval() {
           return (
             <div key={e.id} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 120px 160px 140px', padding: '16px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#8B1A1A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#8B1A1A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
                   {initials}
                 </div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{empName}</div>
-                  <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'capitalize' }}>{e.category.replace('_', ' ')}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>{empName}</div>
+                  <div style={{ fontSize: 12, color: '#94a3b8', textTransform: 'capitalize' }}>{e.category.replace('_', ' ')}</div>
                 </div>
               </div>
-              <div style={{ fontSize: 12, color: '#334155', paddingRight: 12 }}>{e.description}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(e.amount)}</div>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: isCompliant ? '#D1FAE5' : '#FEE2E2', color: isCompliant ? '#065F46' : '#991B1B', width: 'fit-content' }}>
+              <div style={{ fontSize: 13, color: '#334155', paddingRight: 12 }}>{e.description}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#1a2a4a' }}>{formatINR(e.amount)}</div>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: isCompliant ? '#D1FAE5' : '#FEE2E2', color: isCompliant ? '#065F46' : '#991B1B', width: 'fit-content' }}>
                 {isCompliant ? '✓ COMPLIANT' : '✗ OUT OF POLICY'}
               </span>
               {e.status === 'pending' && can('expense.approve') && (
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <button onClick={() => handleApprove(e.id, empName)} style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Approve</button>
-                  <button onClick={() => handleReject(e.id, empName)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#DC2626', fontSize: 11, cursor: 'pointer' }}>Reject</button>
+                  <button onClick={() => handleApprove(e.id, empName)} style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Approve</button>
+                  <button onClick={() => handleReject(e.id, empName)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #E8E0D8', background: '#fff', color: '#DC2626', fontSize: 12, cursor: 'pointer' }}>Reject</button>
                 </div>
               )}
               {e.status !== 'pending' && (
-                <span style={{ fontSize: 11, fontWeight: 700, color: e.status === 'approved' ? '#059669' : '#DC2626', textTransform: 'capitalize' }}>{e.status}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: e.status === 'approved' ? '#059669' : '#DC2626', textTransform: 'capitalize' }}>{e.status}</span>
               )}
             </div>
           )
