@@ -5,6 +5,7 @@ import { useFinanceKPIs } from '../../modules/finance/hooks/useFinanceDashboard'
 import { useInvoiceList } from '../../modules/finance/hooks/useInvoices'
 import { formatINR } from '../../modules/finance/utils/currencyFormatter'
 import { useFinanceUIStore } from '../../modules/finance/store/financeUIStore'
+import { CURRENCY_OPTIONS } from '../../modules/finance/utils/currencyFormatter'
 
 function InsightsPanel() {
   const navigate = useNavigate()
@@ -106,6 +107,8 @@ export default function AppLayout() {
   const [financeOpen, setFinanceOpen] = useState(true)
   const collapsed = useFinanceUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useFinanceUIStore((s) => s.toggleSidebar)
+  const currency = useFinanceUIStore((s) => s.currency)
+  const setCurrency = useFinanceUIStore((s) => s.setCurrency)
 
   const isFinance = location.pathname.startsWith('/finance')
   const sidebarW = collapsed ? 64 : 220
@@ -137,6 +140,21 @@ export default function AppLayout() {
           >
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </button>
+        </div>
+
+        {/* Currency selector */}
+        <div style={{ padding: collapsed ? '10px 8px' : '10px 16px', borderBottom: '1px solid #E8E0D8', flexShrink: 0 }}>
+          {!collapsed && <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#94a3b8', marginBottom: 5 }}>Currency</div>}
+          <select
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value as any)}
+            title="Display currency"
+            style={{ width: '100%', padding: collapsed ? '5px 2px' : '6px 8px', border: '1px solid #E8E0D8', borderRadius: 6, fontSize: collapsed ? 11 : 12, color: '#334155', background: '#fff', cursor: 'pointer', textAlign: collapsed ? 'center' : 'left' }}
+          >
+            {CURRENCY_OPTIONS.map((c) => (
+              <option key={c.value} value={c.value}>{collapsed ? c.value : c.label}</option>
+            ))}
+          </select>
         </div>
 
         {/* Nav */}
@@ -242,7 +260,10 @@ export default function AppLayout() {
         padding: 24, minHeight: '100vh', background: '#F5F0EB',
         transition: 'margin-left 0.2s ease',
       }}>
-        <Outlet />
+        {/* key on currency forces money figures to re-format app-wide when currency changes */}
+        <div key={currency}>
+          <Outlet />
+        </div>
       </main>
 
       {/* ── RIGHT INSIGHTS PANEL (live data) ── */}
