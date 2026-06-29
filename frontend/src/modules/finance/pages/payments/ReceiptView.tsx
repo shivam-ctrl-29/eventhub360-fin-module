@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
+import { message } from '@shared/lib/antdStatic'
 import { DownloadOutlined, PrinterOutlined } from '@ant-design/icons'
-import { Skeleton, Alert, message } from 'antd'
+import { Skeleton, Alert } from 'antd'
 import { useReceipt } from '../../hooks/usePayments'
 import { formatINR } from '../../utils/currencyFormatter'
 import dayjs from 'dayjs'

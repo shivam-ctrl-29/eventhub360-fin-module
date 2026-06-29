@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { message, modal } from '@shared/lib/antdStatic'
 import { PlusOutlined } from '@ant-design/icons'
-import { Skeleton, Alert, message, Modal } from 'antd'
+import { Skeleton, Alert } from 'antd'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { invoiceApi } from '../../api/invoiceApi'
 import { formatINR } from '../../utils/currencyFormatter'
@@ -70,7 +71,7 @@ export default function CreditDebitNote() {
       message.warning('Reference invoice and amount are required')
       return
     }
-    Modal.confirm({
+    modal.confirm({
       title: `Create ${noteType} Note`,
       content: `Create a ${noteType.toLowerCase()} note of ${formatINR(Number(formData.amount))}?`,
       okText: 'Create',

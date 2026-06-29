@@ -1,9 +1,10 @@
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import { message } from '@shared/lib/antdStatic'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { PlusOutlined, DeleteOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
-import { message } from 'antd'
+
 import { useCreateInvoice } from '../../hooks/useInvoices'
 import { INDIAN_STATES, CITIES_BY_STATE } from '@shared/constants/indianLocations'
 

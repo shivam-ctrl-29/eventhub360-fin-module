@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { message, modal } from '@shared/lib/antdStatic'
 import { useDebounce } from '@shared/hooks/useDebounce'
 import { SearchOutlined, BellOutlined, FilterOutlined } from '@ant-design/icons'
-import { Skeleton, message, Modal, Form, Input, InputNumber, Select, DatePicker } from 'antd'
+import { Skeleton, Modal, Form, Input, InputNumber, Select, DatePicker } from 'antd'
 import { useExpenseList, useApproveExpense, useRejectExpense, useCreateExpense } from '../../hooks/useExpenses'
 import { usePermissions } from '@shared/hooks/usePermissions'
 import { formatINR } from '../../utils/currencyFormatter'
@@ -68,7 +69,7 @@ export default function ExpenseApproval() {
     : expenses
 
   const handleApprove = (id: string, name: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Approve Expense',
       content: `Approve expense claim by ${name}?`,
       okText: 'Approve',
@@ -85,7 +86,7 @@ export default function ExpenseApproval() {
   }
 
   const handleReject = (id: string, name: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Reject Expense',
       content: `Reject expense claim by ${name}?`,
       okText: 'Reject',

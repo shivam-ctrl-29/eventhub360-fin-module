@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react'
+import { message, modal } from '@shared/lib/antdStatic'
 import {
   SearchOutlined, CloudUploadOutlined, CheckCircleFilled,
   FileTextOutlined, StarFilled,
 } from '@ant-design/icons'
-import { Skeleton, message, Modal, Form, Input, InputNumber, Select, DatePicker } from 'antd'
+import { Skeleton, Modal, Form, Input, InputNumber, Select, DatePicker } from 'antd'
 import { useVendorBills, useApprovePayouts, useUploadBill } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 import { downloadCSV } from '../../utils/exportHelper'
@@ -75,7 +76,7 @@ export default function VendorBillList() {
 
   const handleApprove = () => {
     if (selected.length === 0) return
-    Modal.confirm({
+    modal.confirm({
       title: 'Approve Bills',
       content: `Approve ${selected.length} selected bill(s) for payment?`,
       okText: 'Approve',

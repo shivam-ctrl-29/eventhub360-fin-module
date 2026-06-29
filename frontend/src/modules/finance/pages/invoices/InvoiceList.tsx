@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import { message } from '@shared/lib/antdStatic'
 import { SearchOutlined, PlusOutlined, DownloadOutlined, EyeOutlined, EditOutlined, MoreOutlined, FileTextOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { Skeleton, Alert } from 'antd'
@@ -9,7 +10,7 @@ import { usePermissions } from '@shared/hooks/usePermissions'
 import type { InvoiceStatus } from '../../types/invoice.types'
 import { formatINR } from '../../utils/currencyFormatter'
 import { downloadCSV } from '../../utils/exportHelper'
-import { message, Dropdown } from 'antd'
+import { Dropdown } from 'antd'
 import dayjs from 'dayjs'
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {

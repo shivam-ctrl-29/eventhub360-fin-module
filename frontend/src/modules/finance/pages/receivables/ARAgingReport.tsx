@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { Skeleton, Alert, message, Modal } from 'antd'
+import { message, modal } from '@shared/lib/antdStatic'
+import { Skeleton, Alert } from 'antd'
 import { useARAgingSummary, useARAgingEntries } from '../../hooks/useARDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 import { receivableApi } from '../../api/receivableApi'
@@ -23,7 +24,7 @@ export default function ARAgingReport() {
   }
 
   const showHistory = (c: any) => {
-    Modal.info({
+    modal.info({
       title: c.customerName,
       content: (
         <div style={{ fontSize: 14, lineHeight: 1.9 }}>

@@ -1,4 +1,4 @@
-import { message } from 'antd'
+import { message } from '../lib/antdStatic'
 
 export function useNotification() {
   return {

@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
+import { message } from '@shared/lib/antdStatic'
 import { DownloadOutlined, EditOutlined, PrinterOutlined } from '@ant-design/icons'
-import { Skeleton, Alert, message } from 'antd'
+import { Skeleton, Alert } from 'antd'
 import { useInvoice } from '../../hooks/useInvoices'
 import { useCompany } from '../../hooks/useFinanceDashboard'
 import { formatINR } from '../../utils/currencyFormatter'

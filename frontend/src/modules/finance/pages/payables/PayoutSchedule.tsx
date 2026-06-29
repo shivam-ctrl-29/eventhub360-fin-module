@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { message, modal } from '@shared/lib/antdStatic'
 import { CalendarOutlined, CheckOutlined, DownloadOutlined } from '@ant-design/icons'
-import { Skeleton, message, Modal } from 'antd'
+import { Skeleton } from 'antd'
 import { usePayoutSchedule, useApprovePayouts, useDisburse } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 import { downloadCSV } from '../../utils/exportHelper'
@@ -46,7 +47,7 @@ export default function PayoutSchedule() {
 
   const handleApproveDisburse = () => {
     if (selected.length === 0) return
-    Modal.confirm({
+    modal.confirm({
       title: 'Approve & Disburse',
       content: `Disburse ${selected.length} selected payout(s)?`,
       okText: 'Confirm',

@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { message, modal } from '@shared/lib/antdStatic'
 import { LinkOutlined } from '@ant-design/icons'
-import { Skeleton, Alert, message, Modal } from 'antd'
+import { Skeleton, Alert } from 'antd'
 import { useReconciliationEntries, useMatchEntry } from '../../hooks/useReconciliation'
 import { useInvoiceList } from '../../hooks/useInvoices'
 import { formatINR } from '../../utils/currencyFormatter'
@@ -26,7 +27,7 @@ export default function ReconciliationDesk() {
     const invoiceId = localMatched[entryId]
     if (!invoiceId) return
     const inv = invoices.find((i) => i.id === invoiceId)
-    Modal.confirm({
+    modal.confirm({
       title: 'Reconcile Payment',
       content: `Match this bank entry to ${inv?.invoiceNumber ?? invoiceId}?`,
       okText: 'Reconcile',

@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { message } from '@shared/lib/antdStatic'
 import { useDebounce } from '@shared/hooks/useDebounce'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
 import { SearchOutlined, DownloadOutlined } from '@ant-design/icons'
-import { Skeleton, Alert, message } from 'antd'
+import { Skeleton, Alert } from 'antd'
 import { useGSTSummary, useGSTComplianceScore, useHSNBreakdown } from '../../hooks/useGSTReport'
 import { formatINR } from '../../utils/currencyFormatter'
 import { downloadCSV } from '../../utils/exportHelper'

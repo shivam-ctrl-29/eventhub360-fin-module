@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { message, modal } from '@shared/lib/antdStatic'
 import { CaretRightOutlined, MoreOutlined, DownloadOutlined } from '@ant-design/icons'
-import { Skeleton, Alert, message, Modal, Dropdown } from 'antd'
+import { Skeleton, Alert, Dropdown } from 'antd'
 import { useARAgingSummary, useARAgingEntries } from '../../hooks/useARDashboard'
 import { useAPAgingSummary } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
@@ -14,7 +15,6 @@ const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
   current:    { bg: '#F1F5F9', color: '#475569' },
   paid:       { bg: '#D1FAE5', color: '#065F46' },
 }
-
 
 export default function ARAPAgingDashboard() {
   const [view, setView] = useState<'All Clients' | 'Overdue Only'>('All Clients')
@@ -32,7 +32,7 @@ export default function ARAPAgingDashboard() {
     : entries
 
   const showAccount = (c: any) => {
-    Modal.info({
+    modal.info({
       title: c.customerName,
       content: (
         <div style={{ fontSize: 14, lineHeight: 1.9 }}>

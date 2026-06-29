@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { message, modal } from '@shared/lib/antdStatic'
 import { SendOutlined } from '@ant-design/icons'
-import { Skeleton, message, Modal } from 'antd'
+import { Skeleton } from 'antd'
 import { useDunningQueue, useSendReminder } from '../../hooks/useARDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 import dayjs from 'dayjs'
@@ -22,7 +23,7 @@ export default function DunningManagement() {
   const l3 = queue.filter((d) => d.dunningLevel === 'L3').length
 
   const handleSend = (customerId: string, level: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Send Reminder',
       content: `Send a ${level} reminder to this client?`,
       okText: 'Send',
@@ -40,7 +41,7 @@ export default function DunningManagement() {
 
   const handleSendAll = () => {
     if (queue.length === 0) { message.info('No clients in the dunning queue'); return }
-    Modal.confirm({
+    modal.confirm({
       title: 'Send All Reminders',
       content: `Send reminders to all ${queue.length} client(s) in the queue?`,
       okText: 'Send All',
@@ -56,7 +57,7 @@ export default function DunningManagement() {
   }
 
   const viewHistory = (d: any) => {
-    Modal.info({
+    modal.info({
       title: `${d.customerName} — Collection History`,
       content: (
         <div style={{ fontSize: 14, lineHeight: 1.9 }}>
