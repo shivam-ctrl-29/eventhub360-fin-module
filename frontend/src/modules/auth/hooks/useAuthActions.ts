@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { authApi } from '../api/authApi'
 
 function extractErrorMessage(err: any, fallback: string): string {
-  return err?.response?.data?.message ?? fallback
+  const msg = err?.response?.data?.message
+  if (Array.isArray(msg)) return msg.join(', ')
+  if (typeof msg === 'string' && msg.trim()) return msg
+  return fallback
 }
 
 export function useLogin() {
