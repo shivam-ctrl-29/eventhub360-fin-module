@@ -7,6 +7,8 @@ import { formatINR } from '../../modules/finance/utils/currencyFormatter'
 import { useFinanceUIStore } from '../../modules/finance/store/financeUIStore'
 import { CURRENCY_OPTIONS } from '../../modules/finance/utils/currencyFormatter'
 import { useViewport } from '../hooks/useViewport'
+import { useAuth } from '../hooks/useAuth'
+import { message } from '../lib/antdStatic'
 
 function InsightsPanel() {
   const navigate = useNavigate()
@@ -105,6 +107,7 @@ const topNavLinks = [
 export default function AppLayout() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { logout } = useAuth()
   const [financeOpen, setFinanceOpen] = useState(true)
   const collapsed = useFinanceUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useFinanceUIStore((s) => s.toggleSidebar)
@@ -267,15 +270,28 @@ export default function AppLayout() {
 
         {/* Bottom */}
         <div style={{ borderTop: '1px solid #E8E0D8', paddingTop: 4, paddingBottom: 8, flexShrink: 0 }}>
-          {[{ label: 'Help Center', icon: '❓' }, { label: 'Logout', icon: '↪' }].map((l) => (
-            <div key={l.label} title={l.label} style={{
+          <div
+            title="Help Center"
+            onClick={() => message.info('Contact your administrator for support.')}
+            style={{
               display: 'flex', alignItems: 'center', gap: 10,
               justifyContent: navCollapsed ? 'center' : 'flex-start',
               padding: '10px 16px', fontSize: 14, color: '#64748b', cursor: 'pointer',
-            }}>
-              <span>{l.icon}</span>{!navCollapsed && <span>{l.label}</span>}
-            </div>
-          ))}
+            }}
+          >
+            <span>❓</span>{!navCollapsed && <span>Help Center</span>}
+          </div>
+          <div
+            title="Logout"
+            onClick={logout}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              justifyContent: navCollapsed ? 'center' : 'flex-start',
+              padding: '10px 16px', fontSize: 14, color: '#64748b', cursor: 'pointer',
+            }}
+          >
+            <span>↪</span>{!navCollapsed && <span>Logout</span>}
+          </div>
         </div>
       </aside>
 

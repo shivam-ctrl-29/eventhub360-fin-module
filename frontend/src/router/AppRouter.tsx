@@ -1,20 +1,18 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import AppLayout from '../shared/components/AppLayout'
 import { useAuth } from '../shared/hooks/useAuth'
+import Login from '../modules/auth/pages/Login'
+import Signup from '../modules/auth/pages/Signup'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth()
-  if (!isAuthenticated) {
-    // Seed a dev token so the app is navigable before the login page is built
-    if (import.meta.env.DEV) {
-      const h = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-      const p = btoa(JSON.stringify({ sub: '1', id: '1', name: 'Shivam Mathur', email: 'admin@demo.in', role: 'super_admin' }))
-      localStorage.setItem('auth_token', `${h}.${p}.dev-sig`)
-      window.location.reload()
-      return null
-    }
-    return <Navigate to="/login" replace />
-  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
+function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth()
+  if (isAuthenticated) return <Navigate to="/finance/dashboard" replace />
   return <>{children}</>
 }
 
@@ -53,6 +51,9 @@ import AuditTrail from '../modules/finance/pages/reports/AuditTrail'
 export default function AppRouter() {
   return (
     <Routes>
+      <Route path="/login" element={<RedirectIfAuthed><Login /></RedirectIfAuthed>} />
+      <Route path="/signup" element={<RedirectIfAuthed><Signup /></RedirectIfAuthed>} />
+
       <Route path="/" element={<RequireAuth><AppLayout /></RequireAuth>}>
         <Route index element={<Navigate to="/finance/dashboard" replace />} />
 

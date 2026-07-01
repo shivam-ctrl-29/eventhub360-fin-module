@@ -12,10 +12,14 @@ axiosInstance.interceptors.request.use((config) => {
   return config
 })
 
+const isAuthEndpoint = (url?: string) => !!url && /\/api\/auth\/(login|register)$/.test(url)
+
 axiosInstance.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    // A 401 from the login/register call itself is just "wrong credentials" —
+    // let the calling page show its own inline error, don't force a reload.
+    if (err.response?.status === 401 && !isAuthEndpoint(err.config?.url)) {
       localStorage.removeItem('auth_token')
       window.location.href = '/login'
     }

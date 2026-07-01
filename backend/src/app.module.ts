@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FinanceModule } from './modules/finance/finance.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { FinanceModule } from './modules/finance/finance.module';
         ssl: false,
       }),
     }),
+    AuthModule,
     FinanceModule,
   ],
 })
