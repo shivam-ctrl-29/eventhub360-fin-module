@@ -13,9 +13,11 @@ export class ReconciliationService {
   ) {}
 
   async findAll(params: PaginationDto & { reconciled?: boolean }) {
-    const { page = 1, limit = 20 } = params
+    const { page = 1, limit = 20, reconciled } = params
     try {
+      const where = reconciled !== undefined ? { isReconciled: reconciled } : {}
       const [rows, total] = await this.paymentRepo.findAndCount({
+        where,
         order: { paidAt: 'DESC' },
         skip: (page - 1) * limit,
         take: limit,
@@ -26,6 +28,7 @@ export class ReconciliationService {
           mode: p.mode, gatewayRef: p.gatewayRef, paidAt: p.paidAt,
           isReconciled: !!p.isReconciled,
           matchedInvoiceId: p.matchedInvoiceId,
+          updatedAt: p.updatedAt,
         })),
         total,
       }

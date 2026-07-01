@@ -28,6 +28,7 @@ export interface ReconciliationEntry {
   matchedInvoiceId?: string
   matchedInvoiceNumber?: string
   isReconciled: boolean
+  updatedAt?: string
 }
 
 export interface Receipt {

@@ -17,3 +17,11 @@ export function useMatchEntry() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['finance', 'reconciliation'] }) },
   })
 }
+
+export function useUnmatchEntry() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (entryId: string) => reconciliationApi.unmatch(entryId).then((r) => r.data.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['finance', 'reconciliation'] }) },
+  })
+}
