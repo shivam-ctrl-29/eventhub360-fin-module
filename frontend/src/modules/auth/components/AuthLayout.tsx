@@ -44,7 +44,7 @@ export default function AuthLayout({ title, subtitle, icon, children }: AuthLayo
         </div>
         {!isMobile && (
           <div style={{ display: 'flex', gap: 32 }}>
-            <span style={{ ...navLink, color: e360.primary, fontWeight: 600, borderBottom: `2px solid ${e360.secondary}`, paddingBottom: 4 }}>Ecosystem</span>
+            <span style={navLink}>Ecosystem</span>
             <span style={navLink}>Finance</span>
             <span style={navLink}>Operations</span>
           </div>
