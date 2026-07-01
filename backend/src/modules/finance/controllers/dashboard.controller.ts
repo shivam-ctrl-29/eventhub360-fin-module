@@ -1,14 +1,23 @@
 import { Controller, Get, Query } from '@nestjs/common'
 import { DashboardService } from '../services/dashboard.service'
+import { ExchangeRateService } from '../services/exchange-rate.service'
 import { ok } from '../../../shared/response.helper'
 
 @Controller()
 export class DashboardController {
-  constructor(private readonly svc: DashboardService) {}
+  constructor(
+    private readonly svc: DashboardService,
+    private readonly exchangeRates: ExchangeRateService,
+  ) {}
 
   @Get('fin/dashboard')
   async getKPIs() {
     return ok(await this.svc.getKPIs())
+  }
+
+  @Get('fin/exchange-rates')
+  async getExchangeRates() {
+    return ok(await this.exchangeRates.getRates())
   }
 
   @Get('fin/dashboard/revenue-trends')

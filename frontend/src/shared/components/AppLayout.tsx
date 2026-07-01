@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
-import { useFinanceKPIs } from '../../modules/finance/hooks/useFinanceDashboard'
+import { useFinanceKPIs, useExchangeRatesBootstrap } from '../../modules/finance/hooks/useFinanceDashboard'
 import { useInvoiceList } from '../../modules/finance/hooks/useInvoices'
 import { formatINR } from '../../modules/finance/utils/currencyFormatter'
 import { useFinanceUIStore } from '../../modules/finance/store/financeUIStore'
@@ -113,6 +113,8 @@ export default function AppLayout() {
   const toggleSidebar = useFinanceUIStore((s) => s.toggleSidebar)
   const currency = useFinanceUIStore((s) => s.currency)
   const setCurrency = useFinanceUIStore((s) => s.setCurrency)
+  const ratesFetchedAt = useFinanceUIStore((s) => s.ratesFetchedAt)
+  useExchangeRatesBootstrap()
   const { isMobile, isDesktop } = useViewport()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
@@ -182,6 +184,13 @@ export default function AppLayout() {
               <option key={c.value} value={c.value}>{navCollapsed ? c.value : c.label}</option>
             ))}
           </select>
+          {!navCollapsed && currency !== 'INR' && (
+            <div style={{ fontSize: 9, color: ratesFetchedAt ? '#059669' : '#94a3b8', marginTop: 4 }}>
+              {ratesFetchedAt
+                ? `Live rate · ${new Date(ratesFetchedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                : 'Loading live rate…'}
+            </div>
+          )}
         </div>
 
         {/* Nav */}
@@ -305,8 +314,9 @@ export default function AppLayout() {
         transition: 'margin 0.2s ease',
         minWidth: 0,
       }}>
-        {/* key on currency forces money figures to re-format app-wide when currency changes */}
-        <div key={currency}>
+        {/* key on currency + ratesFetchedAt forces money figures to re-format app-wide
+            when currency changes or live FX rates finish loading */}
+        <div key={`${currency}-${ratesFetchedAt ?? 'pending'}`}>
           <Outlet />
         </div>
       </main>

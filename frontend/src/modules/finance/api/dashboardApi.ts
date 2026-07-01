@@ -35,9 +35,18 @@ export interface CompanyInfo {
   baseCurrency: string
 }
 
+export interface ExchangeRatesResponse {
+  base: 'INR'
+  rates: Record<string, number>
+  fetchedAt: string
+}
+
 export const dashboardApi = {
   getCompany: () =>
     axiosInstance.get<ApiResponse<CompanyInfo | null>>('/api/fin/company'),
+
+  getExchangeRates: () =>
+    axiosInstance.get<ApiResponse<ExchangeRatesResponse>>('/api/fin/exchange-rates'),
 
   getKPIs: () =>
     axiosInstance.get<ApiResponse<DashboardKPIs>>('/api/fin/dashboard'),

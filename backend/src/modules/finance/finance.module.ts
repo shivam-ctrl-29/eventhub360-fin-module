@@ -16,6 +16,7 @@ import { ReconciliationService } from './services/reconciliation.service';
 import { ReportService } from './services/report.service';
 import { DashboardService } from './services/dashboard.service';
 import { AuditService } from './services/audit.service';
+import { ExchangeRateService } from './services/exchange-rate.service';
 import { InvoiceController } from './controllers/invoice.controller';
 import { PaymentController } from './controllers/payment.controller';
 import { ExpenseController } from './controllers/expense.controller';
@@ -38,6 +39,7 @@ import { DashboardController } from './controllers/dashboard.controller';
   providers: [
     DashboardService, InvoiceService, PaymentService,
     ExpenseService, PayableService, ReconciliationService, ReportService, AuditService,
+    ExchangeRateService,
   ],
   exports: [AuditService],
 })

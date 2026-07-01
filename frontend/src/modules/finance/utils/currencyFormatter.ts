@@ -21,17 +21,26 @@ export const CURRENCY_OPTIONS: Array<{ value: CurrencyCode; label: string }> = [
   { value: 'KWD', label: 'KD KWD' },
 ]
 
-function activeCurrency(): CurrencyConfig {
-  return CURRENCY_CONFIG[useFinanceUIStore.getState().currency] ?? CURRENCY_CONFIG.INR
+function activeCurrency(): CurrencyCode {
+  return useFinanceUIStore.getState().currency
 }
 
-// Currency-aware money formatter. Honours the globally selected currency
-// (symbol + decimals + locale). No FX conversion — the numeric value is unchanged.
+// Currency-aware money formatter. Converts using live exchange rates fetched
+// from the backend (see useExchangeRates) — never a hardcoded/invented rate.
+// Until rates have loaded at least once, falls back to INR (the true source
+// value) rather than showing a non-INR symbol next to an unconverted number.
 export function formatINR(amount: number, options?: { compact?: boolean; showSymbol?: boolean }): string {
   const { compact = false, showSymbol = true } = options ?? {}
-  const cfg = activeCurrency()
+  const selected = activeCurrency()
+  const { rates } = useFinanceUIStore.getState()
+
+  const rate = selected === 'INR' ? 1 : rates?.[selected]
+  // No live rate available yet for a non-INR selection — show the real INR
+  // value rather than fabricate a 1:1 "conversion".
+  const code: CurrencyCode = rate !== undefined ? selected : 'INR'
+  const cfg = CURRENCY_CONFIG[code]
   const sym = showSymbol ? cfg.symbol : ''
-  const n = Number(amount) || 0
+  const n = (Number(amount) || 0) * (code === 'INR' ? 1 : (rate as number))
 
   if (compact) {
     const abs = Math.abs(n)
