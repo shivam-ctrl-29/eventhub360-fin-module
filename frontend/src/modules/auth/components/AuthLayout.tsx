@@ -1,120 +1,211 @@
 import type { ReactNode } from 'react'
 import { useViewport } from '@shared/hooks/useViewport'
-import { AuthScaleProvider } from './AuthScaleContext'
+import { formatINR } from '../../finance/utils/currencyFormatter'
+import { useLoginSnapshot } from '../hooks/useLoginSnapshot'
+import { message } from '@shared/lib/antdStatic'
+import { e360 } from '../theme'
+import '../auth.css'
 
 interface AuthLayoutProps {
   title: string
   subtitle: string
+  icon: string
   children: ReactNode
 }
 
-const BAR_HEIGHTS = [18, 26, 22, 34, 46, 58]
+const navLink: React.CSSProperties = {
+  fontSize: 13, letterSpacing: '0.03em', color: e360.onSurfaceVariant,
+  fontWeight: 500, cursor: 'default', userSelect: 'none',
+}
 
-export default function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
-  const { isMobile, isTablet, width } = useViewport()
-  const showMarketingPanel = !isMobile && !isTablet
-  // Scale the whole composition up on large monitors so it doesn't look like a
-  // tiny centered island in a sea of empty background.
-  const isLarge = width >= 1440
-  const s = isLarge ? 1.18 : 1
+export default function AuthLayout({ title, subtitle, icon, children }: AuthLayoutProps) {
+  const { isMobile } = useViewport()
+  const snap = useLoginSnapshot()
 
   return (
-    <div style={{
-      minHeight: '100vh', background: '#F5F0EB', display: 'flex',
-      alignItems: 'center', justifyContent: 'center', padding: 24,
-    }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: isLarge ? 88 : 64, width: '100%',
-        maxWidth: showMarketingPanel ? (isLarge ? 1280 : 1080) : (isLarge ? 480 : 440),
-        justifyContent: 'center',
+    <div className="e360-page">
+      <div className="e360-grain" />
+      <div className="e360-atmosphere" />
+
+      {/* ── Top Nav ── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 50,
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: isMobile ? '18px 20px' : '24px 64px',
       }}>
-
-        {/* ── Left: marketing panel (desktop only) ── */}
-        {showMarketingPanel && (
-          <div style={{ flex: 1, maxWidth: 460 * s }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28 * s }}>
-              <span style={{ fontSize: 20 * s }}>🏦</span>
-              <span style={{ fontSize: 17 * s, fontWeight: 700, color: '#8B1A1A' }}>EventHub360</span>
-            </div>
-
-            <h1 style={{ fontSize: 38 * s, fontWeight: 800, color: '#1a2a4a', lineHeight: 1.15, margin: 0 }}>
-              Smarter Finance<br />Starts Here.
-            </h1>
-            <p style={{ fontSize: 15 * s, color: '#64748b', marginTop: 16 * s, lineHeight: 1.6, maxWidth: 380 * s }}>
-              The institutional-grade platform for modern event finance. Precision tools for invoicing, payments, and profitability.
-            </p>
-
-            {/* Floating stat cards */}
-            <div style={{ position: 'relative', marginTop: 48 * s, height: 260 * s }}>
-              <div style={{
-                position: 'absolute', left: 0, top: 0, width: 280 * s,
-                background: '#fff', borderRadius: 14, border: '1px solid #E8E0D8',
-                boxShadow: '0 12px 32px rgba(26,42,74,0.10)', padding: `${18 * s}px ${20 * s}px`,
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontSize: 10 * s, fontWeight: 700, letterSpacing: '0.5px', color: '#94a3b8', textTransform: 'uppercase' }}>Total Revenue</span>
-                  <span style={{ fontSize: 11 * s, fontWeight: 700, color: '#059669' }}>+12.4%</span>
-                </div>
-                <div style={{ fontSize: 22 * s, fontWeight: 800, color: '#1a2a4a', marginBottom: 14 * s }}>₹24,82,904</div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6 * s, height: 58 * s }}>
-                  {BAR_HEIGHTS.map((h, i) => (
-                    <div key={i} style={{
-                      width: 16 * s, height: h * s, borderRadius: 3,
-                      background: i === BAR_HEIGHTS.length - 1 ? '#8B1A1A' : 'rgba(139,26,26,0.28)',
-                    }} />
-                  ))}
-                </div>
-              </div>
-
-              <div style={{
-                position: 'absolute', left: 190 * s, top: 96 * s, width: 230 * s,
-                background: '#fff', borderRadius: 14, border: '1px solid #E8E0D8',
-                boxShadow: '0 12px 32px rgba(26,42,74,0.10)', padding: `${16 * s}px ${18 * s}px`,
-              }}>
-                <span style={{ fontSize: 10 * s, fontWeight: 700, letterSpacing: '0.5px', color: '#94a3b8', textTransform: 'uppercase' }}>Event Margin</span>
-                <div style={{ fontSize: 18 * s, fontWeight: 800, color: '#1a2a4a', margin: `${6 * s}px 0 ${10 * s}px` }}>Score: 81.5</div>
-                <div style={{ height: 6 * s, background: '#F1F5F9', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ width: '81%', height: '100%', background: '#C4A24D', borderRadius: 3 }} />
-                </div>
-              </div>
-
-              <div style={{
-                position: 'absolute', left: 24 * s, top: 190 * s, width: 220 * s,
-                background: '#fff', borderRadius: 14, border: '1px solid #E8E0D8',
-                boxShadow: '0 12px 32px rgba(26,42,74,0.10)', padding: `${14 * s}px ${18 * s}px`,
-              }}>
-                <span style={{ fontSize: 10 * s, fontWeight: 700, letterSpacing: '0.5px', color: '#94a3b8', textTransform: 'uppercase' }}>Active Branches</span>
-                <div style={{ display: 'flex', marginTop: 8 * s }}>
-                  {['MUM', 'DEL', 'BLR'].map((code, i) => (
-                    <div key={code} title={code} style={{
-                      width: 30 * s, height: 30 * s, borderRadius: '50%',
-                      background: ['#8B1A1A', '#1a2a4a', '#C4A24D'][i],
-                      color: '#fff', fontSize: 9 * s, fontWeight: 700,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      border: '2px solid #fff', marginLeft: i === 0 ? 0 : -10 * s,
-                    }}>
-                      {code.slice(0, 2)}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <span style={{ fontSize: isMobile ? 16 : 20, fontWeight: 700, color: e360.primary, letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>EventHub360</span>
+          {!isMobile && (
+            <>
+              <span style={{ color: 'rgba(88,65,63,0.3)', fontWeight: 300 }}>|</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: e360.secondary, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Institutional</span>
+            </>
+          )}
+        </div>
+        {!isMobile && (
+          <div style={{ display: 'flex', gap: 32 }}>
+            <span style={{ ...navLink, color: e360.primary, fontWeight: 600, borderBottom: `2px solid ${e360.secondary}`, paddingBottom: 4 }}>Ecosystem</span>
+            <span style={navLink}>Finance</span>
+            <span style={navLink}>Operations</span>
           </div>
         )}
+        <button
+          onClick={() => message.info('Priority support is available to verified institutional accounts.')}
+          style={{
+            padding: isMobile ? '7px 12px' : '9px 20px', borderRadius: 9999, border: `1px solid rgba(69,0,4,0.18)`,
+            fontSize: isMobile ? 11 : 12, fontWeight: 600, color: e360.primary, background: 'rgba(255,255,255,0.6)',
+            backdropFilter: 'blur(8px)', cursor: 'pointer', letterSpacing: '0.02em', whiteSpace: 'nowrap', flexShrink: 0,
+          }}
+        >
+          {isMobile ? 'Support' : 'Priority Support'}
+        </button>
+      </nav>
+
+      {/* ── Main grid ── */}
+      <main style={{
+        position: 'relative', zIndex: 10, width: '100%', maxWidth: 1600, margin: '0 auto',
+        display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 24,
+        padding: isMobile ? '96px 20px 48px' : '140px 64px 64px',
+        minHeight: '100vh', boxSizing: 'border-box',
+      }}>
+
+        {/* ── Left: marketing / live snapshot (hidden on mobile+tablet) ── */}
+        <div className="e360-marketing-col" style={{ flex: '1 1 480px', display: 'flex', flexDirection: 'column', gap: 32, minWidth: 0 }}>
+          <div>
+            <h1 className="e360-headline" style={{ fontSize: 44, fontWeight: 800, color: e360.primary, lineHeight: 1.12, letterSpacing: '-0.02em', margin: 0 }}>
+              EventHub360<br />
+              <span style={{ color: e360.secondary, opacity: 0.85 }}>Secure Access.</span>
+            </h1>
+            <p style={{ fontSize: 16, color: 'rgba(88,65,63,0.8)', marginTop: 14, maxWidth: 440, lineHeight: 1.6 }}>
+              Real-time financial analytics and transactional infrastructure for event operations — invoicing, payments, and profitability, live.
+            </p>
+          </div>
+
+          {/* Total Liquidity card */}
+          <div className="e360-glass e360-floating" style={{ borderRadius: 24, padding: 28, borderLeft: `4px solid ${e360.primary}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 18 }}>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: e360.onSurfaceVariant, margin: '0 0 6px' }}>Total Liquidity</p>
+                <h2 style={{ fontSize: 34, fontWeight: 800, color: e360.primary, margin: 0, letterSpacing: '-0.01em' }}>
+                  {snap.isLoading ? '—' : formatINR(snap.totalLiquidity, { compact: true })}
+                </h2>
+              </div>
+              {snap.momGrowthPct !== null && (
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: snap.momGrowthPct >= 0 ? e360.secondary : e360.error, fontWeight: 700, fontSize: 13, justifyContent: 'flex-end' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{snap.momGrowthPct >= 0 ? 'trending_up' : 'trending_down'}</span>
+                    {snap.momGrowthPct >= 0 ? '+' : ''}{snap.momGrowthPct}%
+                  </span>
+                  <p style={{ fontSize: 11, color: 'rgba(88,65,63,0.5)', margin: '2px 0 0' }}>v. last month</p>
+                </div>
+              )}
+            </div>
+
+            {/* mini bar chart — real monthly revenue */}
+            {snap.bars.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6, height: 72, padding: '0 4px', marginBottom: 16 }}>
+                {snap.bars.map((b, i) => (
+                  <div
+                    key={b.month + i}
+                    className="e360-bar"
+                    title={`${b.month}: ${formatINR(b.revenue, { compact: true })}`}
+                    style={{
+                      width: '100%', borderRadius: '6px 6px 2px 2px',
+                      height: `${Math.max(b.pct, 4)}%`,
+                      background: i === snap.bars.length - 1 ? e360.primary : e360.surfaceContainerHigh,
+                      boxShadow: i === snap.bars.length - 1 ? `0 8px 16px rgba(69,0,4,0.18)` : 'none',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, paddingTop: 14, borderTop: `1px solid ${e360.outlineVariant}55` }}>
+              <div>
+                <span style={{ fontSize: 11, color: 'rgba(88,65,63,0.55)', display: 'block' }}>Net Margin</span>
+                <span style={{ fontSize: 18, fontWeight: 700, color: e360.primary }}>{snap.netMarginPct !== null ? `${snap.netMarginPct}%` : '—'}</span>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: 11, color: 'rgba(88,65,63,0.55)', display: 'block' }}>Avg Collection</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end', fontSize: 18, fontWeight: 700, color: e360.secondary }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+                  {snap.avgCollectionDays !== null ? `${snap.avgCollectionDays}d` : '—'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Micro widgets */}
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <div className="e360-glass e360-floating-delayed" style={{ borderRadius: 16, padding: 16, display: 'flex', alignItems: 'center', gap: 12, flex: '1 1 200px' }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: e360.secondaryContainer, display: 'flex', alignItems: 'center', justifyContent: 'center', color: e360.onSecondaryContainer, flexShrink: 0 }}>
+                <span className="material-symbols-outlined">payments</span>
+              </div>
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: e360.onSurfaceVariant, margin: 0, letterSpacing: '0.06em' }}>Recent Flow</p>
+                <p style={{ fontSize: 15, fontWeight: 700, color: e360.primary, margin: '2px 0 0' }}>
+                  {snap.recentPaymentAmount !== null ? formatINR(snap.recentPaymentAmount) : '—'}
+                </p>
+              </div>
+            </div>
+            <div className="e360-glass e360-floating-more-delayed" style={{ borderRadius: 16, padding: 16, display: 'flex', alignItems: 'center', gap: 12, flex: '1 1 200px' }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#ffdad6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: e360.primaryContainer, flexShrink: 0 }}>
+                <span className="material-symbols-outlined">fact_check</span>
+              </div>
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: e360.onSurfaceVariant, margin: 0, letterSpacing: '0.06em' }}>Collection Rate</p>
+                <p style={{ fontSize: 15, fontWeight: 700, color: e360.primary, margin: '2px 0 0' }}>
+                  {snap.collectionRatePct !== null ? `${snap.collectionRatePct}%` : '—'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* ── Right: auth card ── */}
-        <div style={{
-          width: '100%', maxWidth: 420 * s, background: '#fff', borderRadius: 16,
-          border: '1px solid #E8E0D8', boxShadow: '0 20px 48px rgba(26,42,74,0.12)',
-          padding: `${40 * s}px ${36 * s}px`,
-        }}>
-          <div style={{ textAlign: 'center', marginBottom: 28 * s }}>
-            <h2 style={{ fontSize: 22 * s, fontWeight: 800, color: '#1a2a4a', margin: 0 }}>{title}</h2>
-            <p style={{ fontSize: 13 * s, color: '#94a3b8', marginTop: 8, lineHeight: 1.5 }}>{subtitle}</p>
+        <div style={{ flex: '1 1 420px', display: 'flex', justifyContent: 'center', position: 'relative', minWidth: 0 }}>
+          <div style={{ position: 'absolute', top: -40, right: -40, width: 190, height: 190, background: e360.burgundyGlow, borderRadius: '50%', filter: 'blur(80px)', pointerEvents: 'none' }} />
+
+          {!isMobile && (
+            <div className="e360-glass e360-floating-delayed" style={{
+              position: 'absolute', top: 4, right: 4, zIndex: 20, borderRadius: 9999,
+              padding: '7px 14px', display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span className="e360-pulse-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+              <span style={{ fontSize: 11, color: e360.onSurfaceVariant, fontWeight: 500 }}>Live Protocol</span>
+            </div>
+          )}
+
+          <div className="e360-glass e360-card-hover" style={{ width: '100%', maxWidth: 440, borderRadius: 24, padding: isMobile ? 28 : 36, position: 'relative', zIndex: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
+              <div style={{ width: 60, height: 60, background: e360.surfaceContainer, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14, border: '1px solid rgba(255,255,255,0.5)' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 28, color: e360.primary, fontVariationSettings: "'FILL' 1" }}>{icon}</span>
+              </div>
+              <h2 style={{ fontSize: 22, fontWeight: 700, color: e360.primary, margin: 0 }}>{title}</h2>
+              <p style={{ fontSize: 13, color: 'rgba(88,65,63,0.7)', marginTop: 6, textAlign: 'center' }}>{subtitle}</p>
+            </div>
+            {children}
           </div>
-          <AuthScaleProvider value={s}>{children}</AuthScaleProvider>
+
+          <div style={{ position: 'absolute', bottom: -8, left: -8, width: 90, height: 90, borderLeft: `2px solid rgba(119,90,4,0.2)`, borderBottom: `2px solid rgba(119,90,4,0.2)`, borderRadius: '0 0 0 24px', pointerEvents: 'none' }} />
         </div>
-      </div>
+      </main>
+
+      {/* ── Footer ── */}
+      <footer style={{
+        position: 'relative', zIndex: 10, display: 'flex', flexWrap: 'wrap', gap: 16,
+        justifyContent: 'space-between', alignItems: 'center',
+        padding: isMobile ? '20px' : '24px 64px',
+      }}>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', opacity: 0.7 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.15em', color: e360.secondary, textTransform: 'uppercase' }}>256-bit Encryption</span>
+          <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(88,65,63,0.3)' }} />
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.15em', color: e360.secondary, textTransform: 'uppercase' }}>Full Audit Trail</span>
+        </div>
+        <div style={{ fontSize: 10, color: 'rgba(88,65,63,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          © {new Date().getFullYear()} EventHub360 Finance
+        </div>
+      </footer>
     </div>
   )
 }

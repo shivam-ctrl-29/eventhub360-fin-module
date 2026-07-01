@@ -3,10 +3,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link } from 'react-router-dom'
-import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import AuthLayout from '../components/AuthLayout'
-import { useAuthScale } from '../components/AuthScaleContext'
 import { useRegister } from '../hooks/useAuthActions'
+import { e360 } from '../theme'
 
 const signupSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
@@ -21,8 +20,26 @@ const signupSchema = z.object({
 
 type SignupFormData = z.infer<typeof signupSchema>
 
+const inputWrap = (hasError: boolean): React.CSSProperties => ({
+  display: 'flex', alignItems: 'center', gap: 10,
+  border: `1px solid ${hasError ? e360.error : e360.outlineVariant}`,
+  borderRadius: 12, padding: '13px 14px', background: 'rgba(255,255,255,0.6)',
+})
+
+const inputField: React.CSSProperties = {
+  flex: 1, border: 'none', outline: 'none', background: 'transparent',
+  fontSize: 14, color: e360.primary, fontFamily: 'Geist, sans-serif',
+}
+
+const floatingLabel: React.CSSProperties = {
+  position: 'absolute', top: -9, left: 12, padding: '0 5px',
+  background: '#fff', fontSize: 11, fontWeight: 600, letterSpacing: '0.04em',
+  color: e360.onSurfaceVariant, zIndex: 1,
+}
+
+const iconStyle: React.CSSProperties = { color: 'rgba(88,65,63,0.4)', fontSize: 18 }
+
 export default function Signup() {
-  const scale = useAuthScale()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const { register: doRegister, loading, error } = useRegister()
@@ -30,94 +47,81 @@ export default function Signup() {
     resolver: zodResolver(signupSchema),
   })
 
-  const INPUT: React.CSSProperties = {
-    width: '100%', padding: `${10 * scale}px ${12 * scale}px`, border: '1px solid #E8E0D8', borderRadius: 8,
-    fontSize: 13 * scale, color: '#334155', outline: 'none', background: '#FAFAF9', boxSizing: 'border-box',
-  }
-  const INPUT_ERR: React.CSSProperties = { ...INPUT, border: '1px solid #DC2626' }
-  const LABEL: React.CSSProperties = { fontSize: 11 * scale, fontWeight: 700, letterSpacing: '0.4px', textTransform: 'uppercase', color: '#64748b', display: 'block', marginBottom: 6 }
-  const ERR: React.CSSProperties = { fontSize: 11 * scale, color: '#DC2626', marginTop: 4 }
-
   const onSubmit = async (data: SignupFormData) => {
     await doRegister(data.fullName, data.email, data.password, data.phone)
   }
 
   return (
-    <AuthLayout title="Create Your Account" subtitle="Set up access to the EventHub360 Finance dashboard">
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <AuthLayout title="Institutional Registration" subtitle="Apply for clearance to the EventHub360 ecosystem" icon="badge">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {error && (
-          <div style={{ background: '#FEF2F2', border: '1px solid #F3C9C9', color: '#991B1B', fontSize: 12 * scale, borderRadius: 8, padding: `${10 * scale}px ${12 * scale}px`, marginBottom: 16 * scale }}>
+          <div style={{ background: '#FFDAD6', border: '1px solid rgba(186,26,26,0.25)', color: '#93000A', fontSize: 12, borderRadius: 10, padding: '10px 12px' }}>
             {error}
           </div>
         )}
 
-        <div style={{ marginBottom: 16 * scale }}>
-          <label style={LABEL}>Full Name</label>
-          <input placeholder="Jane Doe" autoComplete="name" style={errors.fullName ? INPUT_ERR : INPUT} {...register('fullName')} />
-          {errors.fullName && <div style={ERR}>{errors.fullName.message}</div>}
+        <div style={{ position: 'relative' }}>
+          <label style={floatingLabel}>Full Name</label>
+          <div style={inputWrap(!!errors.fullName)} className="e360-input-wrap">
+            <span className="material-symbols-outlined" style={iconStyle}>person</span>
+            <input placeholder="Jane Doe" autoComplete="name" style={inputField} {...register('fullName')} />
+          </div>
+          {errors.fullName && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.fullName.message}</div>}
         </div>
 
-        <div style={{ marginBottom: 16 * scale }}>
-          <label style={LABEL}>Email Address</label>
-          <input type="email" placeholder="name@company.com" autoComplete="email" style={errors.email ? INPUT_ERR : INPUT} {...register('email')} />
-          {errors.email && <div style={ERR}>{errors.email.message}</div>}
+        <div style={{ position: 'relative' }}>
+          <label style={floatingLabel}>Institutional Email</label>
+          <div style={inputWrap(!!errors.email)} className="e360-input-wrap">
+            <span className="material-symbols-outlined" style={iconStyle}>alternate_email</span>
+            <input type="email" placeholder="name@eventhub360.com" autoComplete="email" style={inputField} {...register('email')} />
+          </div>
+          {errors.email && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.email.message}</div>}
         </div>
 
-        <div style={{ marginBottom: 16 * scale }}>
-          <label style={LABEL}>Phone (optional)</label>
-          <input placeholder="+91 98765 43210" autoComplete="tel" style={INPUT} {...register('phone')} />
+        <div style={{ position: 'relative' }}>
+          <label style={floatingLabel}>Phone (Optional)</label>
+          <div style={inputWrap(false)} className="e360-input-wrap">
+            <span className="material-symbols-outlined" style={iconStyle}>call</span>
+            <input placeholder="+91 98765 43210" autoComplete="tel" style={inputField} {...register('phone')} />
+          </div>
         </div>
 
-        <div style={{ marginBottom: 16 * scale }}>
-          <label style={LABEL}>Password</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder="At least 8 characters"
-              autoComplete="new-password"
-              style={{ ...(errors.password ? INPUT_ERR : INPUT), paddingRight: 36 * scale }}
-              {...register('password')}
-            />
-            <span onClick={() => setShowPassword((s) => !s)} style={{ position: 'absolute', right: 12 * scale, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: '#94a3b8', fontSize: 14 * scale }}>
-              {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+        <div style={{ position: 'relative' }}>
+          <label style={floatingLabel}>Access Key</label>
+          <div style={inputWrap(!!errors.password)} className="e360-input-wrap">
+            <span className="material-symbols-outlined" style={iconStyle}>key</span>
+            <input type={showPassword ? 'text' : 'password'} placeholder="At least 8 characters" autoComplete="new-password" style={inputField} {...register('password')} />
+            <span className="material-symbols-outlined" onClick={() => setShowPassword((s) => !s)} style={{ ...iconStyle, cursor: 'pointer' }}>
+              {showPassword ? 'visibility_off' : 'visibility'}
             </span>
           </div>
-          {errors.password && <div style={ERR}>{errors.password.message}</div>}
+          {errors.password && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.password.message}</div>}
         </div>
 
-        <div style={{ marginBottom: 20 * scale }}>
-          <label style={LABEL}>Confirm Password</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showConfirm ? 'text' : 'password'}
-              placeholder="Re-enter your password"
-              autoComplete="new-password"
-              style={{ ...(errors.confirmPassword ? INPUT_ERR : INPUT), paddingRight: 36 * scale }}
-              {...register('confirmPassword')}
-            />
-            <span onClick={() => setShowConfirm((s) => !s)} style={{ position: 'absolute', right: 12 * scale, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: '#94a3b8', fontSize: 14 * scale }}>
-              {showConfirm ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+        <div style={{ position: 'relative' }}>
+          <label style={floatingLabel}>Confirm Access Key</label>
+          <div style={inputWrap(!!errors.confirmPassword)} className="e360-input-wrap">
+            <span className="material-symbols-outlined" style={iconStyle}>key</span>
+            <input type={showConfirm ? 'text' : 'password'} placeholder="Re-enter your access key" autoComplete="new-password" style={inputField} {...register('confirmPassword')} />
+            <span className="material-symbols-outlined" onClick={() => setShowConfirm((s) => !s)} style={{ ...iconStyle, cursor: 'pointer' }}>
+              {showConfirm ? 'visibility_off' : 'visibility'}
             </span>
           </div>
-          {errors.confirmPassword && <div style={ERR}>{errors.confirmPassword.message}</div>}
+          {errors.confirmPassword && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.confirmPassword.message}</div>}
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%', padding: `${12 * scale}px 0`, borderRadius: 8, border: 'none',
-            background: '#8B1A1A', color: '#fff', fontSize: 13 * scale, fontWeight: 700,
-            cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1,
-          }}
-        >
-          {loading ? 'Creating account…' : 'Create Account'}
+        <button type="submit" disabled={loading} className="e360-cta" style={{
+          width: '100%', height: 52, borderRadius: 14, border: `1px solid rgba(119,90,4,0.2)`,
+          color: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        }}>
+          {loading ? 'Creating Access…' : 'Request Clearance'}
+          {!loading && <span className="material-symbols-outlined e360-arrow" style={{ fontSize: 18 }}>arrow_forward</span>}
         </button>
 
-        <div style={{ textAlign: 'center', marginTop: 24 * scale, fontSize: 12 * scale, color: '#64748b' }}>
-          Already have an account?{' '}
-          <Link to="/login" style={{ color: '#8B1A1A', fontWeight: 700, textDecoration: 'none' }}>Sign in</Link>
-        </div>
+        <p style={{ textAlign: 'center', fontSize: 12, color: e360.onSurfaceVariant, margin: 0 }}>
+          Already have access? <Link to="/login" style={{ color: e360.primary, fontWeight: 700, textDecoration: 'none' }}>Sign in</Link>
+        </p>
       </form>
     </AuthLayout>
   )
