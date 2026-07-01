@@ -138,7 +138,7 @@ export default function FinanceDashboard() {
       </div>
 
       {/* ── Charts Row ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16, marginBottom: 20, alignItems: 'start' }}>
 
         {/* Revenue Trends */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
