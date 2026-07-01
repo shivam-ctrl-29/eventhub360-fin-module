@@ -29,6 +29,12 @@ export class Payment {
   @Column({ name: 'paid_at', type: 'timestamptz' })
   paidAt: Date;
 
+  @Column({ name: 'is_reconciled', type: 'boolean', default: false })
+  isReconciled: boolean;
+
+  @Column({ name: 'matched_invoice_id', type: 'bigint', nullable: true })
+  matchedInvoiceId: string | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 

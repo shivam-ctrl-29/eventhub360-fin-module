@@ -24,7 +24,8 @@ export class ReconciliationService {
         data: rows.map((p) => ({
           id: p.paymentId, invoiceId: p.invoiceId, amount: Number(p.amount),
           mode: p.mode, gatewayRef: p.gatewayRef, paidAt: p.paidAt,
-          isReconciled: !!p.gatewayRef,
+          isReconciled: !!p.isReconciled,
+          matchedInvoiceId: p.matchedInvoiceId,
         })),
         total,
       }
@@ -34,12 +35,28 @@ export class ReconciliationService {
   }
 
   async match(entryId: string, invoiceId: string, userId: string) {
-    await this.audit.log(userId, 'RECONCILE_ENTRY', 'payment', entryId, `Matched to invoice ${invoiceId}`, 'success')
-    return { id: entryId, matchedInvoiceId: invoiceId, isReconciled: true }
+    try {
+      await this.paymentRepo.update(
+        { paymentId: entryId },
+        { isReconciled: true, matchedInvoiceId: invoiceId, updatedBy: userId },
+      )
+      await this.audit.log(userId, 'RECONCILE_ENTRY', 'payment', entryId, `Matched to invoice ${invoiceId}`, 'success')
+      return { id: entryId, matchedInvoiceId: invoiceId, isReconciled: true }
+    } catch {
+      return null
+    }
   }
 
   async unmatch(entryId: string, userId: string) {
-    await this.audit.log(userId, 'UNMATCH_ENTRY', 'payment', entryId, 'Reconciliation removed', 'warning')
-    return { id: entryId, matchedInvoiceId: null, isReconciled: false }
+    try {
+      await this.paymentRepo.update(
+        { paymentId: entryId },
+        { isReconciled: false, matchedInvoiceId: null, updatedBy: userId },
+      )
+      await this.audit.log(userId, 'UNMATCH_ENTRY', 'payment', entryId, 'Reconciliation removed', 'warning')
+      return { id: entryId, matchedInvoiceId: null, isReconciled: false }
+    } catch {
+      return null
+    }
   }
 }

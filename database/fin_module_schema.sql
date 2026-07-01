@@ -133,6 +133,8 @@ CREATE TABLE IF NOT EXISTS payment (
   amount       NUMERIC(14,2) NOT NULL CHECK (amount > 0),
   gateway_ref  VARCHAR(60),            -- UTR / transaction reference
   paid_at      TIMESTAMPTZ  NOT NULL,
+  is_reconciled      BOOLEAN NOT NULL DEFAULT FALSE,   -- bank reconciliation state
+  matched_invoice_id BIGINT,                            -- invoice matched during reconciliation
   created_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   updated_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   created_by   BIGINT                REFERENCES user_account(user_id),
