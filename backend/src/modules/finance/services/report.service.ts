@@ -203,9 +203,19 @@ export class ReportService {
         .filter(({ inv, days }) => days > 30 && Number(inv.balance) > 0)
         .sort((a, b) => b.days - a.days)
 
+      const DAY_MS = 86400000
       const records = overdue.map(({ inv, days }) => {
         const level = days > 90 ? 'L3' : days > 60 ? 'L2' : 'L1'
         const emailsSent = level === 'L3' ? 3 : level === 'L2' ? 2 : 1
+        // Next scheduled action: the date this invoice crosses into the next
+        // escalation tier (L1->L2 at day 61, L2->L3 at day 91). L3 has no
+        // further escalation tier, so it gets a short recurring follow-up
+        // cadence instead of a fabricated "next level" date.
+        const createdAt = new Date(inv.createdAt).getTime()
+        const nextActionDate =
+          level === 'L1' ? new Date(createdAt + 61 * DAY_MS)
+          : level === 'L2' ? new Date(createdAt + 91 * DAY_MS)
+          : new Date(new Date(inv.updatedAt).getTime() + 7 * DAY_MS)
         return {
           id: inv.invoiceId,
           customerId: inv.invoiceId,
@@ -214,7 +224,7 @@ export class ReportService {
           dunningLevel: level,
           daysOverdue: days,
           lastActionDate: inv.updatedAt,
-          nextActionDate: null,
+          nextActionDate,
           emailsSent,
           status: 'active',
         }

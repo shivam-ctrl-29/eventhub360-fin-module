@@ -108,7 +108,7 @@ export default function DunningManagement() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a' }}>{d.customerName}</div>
-                    <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Next action: {dayjs(d.nextActionDate).format('MMM DD, YYYY')}</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Next action: {d.nextActionDate ? dayjs(d.nextActionDate).format('MMM DD, YYYY') : '—'}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: '#8B1A1A' }}>{formatINR(d.outstandingAmount)}</div>
@@ -130,9 +130,9 @@ export default function DunningManagement() {
 
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: '#1a2a4a', marginBottom: 16 }}>Dunning Workflow</div>
-          {[{ level: 'L1', label: 'Soft Reminder', days: '1-7 days', icon: '📧' }, { level: 'L2', label: 'Follow-up Call', days: '8-30 days', icon: '📞' }, { level: 'L3', label: 'Demand Letter', days: '31-60 days', icon: '📜' }, { level: 'L4', label: 'Legal Action', days: '60+ days', icon: '⚖️' }].map((s, i) => (
+          {[{ level: 'L1', label: 'Soft Reminder', days: '31-60 days', icon: '📧' }, { level: 'L2', label: 'Follow-up Call', days: '61-90 days', icon: '📞' }, { level: 'L3', label: 'Demand Letter', days: '90+ days', icon: '📜' }].map((s, i) => (
             <div key={s.level} style={{ display: 'flex', gap: 12, marginBottom: 16, position: 'relative' }}>
-              {i < 3 && <div style={{ position: 'absolute', left: 15, top: 32, width: 2, height: 'calc(100% + 4px)', background: '#E8E0D8' }} />}
+              {i < 2 && <div style={{ position: 'absolute', left: 15, top: 32, width: 2, height: 'calc(100% + 4px)', background: '#E8E0D8' }} />}
               <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#F5F0EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, zIndex: 1 }}>{s.icon}</div>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#1a2a4a' }}>{s.level} — {s.label}</div>
