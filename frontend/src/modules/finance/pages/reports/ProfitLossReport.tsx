@@ -83,7 +83,7 @@ export default function ProfitLossReport() {
                 { label: 'GROSS REVENUE',  value: formatINR(pnl?.totalRevenue ?? 0),  delta: '',        deltaColor: '#059669', bg: '#fff', valueColor: '#1a2a4a' },
                 { label: 'TOTAL EXPENSES', value: formatINR(pnl?.totalExpenses ?? 0), delta: '',        deltaColor: '#C4A24D', bg: '#fff', valueColor: '#1a2a4a' },
                 { label: 'NET PROFIT',     value: formatINR(pnl?.netProfit ?? 0),     delta: 'Realized', deltaColor: '#8B1A1A', bg: '#fff', valueColor: '#8B1A1A' },
-                { label: 'PROFIT MARGIN',  value: `${pnl ? pnl.netMargin.toFixed(1) : '0'}%`, delta: 'Industry Benchmark: 28%', deltaColor: '#94a3b8', bg: '#FEF3C7', valueColor: '#1a2a4a' },
+                { label: 'PROFIT MARGIN',  value: `${pnl ? pnl.netMargin.toFixed(1) : '0'}%`, delta: 'Net margin this period', deltaColor: '#94a3b8', bg: '#fff', valueColor: '#1a2a4a' },
               ].map((k) => (
                 <div key={k.label} style={{ background: k.bg, border: '1px solid #E8E0D8', borderRadius: 12, padding: '16px 18px' }}>
                   <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8', marginBottom: 8 }}>{k.label}</div>
@@ -198,13 +198,19 @@ export default function ProfitLossReport() {
         {!isLoading && lineItems.length === 0 && (
           <div style={{ padding: '32px', textAlign: 'center', fontSize: 14, color: '#94a3b8' }}>No line items available</div>
         )}
-        {!isLoading && lineItems.map((item, i) => (
-          <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 130px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
-            <div style={{ fontSize: 13, color: '#334155' }}>{item.description}</div>
-            <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: '#F1F5F9', color: '#475569', width: 'fit-content' }}>{item.category}</span>
-            <div style={{ fontSize: 14, fontWeight: 700, color: item.actual < 0 ? '#DC2626' : '#059669' }}>{formatINR(Math.abs(item.actual))}</div>
-          </div>
-        ))}
+        {!isLoading && lineItems.map((item, i) => {
+          // Backend sends `amount` (see getEventPnL) — the PLLineItem type's
+          // `actual`/`budgeted`/`variance` fields describe a budget-comparison
+          // feature that was never actually implemented server-side.
+          const amount = (item as any).amount ?? (item as any).actual ?? 0
+          return (
+            <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 130px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
+              <div style={{ fontSize: 13, color: '#334155' }}>{item.description}</div>
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: '#F1F5F9', color: '#475569', width: 'fit-content' }}>{item.category}</span>
+              <div style={{ fontSize: 14, fontWeight: 700, color: amount < 0 ? '#DC2626' : '#059669' }}>{formatINR(Math.abs(amount))}</div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
