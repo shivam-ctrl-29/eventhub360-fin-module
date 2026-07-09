@@ -2,7 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict rafDnWxuvmZzXjkohRYiPVHsULsALnX8sjshbXnU6RlFYavJkYazMsfzUhYXx9m
 
 -- Dumped from database version 15.18 (Homebrew)
 -- Dumped by pg_dump version 15.18 (Homebrew)
@@ -23,13 +22,6 @@ SET row_security = off;
 --
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
-
-
---
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 --
@@ -707,180 +699,152 @@ ALTER TABLE ONLY public.vendor_bill ALTER COLUMN vendor_bill_id SET DEFAULT next
 -- Data for Name: branch; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.branch (branch_id, company_id, name, city) FROM stdin;
-1	1	Mumbai HQ	Mumbai
-2	1	Delhi Office	Delhi
-\.
+INSERT INTO public.branch (branch_id, company_id, name, city) VALUES (1, 1, 'Mumbai HQ', 'Mumbai');
+INSERT INTO public.branch (branch_id, company_id, name, city) VALUES (2, 1, 'Delhi Office', 'Delhi');
 
 
 --
 -- Data for Name: company; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.company (company_id, tenant_id, name, gstin, pan, base_currency) FROM stdin;
-1	1	Demo Events Pvt Ltd	27AABCU9603R1ZM	AABCU9603R	INR
-\.
+INSERT INTO public.company (company_id, tenant_id, name, gstin, pan, base_currency) VALUES (1, 1, 'Demo Events Pvt Ltd', '27AABCU9603R1ZM', 'AABCU9603R', 'INR');
 
 
 --
 -- Data for Name: credit_note; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.credit_note (credit_note_id, tenant_id, company_id, branch_id, invoice_id, amount, reason, created_at, updated_at, created_by, updated_by, is_active) FROM stdin;
-1	1	1	\N	3	15000.00	Service cancellation – partial refund	2026-06-14 13:22:28.179236+05:30	2026-06-24 13:22:28.179236+05:30	1	\N	t
-2	1	1	\N	4	8500.00	Billing correction – quantity error	2026-06-19 13:22:28.179236+05:30	2026-06-24 13:22:28.179236+05:30	1	\N	t
-\.
+INSERT INTO public.credit_note (credit_note_id, tenant_id, company_id, branch_id, invoice_id, amount, reason, created_at, updated_at, created_by, updated_by, is_active) VALUES (1, 1, 1, NULL, 3, 15000.00, 'Service cancellation – partial refund', '2026-06-14 13:22:28.179236+05:30', '2026-06-24 13:22:28.179236+05:30', 1, NULL, true);
+INSERT INTO public.credit_note (credit_note_id, tenant_id, company_id, branch_id, invoice_id, amount, reason, created_at, updated_at, created_by, updated_by, is_active) VALUES (2, 1, 1, NULL, 4, 8500.00, 'Billing correction – quantity error', '2026-06-19 13:22:28.179236+05:30', '2026-06-24 13:22:28.179236+05:30', 1, NULL, true);
 
 
 --
 -- Data for Name: expense; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) FROM stdin;
-1	1	1	\N	\N	venue	Conference Hall	25000.00	\N	pending	\N	2026-06-24 13:15:22.645567+05:30	2026-06-24 13:15:22.645567+05:30	1	\N	t
-2	1	1	\N	\N	venue	Grand Hyatt Banquet Hall	85000.00	\N	approved	\N	2026-06-04 13:22:28.176377+05:30	2026-06-24 13:22:28.176377+05:30	1	\N	t
-3	1	1	\N	\N	logistics	AV Equipment Rental	32000.00	\N	approved	\N	2026-06-06 13:22:28.176377+05:30	2026-06-24 13:22:28.176377+05:30	1	\N	t
-4	1	1	\N	\N	food_beverage	Catering – 200 Pax	48000.00	\N	pending	\N	2026-06-19 13:22:28.176377+05:30	2026-06-24 13:22:28.176377+05:30	1	\N	t
-5	1	1	\N	\N	travel	Team Travel – Mumbai to Delhi	18500.00	\N	pending	\N	2026-06-21 13:22:28.176377+05:30	2026-06-24 13:22:28.176377+05:30	1	\N	t
-6	1	1	\N	\N	decor	Floral & Stage Decoration	27000.00	\N	rejected	\N	2026-05-25 13:22:28.176377+05:30	2026-06-24 13:22:28.176377+05:30	1	\N	t
-7	1	1	\N	\N	marketing	Social Media Campaign	15000.00	\N	approved	\N	2026-06-12 13:22:28.176377+05:30	2026-06-24 13:22:28.176377+05:30	1	\N	t
-8	1	1	\N	\N	marketing	Button test expense	12345.00	\N	pending	\N	2026-06-27 13:55:40.769567+05:30	2026-06-27 13:55:40.769567+05:30	1	\N	t
-\.
+INSERT INTO public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) VALUES (1, 1, 1, NULL, NULL, 'venue', 'Conference Hall', 25000.00, NULL, 'pending', NULL, '2026-06-24 13:15:22.645567+05:30', '2026-06-24 13:15:22.645567+05:30', 1, NULL, true);
+INSERT INTO public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) VALUES (2, 1, 1, NULL, NULL, 'venue', 'Grand Hyatt Banquet Hall', 85000.00, NULL, 'approved', NULL, '2026-06-04 13:22:28.176377+05:30', '2026-06-24 13:22:28.176377+05:30', 1, NULL, true);
+INSERT INTO public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) VALUES (3, 1, 1, NULL, NULL, 'logistics', 'AV Equipment Rental', 32000.00, NULL, 'approved', NULL, '2026-06-06 13:22:28.176377+05:30', '2026-06-24 13:22:28.176377+05:30', 1, NULL, true);
+INSERT INTO public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) VALUES (4, 1, 1, NULL, NULL, 'food_beverage', 'Catering – 200 Pax', 48000.00, NULL, 'pending', NULL, '2026-06-19 13:22:28.176377+05:30', '2026-06-24 13:22:28.176377+05:30', 1, NULL, true);
+INSERT INTO public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) VALUES (5, 1, 1, NULL, NULL, 'travel', 'Team Travel – Mumbai to Delhi', 18500.00, NULL, 'pending', NULL, '2026-06-21 13:22:28.176377+05:30', '2026-06-24 13:22:28.176377+05:30', 1, NULL, true);
+INSERT INTO public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) VALUES (6, 1, 1, NULL, NULL, 'decor', 'Floral & Stage Decoration', 27000.00, NULL, 'rejected', NULL, '2026-05-25 13:22:28.176377+05:30', '2026-06-24 13:22:28.176377+05:30', 1, NULL, true);
+INSERT INTO public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) VALUES (7, 1, 1, NULL, NULL, 'marketing', 'Social Media Campaign', 15000.00, NULL, 'approved', NULL, '2026-06-12 13:22:28.176377+05:30', '2026-06-24 13:22:28.176377+05:30', 1, NULL, true);
+INSERT INTO public.expense (expense_id, tenant_id, company_id, branch_id, event_id, category, description, amount, receipt_url, status, approved_by, created_at, updated_at, created_by, updated_by, is_active) VALUES (8, 1, 1, NULL, NULL, 'marketing', 'Button test expense', 12345.00, NULL, 'pending', NULL, '2026-06-27 13:55:40.769567+05:30', '2026-06-27 13:55:40.769567+05:30', 1, NULL, true);
 
 
 --
 -- Data for Name: fin_audit_trail; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) FROM stdin;
-1	1	1	1	CREATE_INVOICE	invoice	2	Invoice INV-2026-1000 created	success	\N	2026-06-24 13:15:22.593033+05:30	t
-2	1	1	1	RECORD_PAYMENT	payment	2	Payment recorded for invoice 2	success	\N	2026-06-24 13:15:22.618058+05:30	t
-3	1	1	1	CREATE_EXPENSE	expense	1	Expense created: venue	success	\N	2026-06-24 13:15:22.648786+05:30	t
-4	1	1	1	CREATE_INVOICE	invoice	3	Invoice INV-2026-0001 created	success	\N	2026-06-09 13:22:28.180549+05:30	t
-5	1	1	1	SEND_INVOICE	invoice	3	Invoice sent to client	success	\N	2026-06-10 13:22:28.180549+05:30	t
-6	1	1	1	RECORD_PAYMENT	payment	3	Payment ₹2,36,000 via Bank	success	\N	2026-04-30 13:22:28.180549+05:30	t
-7	1	1	1	APPROVE_EXPENSE	expense	2	Expense approved: venue	success	\N	2026-06-05 13:22:28.180549+05:30	t
-8	1	1	1	REJECT_EXPENSE	expense	6	Expense rejected: decor	warning	\N	2026-05-26 13:22:28.180549+05:30	t
-9	1	1	1	CREATE_EXPENSE	expense	8	Expense created: marketing	success	\N	2026-06-27 13:55:40.809097+05:30	t
-10	1	1	1	UPLOAD_BILL	vendor_bill	4	Vendor bill VB-2026-76031 uploaded	success	\N	2026-06-29 18:01:16.04416+05:30	t
-11	1	1	1	UPLOAD_BILL	vendor_bill	5	Vendor bill VB-2026-33626 uploaded	success	\N	2026-06-29 18:03:53.632738+05:30	t
-12	1	1	1	APPROVE_PAYOUTS	payout	2	1 payouts approved	success	\N	2026-06-29 18:12:14.574986+05:30	t
-13	1	1	1	DISBURSE_PAYOUTS	payout	2	1 payouts disbursed	success	\N	2026-06-29 18:12:14.584923+05:30	t
-14	1	1	1	CREATE_EXPENSE	expense	9	Expense created: marketing	success	\N	2026-06-29 23:21:49.350656+05:30	t
-15	1	1	1	RECONCILE_ENTRY	payment	1	Matched to invoice 3	success	\N	2026-07-01 12:36:37.70443+05:30	t
-16	1	1	1	UNMATCH_ENTRY	payment	1	Reconciliation removed	warning	\N	2026-07-01 12:36:37.774147+05:30	t
-17	1	1	1	RECONCILE_ENTRY	payment	2	Matched to invoice 8	success	\N	2026-07-02 00:14:56.256739+05:30	t
-18	1	1	1	UNMATCH_ENTRY	payment	2	Reconciliation removed	warning	\N	2026-07-02 00:20:42.114297+05:30	t
-19	1	1	1	RECONCILE_ENTRY	payment	2	Matched to invoice 8	success	\N	2026-07-02 00:28:26.747236+05:30	t
-\.
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (1, 1, 1, '1', 'CREATE_INVOICE', 'invoice', '2', 'Invoice INV-2026-1000 created', 'success', NULL, '2026-06-24 13:15:22.593033+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (2, 1, 1, '1', 'RECORD_PAYMENT', 'payment', '2', 'Payment recorded for invoice 2', 'success', NULL, '2026-06-24 13:15:22.618058+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (3, 1, 1, '1', 'CREATE_EXPENSE', 'expense', '1', 'Expense created: venue', 'success', NULL, '2026-06-24 13:15:22.648786+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (4, 1, 1, '1', 'CREATE_INVOICE', 'invoice', '3', 'Invoice INV-2026-0001 created', 'success', NULL, '2026-06-09 13:22:28.180549+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (5, 1, 1, '1', 'SEND_INVOICE', 'invoice', '3', 'Invoice sent to client', 'success', NULL, '2026-06-10 13:22:28.180549+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (6, 1, 1, '1', 'RECORD_PAYMENT', 'payment', '3', 'Payment ₹2,36,000 via Bank', 'success', NULL, '2026-04-30 13:22:28.180549+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (7, 1, 1, '1', 'APPROVE_EXPENSE', 'expense', '2', 'Expense approved: venue', 'success', NULL, '2026-06-05 13:22:28.180549+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (8, 1, 1, '1', 'REJECT_EXPENSE', 'expense', '6', 'Expense rejected: decor', 'warning', NULL, '2026-05-26 13:22:28.180549+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (9, 1, 1, '1', 'CREATE_EXPENSE', 'expense', '8', 'Expense created: marketing', 'success', NULL, '2026-06-27 13:55:40.809097+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (10, 1, 1, '1', 'UPLOAD_BILL', 'vendor_bill', '4', 'Vendor bill VB-2026-76031 uploaded', 'success', NULL, '2026-06-29 18:01:16.04416+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (11, 1, 1, '1', 'UPLOAD_BILL', 'vendor_bill', '5', 'Vendor bill VB-2026-33626 uploaded', 'success', NULL, '2026-06-29 18:03:53.632738+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (12, 1, 1, '1', 'APPROVE_PAYOUTS', 'payout', '2', '1 payouts approved', 'success', NULL, '2026-06-29 18:12:14.574986+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (13, 1, 1, '1', 'DISBURSE_PAYOUTS', 'payout', '2', '1 payouts disbursed', 'success', NULL, '2026-06-29 18:12:14.584923+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (14, 1, 1, '1', 'CREATE_EXPENSE', 'expense', '9', 'Expense created: marketing', 'success', NULL, '2026-06-29 23:21:49.350656+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (15, 1, 1, '1', 'RECONCILE_ENTRY', 'payment', '1', 'Matched to invoice 3', 'success', NULL, '2026-07-01 12:36:37.70443+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (16, 1, 1, '1', 'UNMATCH_ENTRY', 'payment', '1', 'Reconciliation removed', 'warning', NULL, '2026-07-01 12:36:37.774147+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (17, 1, 1, '1', 'RECONCILE_ENTRY', 'payment', '2', 'Matched to invoice 8', 'success', NULL, '2026-07-02 00:14:56.256739+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (18, 1, 1, '1', 'UNMATCH_ENTRY', 'payment', '2', 'Reconciliation removed', 'warning', NULL, '2026-07-02 00:20:42.114297+05:30', true);
+INSERT INTO public.fin_audit_trail (audit_id, tenant_id, company_id, user_id, action, entity, entity_id, description, severity, ip_address, created_at, is_active) VALUES (19, 1, 1, '1', 'RECONCILE_ENTRY', 'payment', '2', 'Matched to invoice 8', 'success', NULL, '2026-07-02 00:28:26.747236+05:30', true);
 
 
 --
 -- Data for Name: invoice; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) FROM stdin;
-1	1	1	2	\N	INV-2026-1001	Tax	50000.00	9000.00	59000.00	59000.00	Draft	2026-06-24 13:10:15.06221+05:30	2026-06-27 14:26:17.564962+05:30	1	\N	t
-2	1	1	1	\N	INV-2026-1000	Tax	60000.00	10800.00	70800.00	70800.00	Draft	2026-06-24 13:15:22.575755+05:30	2026-06-27 14:26:17.564962+05:30	1	\N	t
-3	1	1	2	\N	INV-2026-0001	Tax	150000.00	27000.00	177000.00	177000.00	Issued	2026-06-09 13:22:28.168083+05:30	2026-06-27 14:26:17.564962+05:30	1	\N	t
-4	1	1	1	\N	INV-2026-0002	Tax	85000.00	15300.00	100300.00	100300.00	Issued	2026-05-10 13:22:28.168083+05:30	2026-06-27 14:26:17.564962+05:30	1	\N	t
-5	1	1	2	\N	INV-2026-0003	Tax	200000.00	36000.00	236000.00	0.00	Paid	2026-04-25 13:22:28.168083+05:30	2026-06-27 14:26:17.564962+05:30	1	\N	t
-6	1	1	1	\N	INV-2026-0004	Tax	60000.00	10800.00	70800.00	70800.00	Draft	2026-06-22 13:22:28.168083+05:30	2026-06-27 14:26:17.564962+05:30	1	\N	t
-7	1	1	1	\N	INV-2026-0010	Tax	90000.00	16200.00	106200.00	106200.00	Issued	2026-04-18 18:20:31.180845+05:30	2026-04-18 18:20:31.180845+05:30	1	\N	t
-8	1	1	1	\N	INV-2026-0011	Tax	60000.00	10800.00	70800.00	70800.00	Issued	2026-03-16 18:20:31.180845+05:30	2026-03-16 18:20:31.180845+05:30	1	\N	t
-\.
+INSERT INTO public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) VALUES (1, 1, 1, 2, NULL, 'INV-2026-1001', 'Tax', 50000.00, 9000.00, 59000.00, 59000.00, 'Draft', '2026-06-24 13:10:15.06221+05:30', '2026-06-27 14:26:17.564962+05:30', 1, NULL, true);
+INSERT INTO public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) VALUES (2, 1, 1, 1, NULL, 'INV-2026-1000', 'Tax', 60000.00, 10800.00, 70800.00, 70800.00, 'Draft', '2026-06-24 13:15:22.575755+05:30', '2026-06-27 14:26:17.564962+05:30', 1, NULL, true);
+INSERT INTO public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) VALUES (3, 1, 1, 2, NULL, 'INV-2026-0001', 'Tax', 150000.00, 27000.00, 177000.00, 177000.00, 'Issued', '2026-06-09 13:22:28.168083+05:30', '2026-06-27 14:26:17.564962+05:30', 1, NULL, true);
+INSERT INTO public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) VALUES (4, 1, 1, 1, NULL, 'INV-2026-0002', 'Tax', 85000.00, 15300.00, 100300.00, 100300.00, 'Issued', '2026-05-10 13:22:28.168083+05:30', '2026-06-27 14:26:17.564962+05:30', 1, NULL, true);
+INSERT INTO public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) VALUES (5, 1, 1, 2, NULL, 'INV-2026-0003', 'Tax', 200000.00, 36000.00, 236000.00, 0.00, 'Paid', '2026-04-25 13:22:28.168083+05:30', '2026-06-27 14:26:17.564962+05:30', 1, NULL, true);
+INSERT INTO public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) VALUES (6, 1, 1, 1, NULL, 'INV-2026-0004', 'Tax', 60000.00, 10800.00, 70800.00, 70800.00, 'Draft', '2026-06-22 13:22:28.168083+05:30', '2026-06-27 14:26:17.564962+05:30', 1, NULL, true);
+INSERT INTO public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) VALUES (7, 1, 1, 1, NULL, 'INV-2026-0010', 'Tax', 90000.00, 16200.00, 106200.00, 106200.00, 'Issued', '2026-04-18 18:20:31.180845+05:30', '2026-04-18 18:20:31.180845+05:30', 1, NULL, true);
+INSERT INTO public.invoice (invoice_id, tenant_id, company_id, branch_id, booking_id, invoice_no, type, subtotal, tax_total, total, balance, status, created_at, updated_at, created_by, updated_by, is_active) VALUES (8, 1, 1, 1, NULL, 'INV-2026-0011', 'Tax', 60000.00, 10800.00, 70800.00, 70800.00, 'Issued', '2026-03-16 18:20:31.180845+05:30', '2026-03-16 18:20:31.180845+05:30', 1, NULL, true);
 
 
 --
 -- Data for Name: invoice_line; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.invoice_line (invoice_line_id, tenant_id, company_id, branch_id, invoice_id, description, qty, rate, amount, tax_rule_id, created_at, updated_at, created_by, updated_by, is_active) FROM stdin;
-1	1	1	\N	1	Event Management Services	1.00	50000.00	50000.00	\N	2026-06-24 13:10:15.06221+05:30	2026-06-24 13:10:15.06221+05:30	1	\N	t
-2	1	1	\N	2	Stage Setup	2.00	30000.00	60000.00	\N	2026-06-24 13:15:22.575755+05:30	2026-06-24 13:15:22.575755+05:30	1	\N	t
-3	1	1	\N	3	Corporate Event Management	1.00	150000.00	150000.00	\N	2026-06-24 13:22:28.173246+05:30	2026-06-24 13:22:28.173246+05:30	1	\N	t
-4	1	1	\N	4	Wedding Decoration Package	1.00	85000.00	85000.00	\N	2026-06-24 13:22:28.173246+05:30	2026-06-24 13:22:28.173246+05:30	1	\N	t
-5	1	1	\N	5	Product Launch – Full Setup	1.00	200000.00	200000.00	\N	2026-06-24 13:22:28.173246+05:30	2026-06-24 13:22:28.173246+05:30	1	\N	t
-6	1	1	\N	6	Birthday Party Package	1.00	60000.00	60000.00	\N	2026-06-24 13:22:28.173246+05:30	2026-06-24 13:22:28.173246+05:30	1	\N	t
-\.
+INSERT INTO public.invoice_line (invoice_line_id, tenant_id, company_id, branch_id, invoice_id, description, qty, rate, amount, tax_rule_id, created_at, updated_at, created_by, updated_by, is_active) VALUES (1, 1, 1, NULL, 1, 'Event Management Services', 1.00, 50000.00, 50000.00, NULL, '2026-06-24 13:10:15.06221+05:30', '2026-06-24 13:10:15.06221+05:30', 1, NULL, true);
+INSERT INTO public.invoice_line (invoice_line_id, tenant_id, company_id, branch_id, invoice_id, description, qty, rate, amount, tax_rule_id, created_at, updated_at, created_by, updated_by, is_active) VALUES (2, 1, 1, NULL, 2, 'Stage Setup', 2.00, 30000.00, 60000.00, NULL, '2026-06-24 13:15:22.575755+05:30', '2026-06-24 13:15:22.575755+05:30', 1, NULL, true);
+INSERT INTO public.invoice_line (invoice_line_id, tenant_id, company_id, branch_id, invoice_id, description, qty, rate, amount, tax_rule_id, created_at, updated_at, created_by, updated_by, is_active) VALUES (3, 1, 1, NULL, 3, 'Corporate Event Management', 1.00, 150000.00, 150000.00, NULL, '2026-06-24 13:22:28.173246+05:30', '2026-06-24 13:22:28.173246+05:30', 1, NULL, true);
+INSERT INTO public.invoice_line (invoice_line_id, tenant_id, company_id, branch_id, invoice_id, description, qty, rate, amount, tax_rule_id, created_at, updated_at, created_by, updated_by, is_active) VALUES (4, 1, 1, NULL, 4, 'Wedding Decoration Package', 1.00, 85000.00, 85000.00, NULL, '2026-06-24 13:22:28.173246+05:30', '2026-06-24 13:22:28.173246+05:30', 1, NULL, true);
+INSERT INTO public.invoice_line (invoice_line_id, tenant_id, company_id, branch_id, invoice_id, description, qty, rate, amount, tax_rule_id, created_at, updated_at, created_by, updated_by, is_active) VALUES (5, 1, 1, NULL, 5, 'Product Launch – Full Setup', 1.00, 200000.00, 200000.00, NULL, '2026-06-24 13:22:28.173246+05:30', '2026-06-24 13:22:28.173246+05:30', 1, NULL, true);
+INSERT INTO public.invoice_line (invoice_line_id, tenant_id, company_id, branch_id, invoice_id, description, qty, rate, amount, tax_rule_id, created_at, updated_at, created_by, updated_by, is_active) VALUES (6, 1, 1, NULL, 6, 'Birthday Party Package', 1.00, 60000.00, 60000.00, NULL, '2026-06-24 13:22:28.173246+05:30', '2026-06-24 13:22:28.173246+05:30', 1, NULL, true);
 
 
 --
 -- Data for Name: payment; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.payment (payment_id, tenant_id, company_id, branch_id, invoice_id, mode, amount, gateway_ref, paid_at, created_at, updated_at, created_by, updated_by, is_active, is_reconciled, matched_invoice_id) FROM stdin;
-3	1	1	\N	5	Bank	236000.00	UTR20260401123	2026-04-30 13:22:28.175384+05:30	2026-06-24 13:22:28.175384+05:30	2026-06-24 13:22:28.175384+05:30	1	\N	t	f	\N
-4	1	1	\N	3	UPI	100000.00	UTR20260515456	2026-06-14 13:22:28.175384+05:30	2026-06-24 13:22:28.175384+05:30	2026-06-24 13:22:28.175384+05:30	1	\N	t	f	\N
-1	1	1	\N	1	UPI	59000.00	UTR123456	2026-06-24 05:30:00+05:30	2026-06-24 13:10:24.481841+05:30	2026-07-01 12:36:37.773325+05:30	1	1	t	f	\N
-2	1	1	\N	2	Card	70800.00	\N	2026-06-24 05:30:00+05:30	2026-06-24 13:15:22.615029+05:30	2026-07-02 00:28:26.740595+05:30	1	1	t	t	8
-\.
+INSERT INTO public.payment (payment_id, tenant_id, company_id, branch_id, invoice_id, mode, amount, gateway_ref, paid_at, created_at, updated_at, created_by, updated_by, is_active, is_reconciled, matched_invoice_id) VALUES (3, 1, 1, NULL, 5, 'Bank', 236000.00, 'UTR20260401123', '2026-04-30 13:22:28.175384+05:30', '2026-06-24 13:22:28.175384+05:30', '2026-06-24 13:22:28.175384+05:30', 1, NULL, true, false, NULL);
+INSERT INTO public.payment (payment_id, tenant_id, company_id, branch_id, invoice_id, mode, amount, gateway_ref, paid_at, created_at, updated_at, created_by, updated_by, is_active, is_reconciled, matched_invoice_id) VALUES (4, 1, 1, NULL, 3, 'UPI', 100000.00, 'UTR20260515456', '2026-06-14 13:22:28.175384+05:30', '2026-06-24 13:22:28.175384+05:30', '2026-06-24 13:22:28.175384+05:30', 1, NULL, true, false, NULL);
+INSERT INTO public.payment (payment_id, tenant_id, company_id, branch_id, invoice_id, mode, amount, gateway_ref, paid_at, created_at, updated_at, created_by, updated_by, is_active, is_reconciled, matched_invoice_id) VALUES (1, 1, 1, NULL, 1, 'UPI', 59000.00, 'UTR123456', '2026-06-24 05:30:00+05:30', '2026-06-24 13:10:24.481841+05:30', '2026-07-01 12:36:37.773325+05:30', 1, 1, true, false, NULL);
+INSERT INTO public.payment (payment_id, tenant_id, company_id, branch_id, invoice_id, mode, amount, gateway_ref, paid_at, created_at, updated_at, created_by, updated_by, is_active, is_reconciled, matched_invoice_id) VALUES (2, 1, 1, NULL, 2, 'Card', 70800.00, NULL, '2026-06-24 05:30:00+05:30', '2026-06-24 13:15:22.615029+05:30', '2026-07-02 00:28:26.740595+05:30', 1, 1, true, true, 8);
 
 
 --
 -- Data for Name: payout; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.payout (payout_id, tenant_id, company_id, branch_id, vendor_invoice_id, amount, status, scheduled_date, paid_at, created_at, updated_at, created_by, updated_by, is_active) FROM stdin;
-1	1	1	\N	\N	45000.00	scheduled	2026-06-29	\N	2026-06-24 13:22:28.177563+05:30	2026-06-24 13:22:28.177563+05:30	1	\N	t
-3	1	1	\N	\N	78000.00	approved	2026-06-26	\N	2026-06-24 13:22:28.177563+05:30	2026-06-24 13:22:28.177563+05:30	1	\N	t
-4	1	1	\N	\N	120000.00	paid	2026-06-19	\N	2026-06-24 13:22:28.177563+05:30	2026-06-24 13:22:28.177563+05:30	1	\N	t
-2	1	1	\N	\N	32000.00	paid	2026-07-04	2026-06-29 18:12:14.582+05:30	2026-06-24 13:22:28.177563+05:30	2026-06-29 18:12:14.583405+05:30	1	1	t
-\.
+INSERT INTO public.payout (payout_id, tenant_id, company_id, branch_id, vendor_invoice_id, amount, status, scheduled_date, paid_at, created_at, updated_at, created_by, updated_by, is_active) VALUES (1, 1, 1, NULL, NULL, 45000.00, 'scheduled', '2026-06-29', NULL, '2026-06-24 13:22:28.177563+05:30', '2026-06-24 13:22:28.177563+05:30', 1, NULL, true);
+INSERT INTO public.payout (payout_id, tenant_id, company_id, branch_id, vendor_invoice_id, amount, status, scheduled_date, paid_at, created_at, updated_at, created_by, updated_by, is_active) VALUES (3, 1, 1, NULL, NULL, 78000.00, 'approved', '2026-06-26', NULL, '2026-06-24 13:22:28.177563+05:30', '2026-06-24 13:22:28.177563+05:30', 1, NULL, true);
+INSERT INTO public.payout (payout_id, tenant_id, company_id, branch_id, vendor_invoice_id, amount, status, scheduled_date, paid_at, created_at, updated_at, created_by, updated_by, is_active) VALUES (4, 1, 1, NULL, NULL, 120000.00, 'paid', '2026-06-19', NULL, '2026-06-24 13:22:28.177563+05:30', '2026-06-24 13:22:28.177563+05:30', 1, NULL, true);
+INSERT INTO public.payout (payout_id, tenant_id, company_id, branch_id, vendor_invoice_id, amount, status, scheduled_date, paid_at, created_at, updated_at, created_by, updated_by, is_active) VALUES (2, 1, 1, NULL, NULL, 32000.00, 'paid', '2026-07-04', '2026-06-29 18:12:14.582+05:30', '2026-06-24 13:22:28.177563+05:30', '2026-06-29 18:12:14.583405+05:30', 1, 1, true);
 
 
 --
 -- Data for Name: pnl; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.pnl (pnl_id, tenant_id, company_id, branch_id, event_id, revenue, direct_cost, created_at, updated_at, created_by, updated_by, is_active) FROM stdin;
-1	1	1	1	101	250000.00	160000.00	2026-06-29 18:20:31.185422+05:30	2026-06-29 18:20:31.185422+05:30	1	\N	t
-2	1	1	1	102	180000.00	120000.00	2026-06-29 18:20:31.185422+05:30	2026-06-29 18:20:31.185422+05:30	1	\N	t
-3	1	1	1	103	320000.00	210000.00	2026-06-29 18:20:31.185422+05:30	2026-06-29 18:20:31.185422+05:30	1	\N	t
-\.
+INSERT INTO public.pnl (pnl_id, tenant_id, company_id, branch_id, event_id, revenue, direct_cost, created_at, updated_at, created_by, updated_by, is_active) VALUES (1, 1, 1, 1, 101, 250000.00, 160000.00, '2026-06-29 18:20:31.185422+05:30', '2026-06-29 18:20:31.185422+05:30', 1, NULL, true);
+INSERT INTO public.pnl (pnl_id, tenant_id, company_id, branch_id, event_id, revenue, direct_cost, created_at, updated_at, created_by, updated_by, is_active) VALUES (2, 1, 1, 1, 102, 180000.00, 120000.00, '2026-06-29 18:20:31.185422+05:30', '2026-06-29 18:20:31.185422+05:30', 1, NULL, true);
+INSERT INTO public.pnl (pnl_id, tenant_id, company_id, branch_id, event_id, revenue, direct_cost, created_at, updated_at, created_by, updated_by, is_active) VALUES (3, 1, 1, 1, 103, 320000.00, 210000.00, '2026-06-29 18:20:31.185422+05:30', '2026-06-29 18:20:31.185422+05:30', 1, NULL, true);
 
 
 --
 -- Data for Name: tax_rule; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.tax_rule (tax_rule_id, company_id, name, cgst_pct, sgst_pct, igst_pct, hsn_sac) FROM stdin;
-1	1	GST 18%	9.00	9.00	0.00	998313
-2	1	GST 12%	6.00	6.00	0.00	998315
-3	1	GST 5%	2.50	2.50	0.00	998312
-4	1	IGST 18%	0.00	0.00	18.00	998313
-5	1	GST 0%	0.00	0.00	0.00	998310
-\.
+INSERT INTO public.tax_rule (tax_rule_id, company_id, name, cgst_pct, sgst_pct, igst_pct, hsn_sac) VALUES (1, 1, 'GST 18%', 9.00, 9.00, 0.00, '998313');
+INSERT INTO public.tax_rule (tax_rule_id, company_id, name, cgst_pct, sgst_pct, igst_pct, hsn_sac) VALUES (2, 1, 'GST 12%', 6.00, 6.00, 0.00, '998315');
+INSERT INTO public.tax_rule (tax_rule_id, company_id, name, cgst_pct, sgst_pct, igst_pct, hsn_sac) VALUES (3, 1, 'GST 5%', 2.50, 2.50, 0.00, '998312');
+INSERT INTO public.tax_rule (tax_rule_id, company_id, name, cgst_pct, sgst_pct, igst_pct, hsn_sac) VALUES (4, 1, 'IGST 18%', 0.00, 0.00, 18.00, '998313');
+INSERT INTO public.tax_rule (tax_rule_id, company_id, name, cgst_pct, sgst_pct, igst_pct, hsn_sac) VALUES (5, 1, 'GST 0%', 0.00, 0.00, 0.00, '998310');
 
 
 --
 -- Data for Name: tenant; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.tenant (tenant_id, name, subdomain, plan, status, is_active) FROM stdin;
-1	EventHub Demo	demo	Enterprise	active	t
-\.
+INSERT INTO public.tenant (tenant_id, name, subdomain, plan, status, is_active) VALUES (1, 'EventHub Demo', 'demo', 'Enterprise', 'active', true);
 
 
 --
 -- Data for Name: user_account; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.user_account (user_id, tenant_id, company_id, email, password_hash, full_name, phone, mfa_enabled, status) FROM stdin;
-1	1	1	admin@demo.in	$2b$10$qz2f75hPDrI1E4YbQPBmhORLUWlK773xo2oxU04dHp4rjU/Ixnnh2	System Admin	\N	f	active
-4	1	1	mathurshivv@gmail.com	$2b$10$gjepR3rxaoA3f6O5VMifGOMtQGjd84rVnGGYCHvERo.1PAxeTOSeu	Shivam Mathur	9009232427	f	active
-\.
+INSERT INTO public.user_account (user_id, tenant_id, company_id, email, password_hash, full_name, phone, mfa_enabled, status) VALUES (1, 1, 1, 'admin@demo.in', '$2b$10$qz2f75hPDrI1E4YbQPBmhORLUWlK773xo2oxU04dHp4rjU/Ixnnh2', 'System Admin', NULL, false, 'active');
+INSERT INTO public.user_account (user_id, tenant_id, company_id, email, password_hash, full_name, phone, mfa_enabled, status) VALUES (4, 1, 1, 'mathurshivv@gmail.com', '$2b$10$gjepR3rxaoA3f6O5VMifGOMtQGjd84rVnGGYCHvERo.1PAxeTOSeu', 'Shivam Mathur', '9009232427', false, 'active');
 
 
 --
 -- Data for Name: vendor_bill; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.vendor_bill (vendor_bill_id, tenant_id, company_id, branch_id, bill_number, vendor_name, category, amount, gst_amount, total_amount, bill_date, due_date, status, file_name, created_at, updated_at, created_by, updated_by, is_active) FROM stdin;
-1	1	1	\N	VB-2026-001	Sound & Stage Co.	logistics	80000.00	14400.00	94400.00	2026-06-19	2026-07-04	pending	\N	2026-06-29 17:58:27.453855+05:30	2026-06-29 17:58:27.453855+05:30	\N	\N	t
-2	1	1	\N	VB-2026-002	Bloom Decorators	decor	45000.00	8100.00	53100.00	2026-06-09	2026-06-27	pending	\N	2026-06-29 17:58:27.453855+05:30	2026-06-29 17:58:27.453855+05:30	\N	\N	t
-3	1	1	\N	VB-2026-003	Gourmet Caterers	food_beverage	120000.00	6000.00	126000.00	2026-06-24	2026-07-14	approved	\N	2026-06-29 17:58:27.453855+05:30	2026-06-29 17:58:27.453855+05:30	\N	\N	t
-\.
+INSERT INTO public.vendor_bill (vendor_bill_id, tenant_id, company_id, branch_id, bill_number, vendor_name, category, amount, gst_amount, total_amount, bill_date, due_date, status, file_name, created_at, updated_at, created_by, updated_by, is_active) VALUES (1, 1, 1, NULL, 'VB-2026-001', 'Sound & Stage Co.', 'logistics', 80000.00, 14400.00, 94400.00, '2026-06-19', '2026-07-04', 'pending', NULL, '2026-06-29 17:58:27.453855+05:30', '2026-06-29 17:58:27.453855+05:30', NULL, NULL, true);
+INSERT INTO public.vendor_bill (vendor_bill_id, tenant_id, company_id, branch_id, bill_number, vendor_name, category, amount, gst_amount, total_amount, bill_date, due_date, status, file_name, created_at, updated_at, created_by, updated_by, is_active) VALUES (2, 1, 1, NULL, 'VB-2026-002', 'Bloom Decorators', 'decor', 45000.00, 8100.00, 53100.00, '2026-06-09', '2026-06-27', 'pending', NULL, '2026-06-29 17:58:27.453855+05:30', '2026-06-29 17:58:27.453855+05:30', NULL, NULL, true);
+INSERT INTO public.vendor_bill (vendor_bill_id, tenant_id, company_id, branch_id, bill_number, vendor_name, category, amount, gst_amount, total_amount, bill_date, due_date, status, file_name, created_at, updated_at, created_by, updated_by, is_active) VALUES (3, 1, 1, NULL, 'VB-2026-003', 'Gourmet Caterers', 'food_beverage', 120000.00, 6000.00, 126000.00, '2026-06-24', '2026-07-14', 'approved', NULL, '2026-06-29 17:58:27.453855+05:30', '2026-06-29 17:58:27.453855+05:30', NULL, NULL, true);
 
 
 --
@@ -1643,5 +1607,4 @@ ALTER TABLE ONLY public.user_account
 -- PostgreSQL database dump complete
 --
 
-\unrestrict rafDnWxuvmZzXjkohRYiPVHsULsALnX8sjshbXnU6RlFYavJkYazMsfzUhYXx9m
 
