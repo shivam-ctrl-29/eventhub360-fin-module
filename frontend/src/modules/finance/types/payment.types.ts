@@ -17,6 +17,10 @@ export interface Payment {
   paymentDate: string
   remarks?: string
   createdAt: string
+  /** Raw backend fields (payment table sends mode/gatewayRef/paidAt) */
+  mode?: string
+  gatewayRef?: string | null
+  paidAt?: string
 }
 
 export interface ReconciliationEntry {
@@ -31,14 +35,12 @@ export interface ReconciliationEntry {
   updatedAt?: string
 }
 
+// Matches what GET /fin/payments/:id/receipt actually returns.
 export interface Receipt {
-  id: string
-  receiptNumber: string
   paymentId: string
-  invoiceNumber: string
-  customerName: string
+  invoiceId: string
   amount: number
-  paymentMode: PaymentMode
-  paymentDate: string
-  utrNumber?: string
+  mode: string
+  gatewayRef?: string | null
+  paidAt: string
 }

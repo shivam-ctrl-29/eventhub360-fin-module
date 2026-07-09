@@ -5,6 +5,7 @@ interface PaymentUIState {
   statusFilter: PaymentStatus | 'all'
   searchQuery: string
   currentPage: number
+  pageSize: number
   recordPaymentModalOpen: boolean
 
   setStatusFilter: (s: PaymentStatus | 'all') => void
@@ -18,6 +19,7 @@ export const usePaymentStore = create<PaymentUIState>((set) => ({
   statusFilter: 'all',
   searchQuery: '',
   currentPage: 1,
+  pageSize: 20,
   recordPaymentModalOpen: false,
 
   setStatusFilter: (s) => set({ statusFilter: s, currentPage: 1 }),

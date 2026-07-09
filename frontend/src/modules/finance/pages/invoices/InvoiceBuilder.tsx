@@ -10,8 +10,8 @@ import { INDIAN_STATES, CITIES_BY_STATE } from '@shared/constants/indianLocation
 
 const lineItemSchema = z.object({
   desc:  z.string().min(1, 'Description is required'),
-  qty:   z.number({ invalid_type_error: 'Required' }).min(1, 'Min 1'),
-  rate:  z.number({ invalid_type_error: 'Required' }).min(0, 'Min 0'),
+  qty:   z.number({ message: 'Required' }).min(1, 'Min 1'),
+  rate:  z.number({ message: 'Required' }).min(0, 'Min 0'),
   gst:   z.number(),
 })
 
@@ -69,7 +69,7 @@ export default function InvoiceBuilder() {
         lineItems:    data.items.map((i) => ({ description: i.desc, quantity: i.qty, unitPrice: i.rate, gstRate: i.gst })),
         notes:        data.notes,
         paymentMode:  data.paymentMode,
-      } as Parameters<typeof createInvoice.mutateAsync>[0])
+      } as unknown as Parameters<typeof createInvoice.mutateAsync>[0])
       message.success('Invoice created successfully')
       navigate('/finance/invoices')
     } catch {

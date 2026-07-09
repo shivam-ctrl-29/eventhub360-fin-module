@@ -6,6 +6,7 @@ export type FilingStatus = 'filed' | 'pending' | 'late_filed'
 
 export interface GSTSummary {
   period: string
+  returnType?: GSTReturnType
   gstOutput: number
   gstInput: number
   itcAvailable: number

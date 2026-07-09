@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { message, modal } from '@shared/lib/antdStatic'
-import { CalendarOutlined, CheckOutlined, DownloadOutlined } from '@ant-design/icons'
+import { CalendarOutlined, CheckOutlined } from '@ant-design/icons'
 import { Skeleton } from 'antd'
 import { usePayoutSchedule, useApprovePayouts, useDisburse } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'

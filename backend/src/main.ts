@@ -7,7 +7,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api');
-  app.enableCors({ origin: 'http://localhost:5174', credentials: true });
+  // Comma-separated allowlist, e.g. "http://localhost:5174,https://your-app.vercel.app"
+  const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5174')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+  app.enableCors({ origin: corsOrigins, credentials: true });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
 
   const port = process.env.PORT ?? 3001;

@@ -1,6 +1,10 @@
 import type { Customer } from './finance.common.types'
 
-export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled' | 'partial'
+// The backend stores capitalized statuses (Draft/Issued/Paid/Overdue/Cancelled);
+// the lowercase values remain for legacy UI filters that map onto them.
+export type InvoiceStatus =
+  | 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled' | 'partial'
+  | 'Draft' | 'Issued' | 'Paid' | 'Overdue' | 'Cancelled'
 export type GSTRate = 0 | 5 | 12 | 18 | 28
 export type PaymentMode = 'upi' | 'bank_transfer' | 'cheque' | 'cash' | 'card'
 
@@ -34,6 +38,10 @@ export interface Invoice {
   gstBreakdown: GSTBreakdown[]
   totalGST: number
   grandTotal: number
+  /** Raw backend fields (invoice table sends total/taxTotal/balance) */
+  total?: number
+  taxTotal?: number
+  balance?: number
   paymentMode?: PaymentMode
   notes?: string
   termsAndConditions?: string

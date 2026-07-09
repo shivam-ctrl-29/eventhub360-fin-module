@@ -14,7 +14,7 @@ import dayjs from 'dayjs'
 
 const paymentSchema = z.object({
   invoiceId:   z.string().min(1, 'Invoice ID is required'),
-  amount:      z.number({ invalid_type_error: 'Amount is required' }).positive('Must be greater than 0'),
+  amount:      z.number({ message: 'Amount is required' }).positive('Must be greater than 0'),
   paymentDate: z.string().min(1, 'Payment date is required'),
   paymentMode: z.enum(['bank_transfer', 'upi', 'cheque', 'cash', 'card']),
   utrNumber:   z.string().optional(),

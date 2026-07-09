@@ -47,6 +47,6 @@ export interface PayoutScheduleItem {
   amount: number
   scheduledDate: string
   priority: 'critical' | 'high' | 'medium' | 'low'
-  status: 'pending' | 'approved' | 'disbursed'
+  status: 'pending' | 'approved' | 'disbursed' | 'scheduled' | 'paid'
   approvedBy?: string
 }
