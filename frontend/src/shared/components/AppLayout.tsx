@@ -315,8 +315,9 @@ export default function AppLayout() {
         minWidth: 0,
       }}>
         {/* key on currency + ratesFetchedAt forces money figures to re-format app-wide
-            when currency changes or live FX rates finish loading */}
-        <div key={`${currency}-${ratesFetchedAt ?? 'pending'}`}>
+            when currency changes or live FX rates finish loading; keying on pathname
+            replays the page-enter animation on every route change */}
+        <div key={`${location.pathname}-${currency}-${ratesFetchedAt ?? 'pending'}`} className="eh-page">
           <Outlet />
         </div>
       </main>

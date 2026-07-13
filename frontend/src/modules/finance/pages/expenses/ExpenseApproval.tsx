@@ -135,7 +135,7 @@ export default function ExpenseApproval() {
         {isLoading
           ? <Skeleton active paragraph={{ rows: 2 }} />
           : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+            <div className="eh-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
               {Object.entries(categoryTotals).slice(0, 4).map(([cat, total]) => {
                 const meta = CATEGORY_DISPLAY[cat] ?? { label: cat, icon: '📦', color: '#F1F5F9', bar: '#94a3b8' }
                 const pct = Math.round((total / maxCategoryTotal) * 100)

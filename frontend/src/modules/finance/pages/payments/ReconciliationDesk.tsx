@@ -106,7 +106,7 @@ export default function ReconciliationDesk() {
 
       {entriesError && <Alert type="error" message="Failed to load reconciliation data." style={{ marginBottom: 16 }} />}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 20 }}>
+      <div className="eh-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 20 }}>
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <div key={i} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: '16px 18px' }}><Skeleton active paragraph={{ rows: 1 }} title={false} /></div>)
           : [

@@ -77,7 +77,7 @@ export default function PayoutSchedule() {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 20 }}>
+      <div className="eh-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 20 }}>
         {[
           { label: 'Total Pending',    value: isLoading ? '—' : formatINR(pending.reduce((s, p) => s + p.amount, 0), { compact: true }), color: '#8B1A1A' },
           { label: 'Pending Items',    value: isLoading ? '—' : `${pending.length} payouts`, color: '#DC2626' },

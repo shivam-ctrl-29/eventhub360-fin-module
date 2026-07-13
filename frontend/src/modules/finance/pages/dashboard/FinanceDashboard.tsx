@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -13,6 +13,38 @@ import { usePayoutSchedule } from '../../hooks/useAPDashboard'
 import { formatINR } from '../../utils/currencyFormatter'
 
 const PIE_COLORS = ['#8B1A1A', '#C4A24D', '#1a2a4a', '#E2946B', '#059669', '#CC5555', '#94a3b8']
+
+/** Eases a number from 0 to its real value on first render (skipped for reduced-motion users). */
+function useCountUp(target: number, duration = 700) {
+  const [val, setVal] = useState(0)
+  useEffect(() => {
+    // rAF doesn't fire in hidden tabs — show the real value immediately there,
+    // and as a hard guarantee settle on it when the animation window ends.
+    if (
+      !Number.isFinite(target) || target === 0 || document.hidden ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      setVal(target)
+      return
+    }
+    let raf: number
+    const start = performance.now()
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1)
+      setVal(target * (1 - Math.pow(1 - p, 3)))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    const settle = window.setTimeout(() => setVal(target), duration + 100)
+    return () => { cancelAnimationFrame(raf); window.clearTimeout(settle) }
+  }, [target, duration])
+  return val
+}
+
+function KpiValue({ raw, isPercent }: { raw: number; isPercent: boolean }) {
+  const animated = useCountUp(raw)
+  return <>{isPercent ? `${animated.toFixed(1)}%` : formatINR(animated, { compact: true })}</>
+}
 
 // Current financial year + quarter label (India FY: Apr–Mar)
 function currentFYLabel() {
@@ -106,7 +138,7 @@ export default function FinanceDashboard() {
 
       {/* ── Error banner — real failures show up here instead of silently rendering ₹0.00 everywhere ── */}
       {kpisError && (
-        <div style={{
+        <div className="eh-pop" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
           background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10,
           padding: '12px 16px', marginBottom: 16,
@@ -129,7 +161,7 @@ export default function FinanceDashboard() {
       )}
 
       {/* ── KPI Cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
+      <div className="eh-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
         {kpisLoading
           ? Array.from({ length: 6 }).map((_, i) => (
               <div key={i} style={{ background: '#fff', borderRadius: 12, padding: '14px 12px', border: '1px solid #E8E0D8' }}>
@@ -141,10 +173,9 @@ export default function FinanceDashboard() {
             : KPI_META.map((k) => {
               const raw = kpis ? kpis[k.key] : 0
               const isPercent = k.key === 'eventMargin'
-              const display = isPercent ? `${raw.toFixed(1)}%` : formatINR(raw, { compact: true })
               const cap = k.caption(raw)
               return (
-                <div key={k.label} style={{ background: '#fff', borderRadius: 12, padding: '14px 12px', border: '1px solid #E8E0D8' }}>
+                <div key={k.label} className="eh-lift" style={{ background: '#fff', borderRadius: 12, padding: '14px 12px', border: '1px solid #E8E0D8' }}>
                   <div style={{ width: 32, height: 32, background: k.iconBg, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, marginBottom: 10 }}>
                     {k.icon}
                   </div>
@@ -152,7 +183,7 @@ export default function FinanceDashboard() {
                     {k.label}
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: '#1a2a4a', lineHeight: 1.2 }}>
-                    {display}
+                    <KpiValue raw={raw} isPercent={isPercent} />
                   </div>
                   <div style={{ fontSize: 12, marginTop: 5, fontWeight: 500, color: cap.color }}>
                     {cap.text}
@@ -164,7 +195,7 @@ export default function FinanceDashboard() {
       </div>
 
       {/* ── Charts Row ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16, marginBottom: 20, alignItems: 'start' }}>
+      <div className="eh-reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16, marginBottom: 20, alignItems: 'start' }}>
 
         {/* Revenue Trends */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>
@@ -245,7 +276,7 @@ export default function FinanceDashboard() {
       </div>
 
       {/* ── Bottom Row ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="eh-reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
         {/* Invoice Aging — real AR aging buckets from the DB */}
         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: 20 }}>

@@ -71,7 +71,7 @@ export default function CashFlowDashboard() {
         {isLoading
           ? <Skeleton active paragraph={{ rows: 1 }} style={{ filter: 'invert(1) opacity(0.4)' }} />
           : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 24 }}>
+            <div className="eh-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 24 }}>
               {[
                 { label: 'Net Liquidity', value: cashHealth ? formatINR(cashHealth.netLiquidity, { compact: true }) : '—', delta: 'Inflows − Outflows', deltaColor: '#C4A24D' },
                 { label: 'OPEX Runway',   value: cashHealth ? `${cashHealth.opexRunway.toFixed(1)} Mo` : '—', delta: 'At current burn', deltaColor: '#C4A24D' },

@@ -48,7 +48,7 @@ export default function ARAgingReport() {
 
       {summaryError && <Alert type="error" message="Failed to load aging data." style={{ marginBottom: 16 }} />}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 20 }}>
+      <div className="eh-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 20 }}>
         {summaryLoading
           ? Array.from({ length: 4 }).map((_, i) => <div key={i} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: '16px 18px' }}><Skeleton active paragraph={{ rows: 2 }} title={false} /></div>)
           : bucketCards.map((b, idx) => (

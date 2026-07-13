@@ -161,7 +161,7 @@ export default function InvoiceList() {
         {!isLoading && invoices.map((inv, i) => {
           const style = STATUS_STYLE[inv.status?.toLowerCase()] ?? STATUS_STYLE['draft']
           return (
-            <div key={inv.id} style={{ display: 'grid', gridTemplateColumns: '140px 1.5fr 1.5fr 100px 100px 130px 100px 80px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
+            <div key={inv.id} className="eh-row" style={{ display: 'grid', gridTemplateColumns: '140px 1.5fr 1.5fr 100px 100px 130px 100px 80px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#8B1A1A' }}>{inv.invoiceNumber}</div>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{(inv as any).customer?.name ?? '—'}</div>
               <div style={{ fontSize: 12, color: '#64748b' }}>—</div>

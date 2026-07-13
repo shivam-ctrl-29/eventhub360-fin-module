@@ -79,7 +79,7 @@ export default function DunningManagement() {
         <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 3 }}>Automated overdue collection workflow and escalation tracking</div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14, marginBottom: 20 }}>
+      <div className="eh-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14, marginBottom: 20 }}>
         {[{ label: 'Level 1 — Soft Remind', count: l1, color: '#C4A24D' }, { label: 'Level 2 — Follow-up', count: l2, color: '#E2946B' }, { label: 'Level 3 — Legal', count: l3, color: '#8B1A1A' }].map((l) => (
           <div key={l.label} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: '16px 18px', borderLeft: `4px solid ${l.color}` }}>
             <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8', marginBottom: 6 }}>{l.label}</div>

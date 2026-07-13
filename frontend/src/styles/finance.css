@@ -366,3 +366,59 @@ button:disabled { cursor: not-allowed; opacity: 0.6; }
 .eh-btn-danger:not(:disabled):hover    { background: #FEF2F2; filter: none; }
 .eh-btn-ghost     { background: transparent; color: var(--color-text); }
 .eh-btn-ghost:not(:disabled):hover     { background: var(--color-primary-light); filter: none; }
+
+/* ══════════════════ ANIMATIONS ══════════════════ */
+
+/* ── Page enter: content slides up + fades on every route change ── */
+@keyframes eh-page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.eh-page { animation: eh-page-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ── Staggered card entrance: apply to a grid, children cascade in ── */
+@keyframes eh-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.eh-stagger > * { animation: eh-card-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.eh-stagger > *:nth-child(1) { animation-delay: 0.03s; }
+.eh-stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.eh-stagger > *:nth-child(3) { animation-delay: 0.13s; }
+.eh-stagger > *:nth-child(4) { animation-delay: 0.18s; }
+.eh-stagger > *:nth-child(5) { animation-delay: 0.23s; }
+.eh-stagger > *:nth-child(6) { animation-delay: 0.28s; }
+.eh-stagger > *:nth-child(n+7) { animation-delay: 0.33s; }
+
+/* ── Card hover: gentle lift + shadow ── */
+.eh-lift { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.eh-lift:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26, 42, 74, 0.08); }
+
+/* ── Table/list row hover ── */
+.eh-row { transition: background 0.15s ease; }
+.eh-row:hover { background: #FAF6F2; }
+
+/* ── Buttons: subtle press feedback on top of existing hover polish ── */
+button:not(:disabled):active { transform: scale(0.97); }
+button { transition: filter 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease; }
+
+/* ── Status pills & alert banners pop in ── */
+@keyframes eh-pop-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.eh-pop { animation: eh-pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* ── Chart/section reveal (slightly later than cards) ── */
+.eh-reveal { animation: eh-card-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+
+/* ── Sidebar nav links ── */
+aside a, aside [role="button"], aside div[style*="cursor"] { transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease; }
+
+/* ── Accessibility: honour reduced-motion preference ── */
+@media (prefers-reduced-motion: reduce) {
+  .eh-page, .eh-stagger > *, .eh-pop, .eh-reveal { animation: none; }
+  .eh-lift, .eh-row, button { transition: none; }
+  .eh-lift:hover { transform: none; }
+  button:not(:disabled):active { transform: none; }
+}

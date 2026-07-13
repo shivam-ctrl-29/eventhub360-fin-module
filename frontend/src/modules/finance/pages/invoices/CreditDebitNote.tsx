@@ -126,7 +126,7 @@ export default function CreditDebitNote() {
 
       {(creditError || debitError) && <Alert type="error" message="Failed to load notes." style={{ marginBottom: 16 }} />}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14, marginBottom: 20 }}>
+      <div className="eh-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14, marginBottom: 20 }}>
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => <div key={i} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E8E0D8', padding: '16px 18px' }}><Skeleton active paragraph={{ rows: 2 }} title={false} /></div>)
           : [
