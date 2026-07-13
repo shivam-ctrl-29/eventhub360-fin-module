@@ -81,7 +81,7 @@ export default function InvoiceDetail() {
               <div style={{ fontSize: 13, color: '#64748b' }}>{item.quantity}</div>
               <div style={{ fontSize: 13, color: '#64748b' }}>{formatINR(item.unitPrice)}</div>
               <div style={{ fontSize: 13, color: '#64748b' }}>{(item as any).gstRate ?? 18}%</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{formatINR(item.total)}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a2a4a' }}>{formatINR((item as any).amount ?? item.total)}</div>
             </div>
           ))}
         </div>

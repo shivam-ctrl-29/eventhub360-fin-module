@@ -25,6 +25,18 @@ export function useCreateInvoice() {
   })
 }
 
+export function useUpdateInvoice() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateInvoicePayload> }) =>
+      invoiceApi.update(id, payload).then((r) => r.data.data),
+    onSuccess: (_data, { id }) => {
+      qc.invalidateQueries({ queryKey: ['finance', 'invoices'] })
+      qc.invalidateQueries({ queryKey: ['finance', 'invoice', id] })
+    },
+  })
+}
+
 export function useSendInvoice() {
   const qc = useQueryClient()
   return useMutation({

@@ -1,11 +1,14 @@
+import { useEffect } from 'react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { message } from '@shared/lib/antdStatic'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { PlusOutlined, DeleteOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Skeleton, Alert } from 'antd'
+import dayjs from 'dayjs'
 
-import { useCreateInvoice } from '../../hooks/useInvoices'
+import { useCreateInvoice, useUpdateInvoice, useInvoice } from '../../hooks/useInvoices'
 import { INDIAN_STATES, CITIES_BY_STATE } from '@shared/constants/indianLocations'
 
 const lineItemSchema = z.object({
@@ -38,9 +41,13 @@ const INPUT_ERR: React.CSSProperties = { ...INPUT, border: '1px solid #DC2626' }
 
 export default function InvoiceBuilder() {
   const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
+  const isEditMode = !!id
   const createInvoice = useCreateInvoice()
+  const updateInvoice = useUpdateInvoice()
+  const { data: existingInvoice, isLoading: isLoadingInvoice, isError: invoiceLoadError } = useInvoice(id ?? '')
 
-  const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm<InvoiceFormData>({
+  const { register, control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<InvoiceFormData>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
       paymentMode: 'bank_transfer',
@@ -53,44 +60,79 @@ export default function InvoiceBuilder() {
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
   const watchedItems = watch('items')
 
+  useEffect(() => {
+    if (!existingInvoice) return
+    const inv = existingInvoice as any
+    reset({
+      invoiceNumber: inv.invoiceNumber,
+      invoiceDate: dayjs(inv.issueDate ?? inv.createdAt).format('YYYY-MM-DD'),
+      dueDate: inv.dueDate ? dayjs(inv.dueDate).format('YYYY-MM-DD') : dayjs(inv.issueDate ?? inv.createdAt).add(30, 'day').format('YYYY-MM-DD'),
+      poNumber: inv.poNumber ?? '',
+      clientName: inv.customer?.name ?? '',
+      gstin: inv.customer?.gstin ?? '',
+      address: inv.customer?.address ?? '',
+      state: inv.customer?.state ?? '',
+      city: inv.customer?.city ?? '',
+      notes: inv.notes ?? '',
+      paymentMode: inv.paymentMode ?? 'bank_transfer',
+      items: (inv.lineItems ?? []).map((li: any) => ({
+        desc: li.description, qty: li.quantity, rate: li.unitPrice, gst: li.gstRate ?? 18,
+      })),
+    })
+  }, [existingInvoice, reset])
+
+  if (isEditMode && isLoadingInvoice) return <div style={{ padding: 32 }}><Skeleton active paragraph={{ rows: 10 }} /></div>
+  if (isEditMode && invoiceLoadError) return <Alert type="error" message="Failed to load invoice for editing." style={{ margin: 24 }} />
+
   const subtotal = watchedItems?.reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0) ?? 0
   const totalGst  = watchedItems?.reduce((s, i) => s + ((i.qty || 0) * (i.rate || 0) * (i.gst || 0)) / 100, 0) ?? 0
   const total     = subtotal + totalGst
   const fmt       = (n: number) => `₹${n.toLocaleString('en-IN')}`
 
   const onSubmit = async (data: InvoiceFormData) => {
+    const payload = {
+      invoiceNumber: data.invoiceNumber,
+      issueDate:     data.invoiceDate,
+      dueDate:       data.dueDate,
+      poNumber:      data.poNumber,
+      customer: { name: data.clientName, gstin: data.gstin, address: data.address, city: data.city, state: data.state, cityState: `${data.city}, ${data.state}` },
+      lineItems:    data.items.map((i) => ({ description: i.desc, quantity: i.qty, unitPrice: i.rate, gstRate: i.gst })),
+      notes:        data.notes,
+      paymentMode:  data.paymentMode,
+    } as unknown as Parameters<typeof createInvoice.mutateAsync>[0]
+
     try {
-      await createInvoice.mutateAsync({
-        invoiceNumber: data.invoiceNumber,
-        issueDate:     data.invoiceDate,
-        dueDate:       data.dueDate,
-        poNumber:      data.poNumber,
-        customer: { name: data.clientName, gstin: data.gstin, address: data.address, city: data.city, state: data.state, cityState: `${data.city}, ${data.state}` },
-        lineItems:    data.items.map((i) => ({ description: i.desc, quantity: i.qty, unitPrice: i.rate, gstRate: i.gst })),
-        notes:        data.notes,
-        paymentMode:  data.paymentMode,
-      } as unknown as Parameters<typeof createInvoice.mutateAsync>[0])
-      message.success('Invoice created successfully')
+      if (isEditMode && id) {
+        await updateInvoice.mutateAsync({ id, payload })
+        message.success('Invoice updated successfully')
+      } else {
+        await createInvoice.mutateAsync(payload)
+        message.success('Invoice created successfully')
+      }
       navigate('/finance/invoices')
     } catch {
-      message.error('Failed to create invoice. Please try again.')
+      message.error(isEditMode ? 'Failed to update invoice. Please try again.' : 'Failed to create invoice. Please try again.')
     }
   }
+
+  const isSaving = createInvoice.isPending || updateInvoice.isPending
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2a4a' }}>Create Invoice</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2a4a' }}>{isEditMode ? 'Edit Invoice' : 'Create Invoice'}</div>
           <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 3 }}>GST-compliant tax invoice with branded template</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <button type="button" onClick={() => navigate('/finance/invoices')} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 13, color: '#334155', cursor: 'pointer' }}>Cancel</button>
-          <button type="submit" name="draft" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 13, color: '#334155', cursor: 'pointer' }}>
-            <SaveOutlined /> Save Draft
-          </button>
-          <button type="submit" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-            <SendOutlined /> Send Invoice
+          {!isEditMode && (
+            <button type="submit" name="draft" disabled={isSaving} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', fontSize: 13, color: '#334155', cursor: isSaving ? 'not-allowed' : 'pointer', opacity: isSaving ? 0.7 : 1 }}>
+              <SaveOutlined /> Save Draft
+            </button>
+          )}
+          <button type="submit" disabled={isSaving} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 13, fontWeight: 600, cursor: isSaving ? 'not-allowed' : 'pointer', opacity: isSaving ? 0.7 : 1 }}>
+            <SendOutlined /> {isSaving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Send Invoice'}
           </button>
         </div>
       </div>
@@ -274,8 +316,8 @@ export default function InvoiceBuilder() {
                 </select>
               )} />
             </div>
-            <button type="submit" disabled={createInvoice.isPending} style={{ width: '100%', padding: '10px 0', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 8, opacity: createInvoice.isPending ? 0.7 : 1 }}>
-              {createInvoice.isPending ? 'Sending...' : 'Send Invoice'}
+            <button type="submit" disabled={isSaving} style={{ width: '100%', padding: '10px 0', borderRadius: 8, border: 'none', background: '#8B1A1A', color: '#fff', fontSize: 14, fontWeight: 700, cursor: isSaving ? 'not-allowed' : 'pointer', marginBottom: 8, opacity: isSaving ? 0.7 : 1 }}>
+              {isSaving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Send Invoice'}
             </button>
             <button type="button" onClick={() => { message.info('Use the print dialog and choose "Save as PDF"'); window.print() }} style={{ width: '100%', padding: '10px 0', borderRadius: 8, border: '1px solid #E8E0D8', background: '#fff', color: '#334155', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
               Download PDF

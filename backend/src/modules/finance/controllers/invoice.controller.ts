@@ -41,7 +41,7 @@ export class InvoiceController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() body: Partial<CreateInvoiceDto>) {
-    return ok(await this.svc.findOne(id))
+    return ok(await this.svc.update(id, body, DEMO_USER), 'Invoice updated')
   }
 
   @Post(':id/send')

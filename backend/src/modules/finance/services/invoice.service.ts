@@ -77,6 +77,35 @@ export class InvoiceService {
     }
   }
 
+  async update(id: string, dto: Partial<CreateInvoiceDto>, userId: string) {
+    const uid = safeId(userId)
+    const inv = await this.invoiceRepo.findOne({ where: { invoiceId: id }, relations: { lines: true } })
+    if (!inv) throw new NotFoundException('Invoice not found')
+
+    if (dto.lineItems?.length) {
+      await this.lineRepo.delete({ invoiceId: id })
+      let subtotal = 0
+      let taxTotal = 0
+      const lines: Partial<InvoiceLine>[] = dto.lineItems.map((li) => {
+        const amount = li.quantity * li.unitPrice
+        const tax = Math.round((amount * li.gstRate) / 100 * 100) / 100
+        subtotal += amount
+        taxTotal += tax
+        return { tenantId: '1', companyId: '1', description: li.description, qty: li.quantity, rate: li.unitPrice, amount, createdBy: uid }
+      })
+      inv.lines = lines as InvoiceLine[]
+      inv.subtotal = subtotal
+      inv.taxTotal = taxTotal
+      inv.total = subtotal + taxTotal
+      inv.balance = inv.total
+    }
+    inv.updatedBy = uid
+
+    await this.invoiceRepo.save(inv)
+    await this.audit.log(uid, 'UPDATE_INVOICE', 'invoice', id, `Invoice ${inv.invoiceNo} updated`, 'success')
+    return this.findOne(id)
+  }
+
   async send(id: string, userId: string) {
     const uid = safeId(userId)
     try {
