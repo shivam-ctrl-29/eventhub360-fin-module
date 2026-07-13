@@ -48,7 +48,7 @@ export default function FinanceDashboard() {
   const [revenueTab, setRevenueTab] = useState<'Revenue' | 'Expenses'>('Revenue')
   const currentYear = new Date().getFullYear()
 
-  const { data: kpis, isLoading: kpisLoading } = useFinanceKPIs()
+  const { data: kpis, isLoading: kpisLoading, isError: kpisError, refetch: refetchKpis, isFetching: kpisFetching } = useFinanceKPIs()
   const { data: revenueTrends, isLoading: trendsLoading } = useRevenueTrends(currentYear)
   const { data: branches, isLoading: branchesLoading } = useBranchPerformance()
   const { data: expenseDist, isLoading: expenseLoading } = useExpenseDistribution()
@@ -104,6 +104,30 @@ export default function FinanceDashboard() {
         </div>
       </div>
 
+      {/* ── Error banner — real failures show up here instead of silently rendering ₹0.00 everywhere ── */}
+      {kpisError && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10,
+          padding: '12px 16px', marginBottom: 16,
+        }}>
+          <div style={{ fontSize: 13, color: '#991B1B' }}>
+            <strong>Couldn't load live data.</strong> The backend may be waking up from idle (free-tier hosting sleeps after ~15 min) — this can take up to a minute on the first try.
+          </div>
+          <button
+            onClick={() => refetchKpis()}
+            disabled={kpisFetching}
+            style={{
+              flexShrink: 0, padding: '6px 14px', borderRadius: 8, border: 'none',
+              background: '#8B1A1A', color: '#fff', fontSize: 12, fontWeight: 600,
+              cursor: kpisFetching ? 'not-allowed' : 'pointer', opacity: kpisFetching ? 0.6 : 1,
+            }}
+          >
+            {kpisFetching ? 'Retrying…' : 'Retry'}
+          </button>
+        </div>
+      )}
+
       {/* ── KPI Cards ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
         {kpisLoading
@@ -112,7 +136,9 @@ export default function FinanceDashboard() {
                 <Skeleton active paragraph={{ rows: 2 }} title={false} />
               </div>
             ))
-          : KPI_META.map((k) => {
+          : kpisError
+            ? null
+            : KPI_META.map((k) => {
               const raw = kpis ? kpis[k.key] : 0
               const isPercent = k.key === 'eventMargin'
               const display = isPercent ? `${raw.toFixed(1)}%` : formatINR(raw, { compact: true })

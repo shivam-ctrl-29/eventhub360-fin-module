@@ -9,7 +9,15 @@ import './styles/finance.css'
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: 1, staleTime: 5 * 60 * 1000 },
+    queries: {
+      // 2 retries with a real backoff so a cold-starting free-tier backend
+      // (Render sleeps after ~15 min idle) has a genuine chance to wake up
+      // within the retry window instead of the UI giving up and silently
+      // showing zeros.
+      retry: 2,
+      retryDelay: (attempt) => Math.min(2000 * 2 ** attempt, 15000),
+      staleTime: 5 * 60 * 1000,
+    },
   },
 })
 

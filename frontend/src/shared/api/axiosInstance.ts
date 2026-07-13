@@ -2,7 +2,10 @@ import axios from 'axios'
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000',
-  timeout: 15000,
+  // Free-tier hosts (Render, etc.) spin the backend down after ~15 min idle;
+  // the first request after that can take 20-40s to wake it back up. 15s was
+  // too short and made every cold start look like a hard failure.
+  timeout: 40000,
   headers: { 'Content-Type': 'application/json' },
 })
 
