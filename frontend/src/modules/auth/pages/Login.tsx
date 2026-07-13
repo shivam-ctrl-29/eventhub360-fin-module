@@ -71,26 +71,30 @@ export default function Login() {
         )}
 
         <div style={{ position: 'relative' }}>
-          <label style={floatingLabel}>Institutional Email</label>
+          <label htmlFor="login-email" style={floatingLabel}>Institutional Email</label>
           <div style={inputWrap(!!errors.email)} className="e360-input-wrap">
-            <span className="material-symbols-outlined" style={{ color: 'rgba(88,65,63,0.4)', fontSize: 18 }}>alternate_email</span>
-            <input type="email" placeholder="name@eventhub360.com" autoComplete="email" style={inputField} {...register('email')} />
+            <span className="material-symbols-outlined" aria-hidden="true" style={{ color: 'rgba(88,65,63,0.4)', fontSize: 18 }}>alternate_email</span>
+            <input id="login-email" type="email" placeholder="name@eventhub360.com" autoComplete="email" style={inputField} {...register('email')} />
           </div>
           {errors.email && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.email.message}</div>}
         </div>
 
         <div style={{ position: 'relative' }}>
-          <label style={floatingLabel}>Access Key</label>
+          <label htmlFor="login-password" style={floatingLabel}>Access Key</label>
           <div style={inputWrap(!!errors.password)} className="e360-input-wrap">
-            <span className="material-symbols-outlined" style={{ color: 'rgba(88,65,63,0.4)', fontSize: 18 }}>key</span>
-            <input type={showPassword ? 'text' : 'password'} placeholder="••••••••" autoComplete="current-password" style={inputField} {...register('password')} />
-            <span
-              className="material-symbols-outlined"
+            <span className="material-symbols-outlined" aria-hidden="true" style={{ color: 'rgba(88,65,63,0.4)', fontSize: 18 }}>key</span>
+            <input id="login-password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" autoComplete="current-password" style={inputField} {...register('password')} />
+            <button
+              type="button"
               onClick={() => setShowPassword((s) => !s)}
-              style={{ color: 'rgba(88,65,63,0.4)', fontSize: 18, cursor: 'pointer' }}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+              style={{ background: 'transparent', border: 'none', padding: 0, display: 'flex', cursor: 'pointer' }}
             >
-              {showPassword ? 'visibility_off' : 'visibility'}
-            </span>
+              <span className="material-symbols-outlined" aria-hidden="true" style={{ color: 'rgba(88,65,63,0.4)', fontSize: 18 }}>
+                {showPassword ? 'visibility_off' : 'visibility'}
+              </span>
+            </button>
           </div>
           {errors.password && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.password.message}</div>}
         </div>
@@ -100,12 +104,13 @@ export default function Login() {
             <input type="checkbox" {...register('remember')} style={{ accentColor: e360.primary, width: 15, height: 15, cursor: 'pointer' }} />
             <span style={{ fontSize: 12, color: e360.onSurfaceVariant }}>Keep session active</span>
           </label>
-          <span
+          <button
+            type="button"
             onClick={() => message.info('Please contact your administrator to reset your access key.')}
-            style={{ fontSize: 12, fontWeight: 600, color: e360.secondary, cursor: 'pointer' }}
+            style={{ fontSize: 12, fontWeight: 600, color: e360.secondary, cursor: 'pointer', background: 'transparent', border: 'none', padding: 0 }}
           >
             Reset Credentials
-          </span>
+          </button>
         </div>
 
         <button type="submit" disabled={loading} className="e360-cta" style={{
@@ -114,7 +119,7 @@ export default function Login() {
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         }}>
           {loading ? 'Signing In…' : 'Enter Ecosystem'}
-          {!loading && <span className="material-symbols-outlined e360-arrow" style={{ fontSize: 18 }}>arrow_forward</span>}
+          {!loading && <span className="material-symbols-outlined e360-arrow" aria-hidden="true" style={{ fontSize: 18 }}>arrow_forward</span>}
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -128,6 +133,7 @@ export default function Login() {
             <button
               key={p}
               type="button"
+              aria-label={`Sign in with ${p[0].toUpperCase() + p.slice(1)} — coming soon`}
               title={`${p[0].toUpperCase() + p.slice(1)} sign-in is coming soon`}
               onClick={() => message.info(`${p[0].toUpperCase() + p.slice(1)} sign-in is coming soon.`)}
               className="e360-social-btn"

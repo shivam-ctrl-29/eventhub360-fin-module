@@ -61,51 +61,63 @@ export default function Signup() {
         )}
 
         <div style={{ position: 'relative' }}>
-          <label style={floatingLabel}>Full Name</label>
+          <label htmlFor="signup-fullname" style={floatingLabel}>Full Name</label>
           <div style={inputWrap(!!errors.fullName)} className="e360-input-wrap">
-            <span className="material-symbols-outlined" style={iconStyle}>person</span>
-            <input placeholder="Jane Doe" autoComplete="name" style={inputField} {...register('fullName')} />
+            <span className="material-symbols-outlined" aria-hidden="true" style={iconStyle}>person</span>
+            <input id="signup-fullname" placeholder="Jane Doe" autoComplete="name" style={inputField} {...register('fullName')} />
           </div>
           {errors.fullName && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.fullName.message}</div>}
         </div>
 
         <div style={{ position: 'relative' }}>
-          <label style={floatingLabel}>Institutional Email</label>
+          <label htmlFor="signup-email" style={floatingLabel}>Institutional Email</label>
           <div style={inputWrap(!!errors.email)} className="e360-input-wrap">
-            <span className="material-symbols-outlined" style={iconStyle}>alternate_email</span>
-            <input type="email" placeholder="name@eventhub360.com" autoComplete="email" style={inputField} {...register('email')} />
+            <span className="material-symbols-outlined" aria-hidden="true" style={iconStyle}>alternate_email</span>
+            <input id="signup-email" type="email" placeholder="name@eventhub360.com" autoComplete="email" style={inputField} {...register('email')} />
           </div>
           {errors.email && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.email.message}</div>}
         </div>
 
         <div style={{ position: 'relative' }}>
-          <label style={floatingLabel}>Phone (Optional)</label>
+          <label htmlFor="signup-phone" style={floatingLabel}>Phone (Optional)</label>
           <div style={inputWrap(false)} className="e360-input-wrap">
-            <span className="material-symbols-outlined" style={iconStyle}>call</span>
-            <input placeholder="+91 98765 43210" autoComplete="tel" style={inputField} {...register('phone')} />
+            <span className="material-symbols-outlined" aria-hidden="true" style={iconStyle}>call</span>
+            <input id="signup-phone" placeholder="+91 98765 43210" autoComplete="tel" style={inputField} {...register('phone')} />
           </div>
         </div>
 
         <div style={{ position: 'relative' }}>
-          <label style={floatingLabel}>Access Key</label>
+          <label htmlFor="signup-password" style={floatingLabel}>Access Key</label>
           <div style={inputWrap(!!errors.password)} className="e360-input-wrap">
-            <span className="material-symbols-outlined" style={iconStyle}>key</span>
-            <input type={showPassword ? 'text' : 'password'} placeholder="At least 8 characters" autoComplete="new-password" style={inputField} {...register('password')} />
-            <span className="material-symbols-outlined" onClick={() => setShowPassword((s) => !s)} style={{ ...iconStyle, cursor: 'pointer' }}>
-              {showPassword ? 'visibility_off' : 'visibility'}
-            </span>
+            <span className="material-symbols-outlined" aria-hidden="true" style={iconStyle}>key</span>
+            <input id="signup-password" type={showPassword ? 'text' : 'password'} placeholder="At least 8 characters" autoComplete="new-password" style={inputField} {...register('password')} />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+              style={{ background: 'transparent', border: 'none', padding: 0, display: 'flex', cursor: 'pointer' }}
+            >
+              <span className="material-symbols-outlined" aria-hidden="true" style={iconStyle}>{showPassword ? 'visibility_off' : 'visibility'}</span>
+            </button>
           </div>
           {errors.password && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.password.message}</div>}
         </div>
 
         <div style={{ position: 'relative' }}>
-          <label style={floatingLabel}>Confirm Access Key</label>
+          <label htmlFor="signup-confirm-password" style={floatingLabel}>Confirm Access Key</label>
           <div style={inputWrap(!!errors.confirmPassword)} className="e360-input-wrap">
-            <span className="material-symbols-outlined" style={iconStyle}>key</span>
-            <input type={showConfirm ? 'text' : 'password'} placeholder="Re-enter your access key" autoComplete="new-password" style={inputField} {...register('confirmPassword')} />
-            <span className="material-symbols-outlined" onClick={() => setShowConfirm((s) => !s)} style={{ ...iconStyle, cursor: 'pointer' }}>
-              {showConfirm ? 'visibility_off' : 'visibility'}
-            </span>
+            <span className="material-symbols-outlined" aria-hidden="true" style={iconStyle}>key</span>
+            <input id="signup-confirm-password" type={showConfirm ? 'text' : 'password'} placeholder="Re-enter your access key" autoComplete="new-password" style={inputField} {...register('confirmPassword')} />
+            <button
+              type="button"
+              onClick={() => setShowConfirm((s) => !s)}
+              aria-label={showConfirm ? 'Hide password' : 'Show password'}
+              aria-pressed={showConfirm}
+              style={{ background: 'transparent', border: 'none', padding: 0, display: 'flex', cursor: 'pointer' }}
+            >
+              <span className="material-symbols-outlined" aria-hidden="true" style={iconStyle}>{showConfirm ? 'visibility_off' : 'visibility'}</span>
+            </button>
           </div>
           {errors.confirmPassword && <div style={{ fontSize: 11, color: e360.error, marginTop: 4 }}>{errors.confirmPassword.message}</div>}
         </div>
@@ -116,7 +128,7 @@ export default function Signup() {
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         }}>
           {loading ? 'Creating Access…' : 'Request Clearance'}
-          {!loading && <span className="material-symbols-outlined e360-arrow" style={{ fontSize: 18 }}>arrow_forward</span>}
+          {!loading && <span className="material-symbols-outlined e360-arrow" aria-hidden="true" style={{ fontSize: 18 }}>arrow_forward</span>}
         </button>
 
         <p style={{ textAlign: 'center', fontSize: 12, color: e360.onSurfaceVariant, margin: 0 }}>

@@ -93,7 +93,7 @@ export default function AuthLayout({ title, subtitle, icon, children }: AuthLayo
               {snap.momGrowthPct !== null && (
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: snap.momGrowthPct >= 0 ? e360.secondary : e360.error, fontWeight: 700, fontSize: 13, justifyContent: 'flex-end' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{snap.momGrowthPct >= 0 ? 'trending_up' : 'trending_down'}</span>
+                    <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 16 }}>{snap.momGrowthPct >= 0 ? 'trending_up' : 'trending_down'}</span>
                     {snap.momGrowthPct >= 0 ? '+' : ''}{snap.momGrowthPct}%
                   </span>
                   <p style={{ fontSize: 11, color: 'rgba(88,65,63,0.5)', margin: '2px 0 0' }}>v. last month</p>
@@ -128,7 +128,7 @@ export default function AuthLayout({ title, subtitle, icon, children }: AuthLayo
               <div style={{ textAlign: 'right' }}>
                 <span style={{ fontSize: 11, color: 'rgba(88,65,63,0.55)', display: 'block' }}>Avg Collection</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end', fontSize: 18, fontWeight: 700, color: e360.secondary }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+                  <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>verified_user</span>
                   {snap.avgCollectionDays !== null ? `${snap.avgCollectionDays}d` : '—'}
                 </span>
               </div>
@@ -139,7 +139,7 @@ export default function AuthLayout({ title, subtitle, icon, children }: AuthLayo
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <div className="e360-glass e360-floating-delayed" style={{ borderRadius: 16, padding: 16, display: 'flex', alignItems: 'center', gap: 12, flex: '1 1 200px' }}>
               <div style={{ width: 40, height: 40, borderRadius: '50%', background: e360.secondaryContainer, display: 'flex', alignItems: 'center', justifyContent: 'center', color: e360.onSecondaryContainer, flexShrink: 0 }}>
-                <span className="material-symbols-outlined">payments</span>
+                <span className="material-symbols-outlined" aria-hidden="true">payments</span>
               </div>
               <div>
                 <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: e360.onSurfaceVariant, margin: 0, letterSpacing: '0.06em' }}>Recent Flow</p>
@@ -150,7 +150,7 @@ export default function AuthLayout({ title, subtitle, icon, children }: AuthLayo
             </div>
             <div className="e360-glass e360-floating-more-delayed" style={{ borderRadius: 16, padding: 16, display: 'flex', alignItems: 'center', gap: 12, flex: '1 1 200px' }}>
               <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#ffdad6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: e360.primaryContainer, flexShrink: 0 }}>
-                <span className="material-symbols-outlined">fact_check</span>
+                <span className="material-symbols-outlined" aria-hidden="true">fact_check</span>
               </div>
               <div>
                 <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: e360.onSurfaceVariant, margin: 0, letterSpacing: '0.06em' }}>Collection Rate</p>
@@ -179,7 +179,7 @@ export default function AuthLayout({ title, subtitle, icon, children }: AuthLayo
           <div className="e360-glass e360-card-hover" style={{ width: '100%', maxWidth: 440, borderRadius: 24, padding: isMobile ? 28 : 36, position: 'relative', zIndex: 10 }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
               <div style={{ width: 60, height: 60, background: e360.surfaceContainer, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14, border: '1px solid rgba(255,255,255,0.5)' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 28, color: e360.primary, fontVariationSettings: "'FILL' 1" }}>{icon}</span>
+                <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 28, color: e360.primary, fontVariationSettings: "'FILL' 1" }}>{icon}</span>
               </div>
               <h2 style={{ fontSize: 22, fontWeight: 700, color: e360.primary, margin: 0 }}>{title}</h2>
               <p style={{ fontSize: 13, color: 'rgba(88,65,63,0.7)', marginTop: 6, textAlign: 'center' }}>{subtitle}</p>
