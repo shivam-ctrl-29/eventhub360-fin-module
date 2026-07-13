@@ -189,7 +189,7 @@ export default function CreditDebitNote() {
         )}
         {!isLoading && allNotes.map((n, i) => {
           const typeStyle   = TYPE_STYLE[n.type]
-          const statusStyle = STATUS_STYLE[n.status] ?? STATUS_STYLE['issued']
+          const statusStyle = STATUS_STYLE[n.status?.toLowerCase()] ?? STATUS_STYLE['issued']
           return (
             <div key={n.id} style={{ display: 'grid', gridTemplateColumns: '130px 80px 110px 1.5fr 1.5fr 110px 100px 90px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#8B1A1A' }}>{n.noteNumber}</div>

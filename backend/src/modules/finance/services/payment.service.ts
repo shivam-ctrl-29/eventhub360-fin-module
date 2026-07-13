@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Payment } from '../entities/payment.entity'
+import { Invoice } from '../entities/invoice.entity'
 import { RecordPaymentDto, PaymentListDto } from '../dto/payment.dto'
 import { AuditService } from './audit.service'
 
@@ -11,6 +12,7 @@ const safeId = (userId: string) => (userId && /^\d+$/.test(userId) ? userId : '1
 export class PaymentService {
   constructor(
     @InjectRepository(Payment) private readonly repo: Repository<Payment>,
+    @InjectRepository(Invoice) private readonly invoiceRepo: Repository<Invoice>,
     private readonly audit: AuditService,
   ) {}
 
@@ -39,17 +41,24 @@ export class PaymentService {
         createdBy: uid,
       })
       const saved = await this.repo.save(pay)
+
+      // Recording a payment must reduce the invoice balance and roll its status
+      // forward — otherwise the books never reflect that money came in.
+      const inv = await this.invoiceRepo.findOne({ where: { invoiceId: dto.invoiceId } })
+      if (inv) {
+        const newBalance = Math.max(0, Number(inv.balance) - Number(dto.amount))
+        await this.invoiceRepo.update(
+          { invoiceId: dto.invoiceId },
+          { balance: newBalance, status: newBalance <= 0 ? 'Paid' : 'Partial', updatedBy: uid },
+        )
+      }
+
       await this.audit.log(uid, 'RECORD_PAYMENT', 'payment', saved.paymentId, `Payment recorded for invoice ${dto.invoiceId}`, 'success')
       return this.format(saved)
     } catch (err) {
+      // No mock fallback — a failed save must surface as an error, never fake success.
       console.error('[PaymentService.record]', (err as any)?.message ?? err)
-      return {
-        id: 'mock-' + Date.now(), invoiceId: dto.invoiceId,
-        mode: dto.paymentMode, amount: dto.amount,
-        gatewayRef: dto.utrNumber ?? null,
-        paidAt: dto.paymentDate ?? new Date().toISOString(),
-        createdAt: new Date(),
-      }
+      throw err
     }
   }
 

@@ -27,8 +27,9 @@ export class ExpenseService {
       await this.audit.log(uid, 'CREATE_EXPENSE', 'expense', saved.expenseId, `Expense created: ${dto.category}`, 'success')
       return this.format(saved)
     } catch (err) {
+      // No mock fallback — a failed save must surface as an error, never fake success.
       console.error('[ExpenseService.create]', (err as any)?.message ?? err)
-      return { id: 'mock-' + Date.now(), category: dto.category, description: dto.description, amount: dto.amount, status: 'pending', createdAt: new Date() }
+      throw err
     }
   }
 

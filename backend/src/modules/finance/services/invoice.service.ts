@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Invoice, InvoiceLine } from '../entities/invoice.entity'
 import { CreditNote } from '../entities/credit-note.entity'
-import { CreateInvoiceDto, InvoiceListDto } from '../dto/invoice.dto'
+import { CreateInvoiceDto, InvoiceListDto, CreateCreditNoteDto } from '../dto/invoice.dto'
 import { AuditService } from './audit.service'
 
 let invoiceSeq = 1000
@@ -24,7 +24,7 @@ export class InvoiceService {
     try {
       const qb = this.invoiceRepo.createQueryBuilder('inv')
         .orderBy(sortBy === 'total' ? 'inv.total' : 'inv.createdAt', sortOrder.toUpperCase() as 'ASC' | 'DESC')
-      if (status) qb.andWhere('inv.status = :status', { status })
+      if (status) qb.andWhere('LOWER(inv.status) = LOWER(:status)', { status })
       if (search) qb.andWhere('inv.invoiceNo ILIKE :s', { s: `%${search}%` })
       if (dateFrom) qb.andWhere('inv.createdAt >= :dateFrom', { dateFrom })
       if (dateTo) qb.andWhere('inv.createdAt <= :dateTo', { dateTo })
@@ -72,8 +72,9 @@ export class InvoiceService {
       await this.audit.log(uid, 'CREATE_INVOICE', 'invoice', saved.invoiceId, `Invoice ${invoiceNo} created`, 'success')
       return this.format(saved)
     } catch (err) {
+      // No mock fallback — a failed save must surface as an error, never fake success.
       console.error('[InvoiceService.create]', (err as any)?.message ?? err)
-      return this.mockInvoice(invoiceNo, dto, subtotal, taxTotal, total)
+      throw err
     }
   }
 
@@ -118,21 +119,59 @@ export class InvoiceService {
   }
 
   async getCreditNotes(params: InvoiceListDto) {
-    const { page = 1, limit = 20 } = params
-    try {
-      const [rows, total] = await this.creditNoteRepo.findAndCount({
-        order: { createdAt: 'DESC' }, skip: (page - 1) * limit, take: limit,
-      })
-      return {
-        data: rows.map((cn) => ({
-          id: cn.creditNoteId, invoiceId: cn.invoiceId,
-          amount: Number(cn.amount), reason: cn.reason, createdAt: cn.createdAt,
-        })),
-        total,
-      }
-    } catch { return { data: [], total: 0 } }
+    return this.getNotes(params, 'credit')
   }
-  async getDebitNotes(_params: InvoiceListDto) { return { data: [], total: 0 } }
+
+  async getDebitNotes(params: InvoiceListDto) {
+    return this.getNotes(params, 'debit')
+  }
+
+  private async getNotes(params: InvoiceListDto, noteType: 'credit' | 'debit') {
+    const { page = 1, limit = 20 } = params
+    const [rows, total] = await this.creditNoteRepo.findAndCount({
+      where: { noteType },
+      order: { createdAt: 'DESC' }, skip: (page - 1) * limit, take: limit,
+    })
+    // Resolve invoice numbers for display in one query
+    const invoiceIds = [...new Set(rows.map((cn) => cn.invoiceId))]
+    const invoices = invoiceIds.length
+      ? await this.invoiceRepo.createQueryBuilder('inv').where('inv.invoiceId IN (:...ids)', { ids: invoiceIds }).getMany()
+      : []
+    const numberById = new Map(invoices.map((inv) => [String(inv.invoiceId), inv.invoiceNo]))
+    return {
+      data: rows.map((cn) => ({
+        id: cn.creditNoteId, invoiceId: cn.invoiceId,
+        originalInvoiceNumber: numberById.get(String(cn.invoiceId)) ?? `#${cn.invoiceId}`,
+        amount: Number(cn.amount), reason: cn.reason, createdAt: cn.createdAt,
+      })),
+      total,
+    }
+  }
+
+  async createNote(dto: CreateCreditNoteDto, noteType: 'credit' | 'debit', userId: string) {
+    const uid = safeId(userId)
+    // The form accepts either an internal id or an invoice number like INV-2026-0001
+    const ref = dto.originalInvoiceId.trim()
+    const inv = await this.invoiceRepo.createQueryBuilder('inv')
+      .where('inv.invoiceNo ILIKE :no', { no: ref })
+      .orWhere(/^\d+$/.test(ref) ? 'inv.invoiceId = :id' : '1=0', { id: ref })
+      .getOne()
+    if (!inv) throw new NotFoundException(`Invoice "${ref}" not found`)
+
+    const note = this.creditNoteRepo.create({
+      tenantId: '1', companyId: '1',
+      invoiceId: inv.invoiceId, noteType,
+      amount: dto.grandTotal, reason: dto.reason || '—',
+      createdBy: uid,
+    })
+    const saved = await this.creditNoteRepo.save(note)
+    await this.audit.log(uid, noteType === 'credit' ? 'CREATE_CREDIT_NOTE' : 'CREATE_DEBIT_NOTE', 'credit_note', saved.creditNoteId, `${noteType === 'credit' ? 'Credit' : 'Debit'} note of ${dto.grandTotal} against ${inv.invoiceNo}`, 'success')
+    return {
+      id: saved.creditNoteId, invoiceId: saved.invoiceId,
+      originalInvoiceNumber: inv.invoiceNo,
+      amount: Number(saved.amount), reason: saved.reason, createdAt: saved.createdAt,
+    }
+  }
 
   private format(inv: Invoice) {
     return {
@@ -147,11 +186,4 @@ export class InvoiceService {
     }
   }
 
-  private mockInvoice(invoiceNo: string, dto: CreateInvoiceDto, subtotal: number, taxTotal: number, total: number) {
-    return {
-      id: 'mock-' + Date.now(), invoiceNumber: invoiceNo, type: 'Tax', status: 'Draft',
-      lineItems: dto.lineItems.map((li, i) => ({ id: `li-${i}`, description: li.description, quantity: li.quantity, unitPrice: li.unitPrice, amount: li.quantity * li.unitPrice })),
-      subtotal, taxTotal, total, balance: total, createdAt: new Date(), updatedAt: new Date(),
-    }
-  }
 }

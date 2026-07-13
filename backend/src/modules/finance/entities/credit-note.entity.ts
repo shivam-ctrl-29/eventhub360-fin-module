@@ -17,6 +17,9 @@ export class CreditNote {
   @Column({ name: 'invoice_id', type: 'bigint' })
   invoiceId: string;
 
+  @Column({ name: 'note_type', length: 6, default: 'credit' })
+  noteType: string;
+
   @Column({ type: 'decimal', precision: 14, scale: 2 })
   amount: number;
 

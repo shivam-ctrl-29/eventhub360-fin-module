@@ -51,11 +51,11 @@ export class InvoiceController {
 
   @Post('credit-notes')
   async createCreditNote(@Body() body: CreateCreditNoteDto) {
-    return ok({ id: 'mock', ...body }, 'Credit note created')
+    return ok(await this.svc.createNote(body, 'credit', DEMO_USER), 'Credit note created')
   }
 
   @Post('debit-notes')
-  async createDebitNote(@Body() body: Record<string, unknown>) {
-    return ok({ id: 'mock', ...body }, 'Debit note created')
+  async createDebitNote(@Body() body: CreateCreditNoteDto) {
+    return ok(await this.svc.createNote(body, 'debit', DEMO_USER), 'Debit note created')
   }
 }

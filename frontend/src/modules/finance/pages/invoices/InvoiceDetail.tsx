@@ -11,6 +11,7 @@ const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
   overdue:   { bg: '#FEE2E2', color: '#991B1B' },
   paid:      { bg: '#D1FAE5', color: '#065F46' },
   sent:      { bg: '#FEF3C7', color: '#92400E' },
+  issued:    { bg: '#FEF3C7', color: '#92400E' },
   draft:     { bg: '#F1F5F9', color: '#475569' },
   partial:   { bg: '#EDE9FE', color: '#5B21B6' },
   cancelled: { bg: '#F1F5F9', color: '#94a3b8' },
@@ -25,7 +26,7 @@ export default function InvoiceDetail() {
   if (isLoading) return <div style={{ padding: 32 }}><Skeleton active paragraph={{ rows: 10 }} /></div>
   if (isError || !invoice) return <Alert type="error" message="Failed to load invoice." style={{ margin: 24 }} />
 
-  const statusStyle = STATUS_STYLE[invoice.status] ?? STATUS_STYLE['draft']
+  const statusStyle = STATUS_STYLE[invoice.status?.toLowerCase()] ?? STATUS_STYLE['draft']
 
   return (
     <div>

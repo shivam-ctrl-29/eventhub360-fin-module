@@ -33,5 +33,11 @@ export class InvoiceListDto extends PaginationDto {
 export class CreateCreditNoteDto {
   @IsString() originalInvoiceId: string
   @IsString() reason: string
-  @IsArray() @ValidateNested({ each: true }) @Type(() => LineItemDto) lineItems: LineItemDto[]
+  @IsNumber() @Min(0.01) grandTotal: number
+  @IsOptional() @IsNumber() totalAmount?: number
+  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => LineItemDto) lineItems?: LineItemDto[]
+  @IsOptional() @IsString() customerId?: string
+  @IsOptional() @IsString() customerName?: string
+  @IsOptional() @IsString() vendorId?: string
+  @IsOptional() @IsString() vendorName?: string
 }

@@ -17,18 +17,20 @@ const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
   overdue:    { bg: '#FEE2E2', color: '#991B1B' },
   pending:    { bg: '#FEF3C7', color: '#92400E' },
   sent:       { bg: '#FEF3C7', color: '#92400E' },
+  issued:     { bg: '#FEF3C7', color: '#92400E' },
   paid:       { bg: '#D1FAE5', color: '#065F46' },
   draft:      { bg: '#F1F5F9', color: '#475569' },
   partial:    { bg: '#EDE9FE', color: '#5B21B6' },
   cancelled:  { bg: '#F1F5F9', color: '#94a3b8' },
 }
 
+// Values must match what the backend stores ('Paid'/'Issued'/...); matching is case-insensitive.
 const FILTERS: Array<{ label: string; value: InvoiceStatus | 'all' }> = [
   { label: 'All',       value: 'all' },
-  { label: 'Paid',      value: 'paid' },
-  { label: 'Pending',   value: 'sent' },
-  { label: 'Overdue',   value: 'overdue' },
-  { label: 'Draft',     value: 'draft' },
+  { label: 'Paid',      value: 'paid' as InvoiceStatus },
+  { label: 'Pending',   value: 'issued' as InvoiceStatus },
+  { label: 'Partial',   value: 'partial' as InvoiceStatus },
+  { label: 'Draft',     value: 'draft' as InvoiceStatus },
 ]
 
 export default function InvoiceList() {
@@ -157,7 +159,7 @@ export default function InvoiceList() {
 
         {/* Rows */}
         {!isLoading && invoices.map((inv, i) => {
-          const style = STATUS_STYLE[inv.status] ?? STATUS_STYLE['draft']
+          const style = STATUS_STYLE[inv.status?.toLowerCase()] ?? STATUS_STYLE['draft']
           return (
             <div key={inv.id} style={{ display: 'grid', gridTemplateColumns: '140px 1.5fr 1.5fr 100px 100px 130px 100px 80px', padding: '14px 20px', alignItems: 'center', borderTop: i === 0 ? 'none' : '1px solid #F5F0EB' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#8B1A1A' }}>{inv.invoiceNumber}</div>
